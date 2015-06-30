@@ -40,7 +40,7 @@ class TgBot:
             'sendMessage',
             chat_id=message["chat"]["id"],
             text=text,
-            disable_web_page_preview=True,
+            disable_web_page_preview='true',
             reply_to_message_id=message["message_id"])
 
     def command(self, regexp):
