@@ -23,6 +23,7 @@ class TgBot:
         self.session = aiohttp.ClientSession(connector=conn)
         self.running = True
         self._default = lambda m: None
+        self._location = lambda m: None
 
     @asyncio.coroutine
     def api_call(self, method, **params):
@@ -63,8 +64,16 @@ class TgBot:
         self._default = callback
         return callback
 
+    def location(self, callback):
+        """Set callback for location messages"""
+        self._location = callback
+        return callback
+
     @asyncio.coroutine
     def _process_message(self, message):
+        if "location" in message:
+            return self._location(message)
+
         if "text" not in message:
             return
         text = message["text"].lower()
@@ -101,3 +110,5 @@ class TgBot:
                 offset = max(offset, update["update_id"])
                 message = update["message"]
                 asyncio.async(self._process_message(message))
+
+        self.session.close()
