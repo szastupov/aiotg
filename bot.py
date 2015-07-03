@@ -8,14 +8,13 @@ API_TIMEOUT = 60
 
 
 class TgBot:
-    """Telegram bot framework designed for asyncio
-
-    Args:
-        api_token - Telegram bot token, ask @BotFather for this
-        api_timeout (optional) - Timeout for long polling
-    """
+    """Telegram bot framework designed for asyncio"""
 
     def __init__(self, api_token, api_timeout=API_TIMEOUT):
+        """
+        api_token - Telegram bot token, ask @BotFather for this
+        api_timeout (optional) - Timeout for long polling
+        """
         self.api_token = api_token
         self.api_timeout = api_timeout
         self.commands = []
