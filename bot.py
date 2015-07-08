@@ -31,12 +31,20 @@ class TgMessage:
         title = " ".join(filter(None, (user.get(part) for part in parts)))
         return title
 
+    def is_group(self):
+        return "chat" in self.data and "title" in self.data["chat"]
+
+
+class TextMessage(TgMessage):
     @property
     def text(self):
         return self.data["text"]
 
-    def is_group(self):
-        return "chat" in self.data and "title" in self.data["chat"]
+
+class LocationMessage(TgMessage):
+    @property
+    def location(self):
+        return self.data["location"]
 
 
 class TgBot:
@@ -96,13 +104,13 @@ class TgBot:
     @asyncio.coroutine
     def _process_message(self, message):
         if "location" in message:
-            return self._location(message)
+            return self._location(LocationMessage(self, message))
 
         if "text" not in message:
             return
 
         text = message["text"].lower()
-        tgm = TgMessage(self, message)
+        tgm = TextMessage(self, message)
 
         for patterns, handler in self.commands:
             m = re.search(patterns, text)
