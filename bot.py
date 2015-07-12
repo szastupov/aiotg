@@ -5,6 +5,10 @@ import aiohttp
 
 from functools import partialmethod
 
+__author__ = "Stepan Zastupov"
+__copyright__ = "Copyright 2015, Stepan Zastupov"
+__license__ = "MIT"
+
 API_URL = "https://api.telegram.org"
 API_TIMEOUT = 60
 
@@ -60,7 +64,7 @@ class TgBot:
         self.commands = []
         conn = aiohttp.TCPConnector(verify_ssl=False)
         self.session = aiohttp.ClientSession(connector=conn)
-        self.running = True
+        self._running = True
         self._default = lambda m: None
         self._location = lambda m: None
 
@@ -121,6 +125,10 @@ class TgBot:
         if not tgm.is_group():
             return self._default(tgm)
 
+    def stop(self):
+        self._running = False
+        self.session.close()
+
     @asyncio.coroutine
     def loop(self):
         """Return bot's main loop as coroutine
@@ -133,7 +141,7 @@ class TgBot:
         loop.create_task(bot.loop())
         """
         offset = 0
-        while self.running:
+        while self._running:
             resp = yield from self.api_call(
                 'getUpdates',
                 offset=offset+1,
@@ -145,4 +153,9 @@ class TgBot:
                 message = update["message"]
                 asyncio.async(self._process_message(message))
 
-        self.session.close()
+    def run(self):
+        loop = asyncio.get_event_loop()
+        try:
+            loop.run_until_complete(self.loop())
+        except KeyboardInterrupt:
+            self.stop()
