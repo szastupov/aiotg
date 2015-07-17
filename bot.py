@@ -18,6 +18,7 @@ class TgMessage:
     def __init__(self, bot, data):
         self.bot = bot
         self.data = data
+        self.sender = data['from'].get('username', data['from']['first_name'])
 
     def reply(self, text):
         """Reply to this message"""
@@ -27,13 +28,6 @@ class TgMessage:
             disable_web_page_preview='true',
             reply_to_message_id=self.data["message_id"]
         )
-
-    @property
-    def sender(self):
-        user = self.data["from"]
-        parts = ["first_name", "last_name", "username"]
-        title = " ".join(filter(None, (user.get(part) for part in parts)))
-        return title
 
     def is_group(self):
         return "chat" in self.data and "title" in self.data["chat"]
