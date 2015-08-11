@@ -5,44 +5,14 @@ import aiohttp
 
 from functools import partialmethod
 
+from . message import *
+
 __author__ = "Stepan Zastupov"
 __copyright__ = "Copyright 2015, Stepan Zastupov"
 __license__ = "MIT"
 
 API_URL = "https://api.telegram.org"
 API_TIMEOUT = 60
-
-
-class TgMessage:
-    """High-level wrapper around Telegram message"""
-    def __init__(self, bot, data):
-        self.bot = bot
-        self.data = data
-        self.sender = data['from'].get('username', data['from']['first_name'])
-
-    def reply(self, text):
-        """Reply to this message"""
-        return self.bot._send_message(
-            chat_id=self.data["chat"]["id"],
-            text=text,
-            disable_web_page_preview='true',
-            reply_to_message_id=self.data["message_id"]
-        )
-
-    def is_group(self):
-        return "chat" in self.data and "title" in self.data["chat"]
-
-
-class TextMessage(TgMessage):
-    @property
-    def text(self):
-        return self.data["text"]
-
-
-class LocationMessage(TgMessage):
-    @property
-    def location(self):
-        return self.data["location"]
 
 
 class TgBot:
@@ -59,8 +29,12 @@ class TgBot:
         conn = aiohttp.TCPConnector(verify_ssl=False)
         self.session = aiohttp.ClientSession(connector=conn)
         self._running = True
+
         self._default = lambda m: None
-        self._location = lambda m: None
+
+        def no_handle(mt):
+            return lambda msg: logging.debug("no handle for %s", mt)
+        self._handlers = {mt:no_handle(mt) for mt in MESSAGE_TYPES}
 
     @asyncio.coroutine
     def api_call(self, method, **params):
@@ -73,6 +47,7 @@ class TgBot:
         return (yield from response.json())
 
     _send_message = partialmethod(api_call, "sendMessage")
+    _send_photo = partialmethod(api_call, "sendPhoto")
 
     def command(self, regexp):
         """Decorator for registering commands
@@ -96,13 +71,24 @@ class TgBot:
 
     def location(self, callback):
         """Set callback for location messages"""
-        self._location = callback
+        self._handlers["location"] = callback
+        return callback
+
+    def photo(self, callback):
+        """Set callback for incoming photos"""
+        self._handlers["photo"] = callback
+        return callback
+
+    def document(self, callback):
+        """Set callback for incoming documents"""
+        self._handlers["document"] = callback
         return callback
 
     @asyncio.coroutine
     def _process_message(self, message):
-        if "location" in message:
-            return self._location(LocationMessage(self, message))
+        for mt, wrapper in MESSAGE_TYPES.items():
+            if mt in message:
+                return self._handlers[mt](wrapper(self, message))
 
         if "text" not in message:
             return
