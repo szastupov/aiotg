@@ -6,6 +6,7 @@ class TgMessage:
         self.bot = bot
         self.data = data
         self.sender = data['from'].get('username', data['from']['first_name'])
+        self.chat_id = data['chat']['id']
 
     def reply(self, text, markup=None):
         """Reply to this message"""
