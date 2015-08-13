@@ -16,6 +16,7 @@ API_TIMEOUT = 60
 
 
 class TgBot:
+
     """Telegram bot framework designed for asyncio"""
 
     def __init__(self, api_token, api_timeout=API_TIMEOUT):
@@ -34,7 +35,7 @@ class TgBot:
 
         def no_handle(mt):
             return lambda msg: logging.debug("no handle for %s", mt)
-        self._handlers = {mt:no_handle(mt) for mt in MESSAGE_TYPES}
+        self._handlers = {mt: no_handle(mt) for mt in MESSAGE_TYPES}
 
     @asyncio.coroutine
     def api_call(self, method, **params):
@@ -48,6 +49,10 @@ class TgBot:
 
     _send_message = partialmethod(api_call, "sendMessage")
     _send_photo = partialmethod(api_call, "sendPhoto")
+
+    @asyncio.coroutine
+    def send_message(self, chat_id, text):
+        yield from self._send_message(chat_id=chat_id, text=text, disable_web_page_preview='true')
 
     def command(self, regexp):
         """Decorator for registering commands
@@ -124,7 +129,7 @@ class TgBot:
         while self._running:
             resp = yield from self.api_call(
                 'getUpdates',
-                offset=offset+1,
+                offset=offset + 1,
                 timeout=self.api_timeout)
 
             for update in resp["result"]:
