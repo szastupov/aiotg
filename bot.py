@@ -48,9 +48,9 @@ class TgBot:
     _send_message = partialmethod(api_call, "sendMessage")
     _send_photo = partialmethod(api_call, "sendPhoto")
 
-    @asyncio.coroutine
-    def send_message(self, chat_id, text):
-        yield from self._send_message(chat_id=chat_id, text=text, disable_web_page_preview='true')
+    def send_message(self, chat_id, text, **kwargs):
+        """Send a text message to chat"""
+        return self._send_message(chat_id=chat_id, text=text, **kwargs)
 
     def command(self, regexp):
         """Decorator for registering commands

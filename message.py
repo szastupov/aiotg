@@ -1,5 +1,6 @@
 import json
 
+
 class TgMessage:
     """High-level wrapper around Telegram message"""
     def __init__(self, bot, data):
@@ -42,24 +43,30 @@ class LocationMessage(TgMessage):
     def location(self):
         return self.data["location"]
 
+
 class PhotoMessage(TgMessage):
     @property
     def photos(self):
         return self.data["photo"]
+
 
 class DocumentMessage(TgMessage):
     @property
     def document(self):
         return self.data["document"]
 
+
 class AudioMessage(TgMessage):
     pass
+
 
 class StickerMessage(TgMessage):
     pass
 
+
 class VideoMessage(TgMessage):
     pass
+
 
 class ContactMessage(TgMessage):
     pass
