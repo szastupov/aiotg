@@ -26,8 +26,6 @@ class TgBot:
         self.api_token = api_token
         self.api_timeout = api_timeout
         self.commands = []
-        conn = aiohttp.TCPConnector(verify_ssl=False)
-        self.session = aiohttp.ClientSession(connector=conn)
         self._running = True
 
         self._default = lambda m: None
@@ -42,7 +40,7 @@ class TgBot:
         See https://core.telegram.org/bots/api for the reference
         """
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
-        response = yield from self.session.request('POST', url, data=params)
+        response = yield from aiohttp.post(url, data=params)
         assert response.status == 200
         return (yield from response.json())
 
@@ -107,7 +105,6 @@ class TgBot:
 
     def stop(self):
         self._running = False
-        self.session.close()
 
     @asyncio.coroutine
     def loop(self):
