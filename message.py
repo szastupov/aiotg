@@ -17,7 +17,7 @@ class TgMessage:
             reply_markup=json.dumps(markup)
         )
 
-    def replyPhoto(self, photo, caption=None, markup=None):
+    def reply_photo(self, photo, caption=None, markup=None):
         return self.bot._send_photo(
             chat_id=self.data["chat"]["id"],
             photo=photo,
