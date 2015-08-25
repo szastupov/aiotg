@@ -10,7 +10,7 @@ Install it with pip:
 
 .. code:: sh
 
-    pip install git+https://github.com/szastupov/aiotg.git@setup
+    pip install aiotg
 
 Then you can create a new bot in few lines:
 
