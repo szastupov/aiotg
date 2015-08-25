@@ -3,15 +3,16 @@ aiotg
 
 Asynchronous Python API for building Telegram bots
 
-This module is under heavy development, so it's not on PyPI yet. The
-current recommended way to use it is as GIT submodule:
+This module is under heavy development, so the API is not stable yet,
+but you are encouraged to play with it and report any issues and suggestions.
+
+Install it with pip:
 
 .. code:: sh
 
-    git submodule add https://github.com/szastupov/aiotg.git
-    pip install -r ./aiotg/requirements.txt
+    pip install git+https://github.com/szastupov/aiotg.git@setup
 
-You can create a new bot in a few lines:
+Then you can create a new bot in few lines:
 
 .. code:: python
 
