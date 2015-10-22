@@ -42,11 +42,12 @@ class TgBot:
         """
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         response = yield from aiohttp.post(url, data=params)
-        assert response.status == 200
+        if response.status != 200:
+            err_msg = yield from response.read()
+            raise RuntimeError(err_msg)
         return (yield from response.json())
 
     _send_message = partialmethod(api_call, "sendMessage")
-    _send_photo = partialmethod(api_call, "sendPhoto")
 
     def send_message(self, chat_id, text, **kwargs):
         """Send a text message to chat"""
@@ -72,32 +73,26 @@ class TgBot:
         self._default = callback
         return callback
 
-    def location(self, callback):
-        """Set callback for location messages"""
-        self._handlers["location"] = callback
-        return callback
-
-    def photo(self, callback):
-        """Set callback for incoming photos"""
-        self._handlers["photo"] = callback
-        return callback
-
-    def document(self, callback):
-        """Set callback for incoming documents"""
-        self._handlers["document"] = callback
-        return callback
+    def handle(self, msg_type):
+        """Set handler for specific message type"""
+        def wrap(callback):
+            self._handlers[msg_type] = callback
+            return callback
+        return wrap
 
     @asyncio.coroutine
     def _process_message(self, message):
-        for mt, wrapper in MESSAGE_TYPES.items():
+        chat = TgChat(self, message["chat"])
+
+        for mt in MESSAGE_TYPES:
             if mt in message:
-                return self._handlers[mt](wrapper(self, message))
+                return self._handlers[mt](chat, message[mt])
 
         if "text" not in message:
             return
 
         text = message["text"].lower()
-        tgm = TextMessage(self, message)
+        tgm = TgMessage(self, message)
 
         for patterns, handler in self.commands:
             m = re.search(patterns, text)
@@ -105,7 +100,7 @@ class TgBot:
                 return handler(tgm, m)
 
         # No match, run default if it's a 1to1 chat
-        if not tgm.is_group():
+        if not chat.is_group():
             return self._default(tgm)
 
     def stop(self):
