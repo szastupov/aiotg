@@ -5,14 +5,53 @@ import aiohttp
 
 from functools import partialmethod
 
-from . message import *
-
 __author__ = "Stepan Zastupov"
 __copyright__ = "Copyright 2015, Stepan Zastupov"
 __license__ = "MIT"
 
 API_URL = "https://api.telegram.org"
 API_TIMEOUT = 60
+
+MESSAGE_TYPES = [
+    "location", "photo", "document", "audio", "voice", "sticker", "contact"
+]
+
+class TgChat:
+    def __init__(self, bot, message):
+        self.bot = bot
+        self.message = message
+        chat = message['chat']
+        self.id = chat['id']
+        self.type = chat['type']
+
+    def send_text(self, text, **kwargs):
+        return self.bot.send_message(self.id, text, **kwargs)
+
+    def _send_to_chat(self, method, **options):
+        return self.bot.api_call(
+            method,
+            chat_id=self.id,
+            **options
+        )
+
+    send_audio = partialmethod(_send_to_chat, "sendAudio")
+    send_photo = partialmethod(_send_to_chat, "sendPhoto")
+    send_video = partialmethod(_send_to_chat, "sendVideo")
+    send_document = partialmethod(_send_to_chat, "sendDocument")
+    send_sticker = partialmethod(_send_to_chat, "sendSticker")
+    send_voice = partialmethod(_send_to_chat, "sendVoice")
+    send_locaton = partialmethod(_send_to_chat, "sendLocation")
+
+    def forward_message(self, from_chat_id, message_id):
+        return self.bot.api_call(
+            "forwardMessage",
+            chat_id=self.id,
+            from_chat_id=from_chat_id,
+            message_id=message_id
+        )
+
+    def is_group(self):
+        return self.type == "group"
 
 
 class TgBot:
@@ -29,7 +68,7 @@ class TgBot:
         self.commands = []
         self._running = True
 
-        self._default = lambda m: None
+        self._default = lambda c, m: None
 
         def no_handle(mt):
             return lambda msg: logging.debug("no handle for %s", mt)
@@ -82,7 +121,7 @@ class TgBot:
 
     @asyncio.coroutine
     def _process_message(self, message):
-        chat = TgChat(self, message["chat"])
+        chat = TgChat(self, message)
 
         for mt in MESSAGE_TYPES:
             if mt in message:
@@ -92,16 +131,15 @@ class TgBot:
             return
 
         text = message["text"].lower()
-        tgm = TgMessage(self, message)
 
         for patterns, handler in self.commands:
             m = re.search(patterns, text)
             if m:
-                return handler(tgm, m)
+                return handler(chat, m)
 
         # No match, run default if it's a 1to1 chat
         if not chat.is_group():
-            return self._default(tgm)
+            return self._default(chat, message)
 
     def stop(self):
         self._running = False
