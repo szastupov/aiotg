@@ -20,6 +20,7 @@ class TgChat:
     def __init__(self, bot, message):
         self.bot = bot
         self.message = message
+        self.sender = message['from'].get('username', message['from']['first_name'])
         chat = message['chat']
         self.id = chat['id']
         self.type = chat['type']
