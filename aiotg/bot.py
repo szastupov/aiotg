@@ -2,6 +2,7 @@ import re
 import logging
 import asyncio
 import aiohttp
+import json
 
 from functools import partialmethod
 
@@ -11,6 +12,7 @@ __license__ = "MIT"
 
 API_URL = "https://api.telegram.org"
 API_TIMEOUT = 60
+BOTAN_URL = "https://api.botan.io/track"
 
 MESSAGE_TYPES = [
     "location", "photo", "document", "audio", "voice", "sticker", "contact"
@@ -59,20 +61,21 @@ class TgBot:
 
     """Telegram bot framework designed for asyncio"""
 
-    def __init__(self, api_token, api_timeout=API_TIMEOUT):
+    def __init__(self, api_token, api_timeout=API_TIMEOUT, botan_token=None):
         """
         api_token - Telegram bot token, ask @BotFather for this
         api_timeout (optional) - Timeout for long polling
         """
         self.api_token = api_token
         self.api_timeout = api_timeout
+        self.botan_token = botan_token
         self.commands = []
         self._running = True
 
         self._default = lambda c, m: None
 
         def no_handle(mt):
-            return lambda msg: logging.debug("no handle for %s", mt)
+            return lambda chat, msg: logging.debug("no handle for %s", mt)
         self._handlers = {mt: no_handle(mt) for mt in MESSAGE_TYPES}
 
     @asyncio.coroutine
@@ -121,11 +124,36 @@ class TgBot:
         return wrap
 
     @asyncio.coroutine
+    def _track(self, message, name):
+        response = yield from aiohttp.post(
+            BOTAN_URL,
+            params={
+                "token": self.botan_token,
+                "uid": message["from"]["id"],
+                "name": name
+            },
+            data=json.dumps(message),
+            headers={'content-type': 'application/json'}
+        )
+        if response.status != 200:
+            logging.info("error submiting stats %d", response.status)
+        yield from response.release()
+        # res = yield from response.json()
+        # if res["status"] != "accepted":
+        #     logging.error("error submiting statistics %s: %s",
+        #         res["status"], res.get("info", ""))
+
+    def track(self, message, name="Message"):
+        if self.botan_token:
+            asyncio.async(self._track(message, name))
+
+    @asyncio.coroutine
     def _process_message(self, message):
         chat = TgChat(self, message)
 
         for mt in MESSAGE_TYPES:
             if mt in message:
+                self.track(message, mt)
                 return self._handlers[mt](chat, message[mt])
 
         if "text" not in message:
@@ -136,10 +164,12 @@ class TgBot:
         for patterns, handler in self.commands:
             m = re.search(patterns, text)
             if m:
+                self.track(message, handler.__name__)
                 return handler(chat, m)
 
         # No match, run default if it's a 1to1 chat
         if not chat.is_group():
+            self.track(message, "default")
             return self._default(chat, message)
 
     def stop(self):
