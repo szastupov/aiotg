@@ -18,11 +18,18 @@ MESSAGE_TYPES = [
     "location", "photo", "document", "audio", "voice", "sticker", "contact"
 ]
 
+logger = logging.getLogger("aiotg")
+
+class TgSender(dict):
+    def __repr__(self):
+        uname = " (%s)" % self["username"] if "username" in self else ""
+        return self['first_name'] + uname
+
 class TgChat:
     def __init__(self, bot, message):
         self.bot = bot
         self.message = message
-        self.sender = message['from'].get('username', message['from']['first_name'])
+        self.sender = TgSender(message['from'])
         chat = message['chat']
         self.id = chat['id']
         self.type = chat['type']
@@ -75,7 +82,7 @@ class TgBot:
         self._default = lambda c, m: None
 
         def no_handle(mt):
-            return lambda chat, msg: logging.debug("no handle for %s", mt)
+            return lambda chat, msg: logger.debug("no handle for %s", mt)
         self._handlers = {mt: no_handle(mt) for mt in MESSAGE_TYPES}
 
     @asyncio.coroutine
@@ -136,11 +143,11 @@ class TgBot:
             headers={'content-type': 'application/json'}
         )
         if response.status != 200:
-            logging.info("error submiting stats %d", response.status)
+            logger.info("error submiting stats %d", response.status)
         yield from response.release()
         # res = yield from response.json()
         # if res["status"] != "accepted":
-        #     logging.error("error submiting statistics %s: %s",
+        #     logger.error("error submiting statistics %s: %s",
         #         res["status"], res.get("info", ""))
 
     def track(self, message, name="Message"):
@@ -194,7 +201,7 @@ class TgBot:
                 timeout=self.api_timeout)
 
             for update in resp["result"]:
-                logging.debug("update %s", update)
+                logger.debug("update %s", update)
                 offset = max(offset, update["update_id"])
                 message = update["message"]
                 asyncio.async(self._process_message(message))
