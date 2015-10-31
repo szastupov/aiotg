@@ -12,6 +12,8 @@ __license__ = "MIT"
 
 API_URL = "https://api.telegram.org"
 API_TIMEOUT = 60
+RETRY_TIMEOUT = 30
+RETRY_CODES = [429, 500, 502, 503, 504]
 BOTAN_URL = "https://api.botan.io/track"
 
 MESSAGE_TYPES = [
@@ -99,10 +101,21 @@ class TgBot:
         """
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         response = yield from aiohttp.post(url, data=params)
-        if response.status != 200:
-            err_msg = yield from response.read()
+
+        if response.status == 200:
+            return (yield from response.json())
+        elif response.status in RETRY_CODES:
+            logger.info("Server returned %d, retrying...", response.status)
+            yield from response.release()
+            yield from asyncio.sleep(RETRY_TIMEOUT)
+            yield from self.api_call(method, **params)
+        else:
+            if response.headers['content-type'] == 'application/json':
+                err_msg = (yield from response.json())["description"]
+            else:
+                err_msg = yield from response.read()
+            logger.error(err_msg)
             raise RuntimeError(err_msg)
-        return (yield from response.json())
 
     _send_message = partialmethod(api_call, "sendMessage")
 
