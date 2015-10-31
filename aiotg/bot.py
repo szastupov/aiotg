@@ -105,7 +105,7 @@ class TgBot:
         if response.status == 200:
             return (yield from response.json())
         elif response.status in RETRY_CODES:
-            logger.info("Server returned %d, retrying...", response.status)
+            logger.info("Server returned %d, retrying in %d sec.", response.status, RETRY_TIMEOUT)
             yield from response.release()
             yield from asyncio.sleep(RETRY_TIMEOUT)
             yield from self.api_call(method, **params)
