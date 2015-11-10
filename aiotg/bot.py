@@ -174,7 +174,6 @@ class TgBot:
         if self.botan_token:
             asyncio.async(self._track(message, name))
 
-    @asyncio.coroutine
     def _process_message(self, message):
         chat = TgChat(self, message)
 
@@ -224,7 +223,9 @@ class TgBot:
                 logger.debug("update %s", update)
                 offset = max(offset, update["update_id"])
                 message = update["message"]
-                asyncio.async(self._process_message(message))
+                coro = self._process_message(message)
+                if coro:
+                    asyncio.async(coro)
 
     def run(self):
         loop = asyncio.get_event_loop()

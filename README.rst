@@ -22,8 +22,8 @@ Then you can create a new bot in few lines:
     bot = TgBot(os.environ["API_TOKEN"])
 
     @bot.command(r"/echo (.+)")
-    def echo(message, match):
-        return message.reply(match.group(1))
+    def echo(chat, match):
+        return chat.reply(match.group(1))
 
     if __name__ == '__main__':
         bot.run()

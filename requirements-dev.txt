@@ -1,0 +1,4 @@
+aiohttp
+chardet
+pytest
+-e .
