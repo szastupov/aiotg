@@ -10,7 +10,7 @@ bot = TgBot(API_TOKEN)
 def custom_msg(msg):
     template = {
         "message_id": 0,
-        "from": {},
+        "from": { "first_name": "John" },
         "chat": { "id": 0, "type": "private" }
     }
     template.update(msg)
@@ -28,6 +28,8 @@ def test_command():
     def echo(chat, match):
         nonlocal called_with
         called_with = match.group(1)
+        # Let's check sender repr as well
+        assert repr(chat.sender) == "John"
 
     bot._process_message(text_msg("/echo foo"))
     assert called_with == "foo"

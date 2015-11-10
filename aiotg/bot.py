@@ -144,7 +144,13 @@ class TgBot:
         return callback
 
     def handle(self, msg_type):
-        """Set handler for specific message type"""
+        """Set handler for specific message type
+
+        Example:
+        @bot.handle("audio")
+        def handle(chat, audio):
+            pass
+        """
         def wrap(callback):
             self._handlers[msg_type] = callback
             return callback
@@ -228,6 +234,12 @@ class TgBot:
                     asyncio.async(coro)
 
     def run(self):
+        """Convenience method for running bots
+
+        Example:
+        if __name__ == '__main__':
+            bot.run()
+        """
         loop = asyncio.get_event_loop()
         try:
             loop.run_until_complete(self.loop())
