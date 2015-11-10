@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='aiotg',
-    version='0.1.0',
+    version='0.5.0',
     description='Asynchronous Python API for building Telegram bots',
     url='https://github.com/szastupov/aiotg',
 
@@ -16,6 +16,7 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries'
     ],
