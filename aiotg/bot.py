@@ -109,7 +109,7 @@ class TgBot:
             logger.info("Server returned %d, retrying in %d sec.", response.status, RETRY_TIMEOUT)
             yield from response.release()
             yield from asyncio.sleep(RETRY_TIMEOUT)
-            yield from self.api_call(method, **params)
+            return (yield from self.api_call(method, **params))
         else:
             if response.headers['content-type'] == 'application/json':
                 err_msg = (yield from response.json())["description"]
