@@ -87,6 +87,7 @@ class TgBot:
         self.botan_token = botan_token
         self.commands = []
         self._running = True
+        self._offset = 0
 
         self._default = lambda c, m: None
 
@@ -207,6 +208,19 @@ class TgBot:
     def stop(self):
         self._running = False
 
+    def _process_updates(self, updates):
+        if not updates["ok"]:
+            logger.error("getUpdates error: %s", updates.get("description"))
+            return
+
+        for update in updates["result"]:
+            logger.debug("update %s", update)
+            self._offset = max(self._offset, update["update_id"])
+            message = update["message"]
+            coro = self._process_message(message)
+            if coro:
+                asyncio.async(coro)
+
     @asyncio.coroutine
     def loop(self):
         """Return bot's main loop as coroutine
@@ -218,20 +232,13 @@ class TgBot:
         or:
         loop.create_task(bot.loop())
         """
-        offset = 0
         while self._running:
-            resp = yield from self.api_call(
+            updates = yield from self.api_call(
                 'getUpdates',
-                offset=offset + 1,
-                timeout=self.api_timeout)
-
-            for update in resp["result"]:
-                logger.debug("update %s", update)
-                offset = max(offset, update["update_id"])
-                message = update["message"]
-                coro = self._process_message(message)
-                if coro:
-                    asyncio.async(coro)
+                offset=self._offset + 1,
+                timeout=self.api_timeout
+            )
+            self._process_updates(updates)
 
     def run(self):
         """Convenience method for running bots

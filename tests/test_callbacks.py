@@ -3,6 +3,7 @@ import random
 
 from aiotg import TgBot
 from aiotg import MESSAGE_TYPES
+from testfixtures import LogCapture
 
 API_TOKEN = "test_token"
 bot = TgBot(API_TOKEN)
@@ -45,6 +46,34 @@ def test_default():
 
     bot._process_message(text_msg("foo bar"))
     assert called_with == "foo bar"
+
+
+def test_updates():
+    update = {
+        "update_id" : 0,
+        "message": text_msg("foo bar")
+    }
+    updates = { "result": [update], "ok": True }
+    called_with = None
+
+    @bot.default
+    def default(chat, message):
+        nonlocal called_with
+        called_with = message["text"]
+
+    bot._process_updates(updates)
+    assert called_with == "foo bar"
+
+
+def test_updates_failed():
+    updates = {
+        "ok": False,
+        "description": "Opps"
+    }
+
+    with LogCapture() as l:
+        bot._process_updates(updates)
+        l.check(('aiotg', 'ERROR', 'getUpdates error: Opps'))
 
 
 @pytest.mark.parametrize("mt", MESSAGE_TYPES)
