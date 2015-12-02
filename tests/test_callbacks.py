@@ -1,6 +1,10 @@
 import pytest
 import random
 
+import asyncio
+from tempfile import mkstemp
+from urllib.request import urlretrieve
+
 from aiotg import TgBot
 from aiotg import MESSAGE_TYPES
 from testfixtures import LogCapture
@@ -74,6 +78,31 @@ def test_updates_failed():
     with LogCapture() as l:
         bot._process_updates(updates)
         l.check(('aiotg', 'ERROR', 'getUpdates error: Opps'))
+
+
+def get_some_image_file_path(extension=None):
+    if extension is None:
+        extension = 'jpg'
+
+    _, image_path = mkstemp(suffix='.' + extension)
+
+    urlretrieve('https://avatars3.githubusercontent.com/u/24799',
+                filename=image_path)
+
+    return image_path
+
+
+def test_apicall_sendphoto():
+    loop = asyncio.get_event_loop()
+
+    chat_id = text_msg({'foo'})['chat']['id']
+    fp = open(get_some_image_file_path('jpg'), 'rb')
+
+    res = loop.run_until_complete(bot.api_call('sendPhoto', chat_id=chat_id, photo=fp))
+
+    assert res['ok'] == True
+    assert 'result' in res
+    assert 'photo' in res['result']
 
 
 @pytest.mark.parametrize("mt", MESSAGE_TYPES)

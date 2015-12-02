@@ -101,7 +101,11 @@ class TgBot:
         See https://core.telegram.org/bots/api for the reference
         """
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
-        response = yield from aiohttp.post(url, data=params)
+        formdata = aiohttp.helpers.FormData({
+            k: str(v) if isinstance(v, int) else v
+            for k, v in params.items()
+        })
+        response = yield from aiohttp.post(url, data=formdata)
 
         if response.status == 200:
             return (yield from response.json())
