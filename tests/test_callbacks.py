@@ -1,7 +1,7 @@
 import pytest
 import random
 
-from aiotg import TgBot
+from aiotg import TgBot, TgChat
 from aiotg import MESSAGE_TYPES
 from testfixtures import LogCapture
 
@@ -88,3 +88,39 @@ def test_handle(mt):
     value = random.random()
     bot._process_message(custom_msg({ mt: value }))
     assert called_with == value
+
+
+class MockBot:
+    def __init__(self):
+        self.calls = {}
+
+    def api_call(self, method, **params):
+        self.calls[method] = params
+
+    def send_message(self, chat_id, text, **kwargs):
+        return self.api_call("sendMessage", chat_id=chat_id, text=text, **kwargs)
+
+
+def test_chat_methods():
+    bot = MockBot()
+    chat_id = 42
+    chat = TgChat(bot, chat_id)
+
+    chat.send_text("hello")
+    assert "sendMessage" in bot.calls
+    assert bot.calls["sendMessage"]["text"] == "hello"
+
+    # Just test a single wrapper, the rest are same
+    chat.send_photo()
+    assert "sendPhoto" in bot.calls
+    assert isinstance(bot.calls["sendPhoto"]["chat_id"], str)
+
+
+def test_chat_reply():
+    bot = MockBot()
+    msg = text_msg("Reply!")
+    chat = TgChat.from_message(bot, msg)
+
+    chat.reply("Hi " + repr(chat.sender))
+    assert "sendMessage" in bot.calls
+    assert bot.calls["sendMessage"]["text"] == "Hi John"
