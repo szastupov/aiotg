@@ -197,10 +197,10 @@ class TgBot:
         if "text" not in message:
             return
 
-        text = message["text"].lower()
+        text = message["text"]
 
         for patterns, handler in self.commands:
-            m = re.search(patterns, text)
+            m = re.search(patterns, text, re.I)
             if m:
                 self.track(message, handler.__name__)
                 return handler(chat, m)
