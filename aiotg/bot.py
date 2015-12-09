@@ -5,6 +5,7 @@ import aiohttp
 import json
 
 from functools import partialmethod
+from . chat import TgChat
 
 __author__ = "Stepan Zastupov"
 __copyright__ = "Copyright 2015, Stepan Zastupov"
@@ -20,69 +21,16 @@ MESSAGE_TYPES = [
     "location", "photo", "document", "audio", "voice", "sticker", "contact"
 ]
 
+
 logger = logging.getLogger("aiotg")
-
-class TgSender(dict):
-    def __repr__(self):
-        uname = " (%s)" % self["username"] if "username" in self else ""
-        return self['first_name'] + uname
-
-class TgChat:
-    def __init__(self, bot, chat_id, chat_type="private", src_message=None):
-        self.bot = bot
-        self.message = src_message
-        sender = src_message['from'] if src_message else {"first_name": "N/A"}
-        self.sender = TgSender(sender)
-        self.id = chat_id
-        self.type = chat_type
-
-    @staticmethod
-    def from_message(bot, message):
-        chat = message["chat"]
-        return TgChat(bot, chat["id"], chat["type"], message)
-
-    def send_text(self, text, **kwargs):
-        return self.bot.send_message(self.id, text, **kwargs)
-
-    def reply(self, text, markup=None):
-        return self.send_text(text,
-            reply_to_message_id=self.message["message_id"],
-            disable_web_page_preview='true',
-            reply_markup=json.dumps(markup)
-        )
-
-    def _send_to_chat(self, method, **options):
-        return self.bot.api_call(
-            method,
-            chat_id=str(self.id),
-            **options
-        )
-
-    send_audio = partialmethod(_send_to_chat, "sendAudio")
-    send_photo = partialmethod(_send_to_chat, "sendPhoto")
-    send_video = partialmethod(_send_to_chat, "sendVideo")
-    send_document = partialmethod(_send_to_chat, "sendDocument")
-    send_sticker = partialmethod(_send_to_chat, "sendSticker")
-    send_voice = partialmethod(_send_to_chat, "sendVoice")
-    send_locaton = partialmethod(_send_to_chat, "sendLocation")
-
-    def forward_message(self, from_chat_id, message_id):
-        return self.bot.api_call(
-            "forwardMessage",
-            chat_id=self.id,
-            from_chat_id=from_chat_id,
-            message_id=message_id
-        )
-
-    def is_group(self):
-        return self.type == "group"
 
 
 class TgBot:
 
     """Telegram bot framework designed for asyncio"""
 
-    def __init__(self, api_token, api_timeout=API_TIMEOUT, botan_token=None, name=None):
+    def __init__(self, api_token, api_timeout=API_TIMEOUT,
+                 botan_token=None, name=None):
         """
         api_token - Telegram bot token, ask @BotFather for this
         api_timeout (optional) - Timeout for long polling
@@ -92,16 +40,17 @@ class TgBot:
         self.api_token = api_token
         self.api_timeout = api_timeout
         self.botan_token = botan_token
-        self.commands = []
-        self._running = True
-        self._offset = 0
         self.name = name
 
+        self._running = False
+        self._offset = 0
         self._default = lambda c, m: None
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
+
         self._handlers = {mt: no_handle(mt) for mt in MESSAGE_TYPES}
+        self._commands = []
 
     @asyncio.coroutine
     def api_call(self, method, **params):
@@ -114,7 +63,8 @@ class TgBot:
         if response.status == 200:
             return (yield from response.json())
         elif response.status in RETRY_CODES:
-            logger.info("Server returned %d, retrying in %d sec.", response.status, RETRY_TIMEOUT)
+            logger.info("Server returned %d, retrying in %d sec.",
+                        response.status, RETRY_TIMEOUT)
             yield from response.release()
             yield from asyncio.sleep(RETRY_TIMEOUT)
             return (yield from self.api_call(method, **params))
@@ -141,7 +91,7 @@ class TgBot:
             pass
         """
         def decorator(fn):
-            self.commands.append((regexp, fn))
+            self._commands.append((regexp, fn))
             return fn
         return decorator
 
@@ -180,10 +130,6 @@ class TgBot:
         if response.status != 200:
             logger.info("error submiting stats %d", response.status)
         yield from response.release()
-        # res = yield from response.json()
-        # if res["status"] != "accepted":
-        #     logger.error("error submiting statistics %s: %s",
-        #         res["status"], res.get("info", ""))
 
     def track(self, message, name="Message"):
         if self.botan_token:
@@ -197,12 +143,11 @@ class TgBot:
                 self.track(message, mt)
                 return self._handlers[mt](chat, message[mt])
 
-        if "text" not in message:
+        text = message.get("text")
+        if not text:
             return
 
-        text = message["text"]
-
-        for patterns, handler in self.commands:
+        for patterns, handler in self._commands:
             m = re.search(patterns, text, re.I)
             if m:
                 self.track(message, handler.__name__)
@@ -212,9 +157,6 @@ class TgBot:
         if not chat.is_group():
             self.track(message, "default")
             return self._default(chat, message)
-
-    def stop(self):
-        self._running = False
 
     def _process_updates(self, updates):
         if not updates["ok"]:
@@ -240,6 +182,7 @@ class TgBot:
         or:
         loop.create_task(bot.loop())
         """
+        self._running = True
         while self._running:
             updates = yield from self.api_call(
                 'getUpdates',
@@ -247,6 +190,9 @@ class TgBot:
                 timeout=self.api_timeout
             )
             self._process_updates(updates)
+
+    def stop(self):
+        self._running = False
 
     def run(self):
         """Convenience method for running bots
