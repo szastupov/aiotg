@@ -82,10 +82,12 @@ class TgBot:
 
     """Telegram bot framework designed for asyncio"""
 
-    def __init__(self, api_token, api_timeout=API_TIMEOUT, botan_token=None):
+    def __init__(self, api_token, api_timeout=API_TIMEOUT, botan_token=None, name=None):
         """
         api_token - Telegram bot token, ask @BotFather for this
         api_timeout (optional) - Timeout for long polling
+        botan_token (optional) - Token for http://botan.io
+        name (optional) - Bot name
         """
         self.api_token = api_token
         self.api_timeout = api_timeout
@@ -93,6 +95,7 @@ class TgBot:
         self.commands = []
         self._running = True
         self._offset = 0
+        self.name = name
 
         self._default = lambda c, m: None
 
