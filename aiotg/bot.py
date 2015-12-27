@@ -82,6 +82,15 @@ class TgBot:
         """Send a text message to chat"""
         return self._send_message(chat_id=chat_id, text=text, **kwargs)
 
+    @asyncio.coroutine
+    def get_file(self, file_id):
+        json = yield from self.api_call("getFile", file_id=file_id)
+        return json["result"]
+
+    def download_file(self, file_path):
+        url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
+        return aiohttp.get(url)
+
     def command(self, regexp):
         """Decorator for registering commands
 
