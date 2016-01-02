@@ -87,9 +87,10 @@ class TgBot:
         json = yield from self.api_call("getFile", file_id=file_id)
         return json["result"]
 
-    def download_file(self, file_path):
+    def download_file(self, file_path, range=None):
+        headers = { "range": range } if range else None
         url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
-        return aiohttp.get(url)
+        return aiohttp.get(url, headers=headers)
 
     def command(self, regexp):
         """Decorator for registering commands
