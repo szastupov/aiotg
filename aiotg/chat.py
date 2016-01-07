@@ -26,11 +26,13 @@ class TgChat:
     def send_text(self, text, **kwargs):
         return self.bot.send_message(self.id, text, **kwargs)
 
-    def reply(self, text, markup=None):
-        return self.send_text(text,
+    def reply(self, text, markup=None, md=None):
+        return self.send_text(
+            text,
             reply_to_message_id=self.message["message_id"],
             disable_web_page_preview='true',
-            reply_markup=json.dumps(markup)
+            reply_markup=json.dumps(markup),
+            parse_mode=md
         )
 
     def _send_to_chat(self, method, **options):
