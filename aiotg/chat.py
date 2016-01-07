@@ -26,11 +26,13 @@ class TgChat:
     def send_text(self, text, **kwargs):
         return self.bot.send_message(self.id, text, **kwargs)
 
-    def reply(self, text, markup=None):
-        return self.send_text(text,
+    def reply(self, text, markup=None, md=None):
+        return self.send_text(
+            text,
             reply_to_message_id=self.message["message_id"],
             disable_web_page_preview='true',
-            reply_markup=json.dumps(markup)
+            reply_markup=json.dumps(markup),
+            parse_mode=md
         )
 
     def _send_to_chat(self, method, **options):
@@ -47,6 +49,7 @@ class TgChat:
     send_sticker = partialmethod(_send_to_chat, "sendSticker")
     send_voice = partialmethod(_send_to_chat, "sendVoice")
     send_locaton = partialmethod(_send_to_chat, "sendLocation")
+    send_chat_action = partialmethod(_send_to_chat, "sendChatAction")
 
     def forward_message(self, from_chat_id, message_id):
         return self.bot.api_call(
