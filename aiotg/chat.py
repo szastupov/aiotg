@@ -9,6 +9,22 @@ class TgSender(dict):
         return self['first_name'] + uname
 
 
+class TgInlineQuery:
+    def __init__(self, bot, src):
+        self.bot = bot
+        self.sender = TgSender(src['from'])
+        self.query_id = src['id']
+        self.query = src['query']
+
+    def answer(self, results, **options):
+        return self.bot.api_call(
+            "answerInlineQuery",
+            inline_query_id=self.query_id,
+            results=json.dumps(results),
+            **options
+        )
+
+
 class TgChat:
     def __init__(self, bot, chat_id, chat_type="private", src_message=None):
         self.bot = bot

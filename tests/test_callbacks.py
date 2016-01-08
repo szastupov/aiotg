@@ -1,7 +1,7 @@
 import pytest
 import random
 
-from aiotg import TgBot, TgChat
+from aiotg import TgBot, TgChat, TgInlineQuery
 from aiotg import MESSAGE_TYPES
 from testfixtures import LogCapture
 
@@ -20,6 +20,15 @@ def custom_msg(msg):
 
 def text_msg(text):
     return custom_msg({ "text": text })
+
+
+def inline_query(query):
+    return {
+        "from": { "first_name": "John" },
+        "offset": "",
+        "query": query,
+        "id": "9999"
+    }
 
 
 def test_command():
@@ -45,6 +54,18 @@ def test_default():
         called_with = message["text"]
 
     bot._process_message(text_msg("foo bar"))
+    assert called_with == "foo bar"
+
+
+def test_inline():
+    called_with = None
+
+    @bot.inline
+    def inline(query):
+        nonlocal called_with
+        called_with = query.query
+
+    bot._process_inline_query(inline_query("foo bar"))
     assert called_with == "foo bar"
 
 
@@ -124,3 +145,16 @@ def test_chat_reply():
     chat.reply("Hi " + repr(chat.sender))
     assert "sendMessage" in bot.calls
     assert bot.calls["sendMessage"]["text"] == "Hi John"
+
+def test_inline_answer():
+    bot = MockBot()
+    src = inline_query("Answer!")
+    iq = TgInlineQuery(bot, src)
+
+    results = [{
+        "type": "article", "id": "000",
+        "title": "test", "message_text": "Foo bar"
+    }]
+    iq.answer(results)
+    assert "answerInlineQuery" in bot.calls
+    assert isinstance(bot.calls["answerInlineQuery"]["results"], str)

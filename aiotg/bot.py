@@ -5,7 +5,7 @@ import aiohttp
 import json
 
 from functools import partialmethod
-from . chat import TgChat
+from . chat import TgChat, TgInlineQuery
 
 __author__ = "Stepan Zastupov"
 __copyright__ = "Copyright 2015, Stepan Zastupov"
@@ -45,6 +45,7 @@ class TgBot:
         self._running = False
         self._offset = 0
         self._default = lambda c, m: None
+        self._inline = lambda iq: None
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
@@ -112,6 +113,12 @@ class TgBot:
         self._default = callback
         return callback
 
+    def inline(self, callback):
+        """Set callback for inline queries
+        """
+        self._inline = callback
+        return callback
+
     def handle(self, msg_type):
         """Set handler for specific message type
 
@@ -168,6 +175,10 @@ class TgBot:
             self.track(message, "default")
             return self._default(chat, message)
 
+    def _process_inline_query(self, query):
+        iq = TgInlineQuery(self, query)
+        return self._inline(iq)
+
     def _process_updates(self, updates):
         if not updates["ok"]:
             logger.error("getUpdates error: %s", updates.get("description"))
@@ -176,8 +187,12 @@ class TgBot:
         for update in updates["result"]:
             logger.debug("update %s", update)
             self._offset = max(self._offset, update["update_id"])
-            message = update["message"]
-            coro = self._process_message(message)
+
+            if "message" in update:
+                coro = self._process_message(update["message"])
+            elif "inline_query" in update:
+                coro = self._process_inline_query(update["inline_query"])
+
             if coro:
                 asyncio.async(coro)
 
