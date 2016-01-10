@@ -58,6 +58,9 @@ class TgBot:
         """Call Telegram API
         See https://core.telegram.org/bots/api for the reference
         """
+        if isinstance(params.get('reply_markup'), dict):
+            params['reply_markup'] = json.dumps(params['reply_markup'])
+
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         response = yield from aiohttp.post(url, data=params)
 
