@@ -1,4 +1,4 @@
-aiotg package
+aiotg reference
 =============
 
 Submodules

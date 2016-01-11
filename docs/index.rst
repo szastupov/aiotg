@@ -42,9 +42,13 @@ For a more complete example, take a look at
 
 Have a question? Ask it on our `Telegram chat <https://telegram.me/joinchat/ABwEXgGJsOukSVJDgVBeFg>`__.
 
+Reference
+---------------
+
 .. toctree::
    :maxdepth: 2
 
+   aiotg.rst
 
 
 Indices and tables
