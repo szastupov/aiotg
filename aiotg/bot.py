@@ -26,26 +26,25 @@ logger = logging.getLogger("aiotg")
 
 
 class TgBot:
+    """Telegram bot framework designed for asyncio
 
-    """Telegram bot framework designed for asyncio"""
+    :param api_token: Telegram bot token, ask @BotFather for this
+    :param api_timeout: Timeout for long polling
+    :param botan_token: Token for http://botan.io
+    :param name: Bot name
+    """
+
+    _running = False
+    _offset = 0
+    _default = lambda c, m: None
+    _inline = lambda iq: None
 
     def __init__(self, api_token, api_timeout=API_TIMEOUT,
                  botan_token=None, name=None):
-        """
-        api_token - Telegram bot token, ask @BotFather for this
-        api_timeout (optional) - Timeout for long polling
-        botan_token (optional) - Token for http://botan.io
-        name (optional) - Bot name
-        """
         self.api_token = api_token
         self.api_timeout = api_timeout
         self.botan_token = botan_token
         self.name = name
-
-        self._running = False
-        self._offset = 0
-        self._default = lambda c, m: None
-        self._inline = lambda iq: None
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
@@ -54,52 +53,48 @@ class TgBot:
         self._commands = []
 
     @asyncio.coroutine
-    def api_call(self, method, **params):
-        """Call Telegram API
-        See https://core.telegram.org/bots/api for the reference
+    def loop(self):
         """
-        url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
-        response = yield from aiohttp.post(url, data=params)
+        Return bot's main loop as coroutine
 
-        if response.status == 200:
-            return (yield from response.json())
-        elif response.status in RETRY_CODES:
-            logger.info("Server returned %d, retrying in %d sec.",
-                        response.status, RETRY_TIMEOUT)
-            yield from response.release()
-            yield from asyncio.sleep(RETRY_TIMEOUT)
-            return (yield from self.api_call(method, **params))
-        else:
-            if response.headers['content-type'] == 'application/json':
-                err_msg = (yield from response.json())["description"]
-            else:
-                err_msg = yield from response.read()
-            logger.error(err_msg)
-            raise RuntimeError(err_msg)
+        Use it with asyncio:
+        >>> loop = asyncio.get_event_loop()
+        >>> loop.run_until_complete(bot.loop())
 
-    _send_message = partialmethod(api_call, "sendMessage")
+        or:
+        >>> loop.create_task(bot.loop())
+        """
+        self._running = True
+        while self._running:
+            updates = yield from self.api_call(
+                'getUpdates',
+                offset=self._offset + 1,
+                timeout=self.api_timeout
+            )
+            self._process_updates(updates)
 
-    def send_message(self, chat_id, text, **kwargs):
-        """Send a text message to chat"""
-        return self._send_message(chat_id=chat_id, text=text, **kwargs)
+    def run(self):
+        """
+        Convenience method for running bots
 
-    @asyncio.coroutine
-    def get_file(self, file_id):
-        json = yield from self.api_call("getFile", file_id=file_id)
-        return json["result"]
-
-    def download_file(self, file_path, range=None):
-        headers = { "range": range } if range else None
-        url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
-        return aiohttp.get(url, headers=headers)
+        :Example:
+        >>> if __name__ == '__main__':
+        >>>     bot.run()
+        """
+        loop = asyncio.get_event_loop()
+        try:
+            loop.run_until_complete(self.loop())
+        except KeyboardInterrupt:
+            self.stop()
 
     def command(self, regexp):
-        """Decorator for registering commands
+        """
+        Register a new command
 
-        Example:
-        @bot.command(r"/(start|help)")
-        def usage(message, match):
-            pass
+        :Example:
+        >>> @bot.command(r"/echo (.+)")
+        >>> def echo(chat, match):
+        >>>     return chat.reply(match.group(1))
         """
         def decorator(fn):
             self._commands.append((regexp, fn))
@@ -107,30 +102,90 @@ class TgBot:
         return decorator
 
     def default(self, callback):
-        """Set callback for default command
-        Default command is called on unrecognized commands for 1to1 chats
+        """
+        Set callback for default command that is
+        called on unrecognized commands for 1to1 chats
         """
         self._default = callback
         return callback
 
     def inline(self, callback):
-        """Set callback for inline queries
+        """
+        Set callback for inline queries
         """
         self._inline = callback
         return callback
 
     def handle(self, msg_type):
-        """Set handler for specific message type
+        """
+        Set handler for specific message type
 
-        Example:
-        @bot.handle("audio")
-        def handle(chat, audio):
-            pass
+        :Example:
+        >>> @bot.handle("audio")
+        >>> def handle(chat, audio):
+        >>>     pass
         """
         def wrap(callback):
             self._handlers[msg_type] = callback
             return callback
         return wrap
+
+    async def api_call(self, method, **params):
+        """
+        Call Telegram API
+        See https://core.telegram.org/bots/api for the reference
+        """
+        url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
+        response = await aiohttp.post(url, data=params)
+
+        if response.status == 200:
+            return (await response.json())
+        elif response.status in RETRY_CODES:
+            logger.info("Server returned %d, retrying in %d sec.",
+                        response.status, RETRY_TIMEOUT)
+            await response.release()
+            await asyncio.sleep(RETRY_TIMEOUT)
+            return (await self.api_call(method, **params))
+        else:
+            if response.headers['content-type'] == 'application/json':
+                err_msg = (await response.json())["description"]
+            else:
+                err_msg = await response.read()
+            logger.error(err_msg)
+            raise RuntimeError(err_msg)
+
+    _send_message = partialmethod(api_call, "sendMessage")
+
+    def send_message(self, chat_id, text, **options):
+        """Send a text message to chat"""
+        return self._send_message(chat_id=chat_id, text=text, **options)
+
+    @asyncio.coroutine
+    def get_file(self, file_id):
+        """
+        https://core.telegram.org/bots/api#getfile
+        """
+        json = yield from self.api_call("getFile", file_id=file_id)
+        return json["result"]
+
+    def download_file(self, file_path, range=None):
+        """
+        Dowload a file from Telegram servers
+        """
+        headers = { "range": range } if range else None
+        url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
+        return aiohttp.get(url, headers=headers)
+
+    def track(self, message, name="Message"):
+        """
+        Track message using http://botan.io
+        Set botak_token to make it work
+        """
+        if self.botan_token:
+            asyncio.async(self._track(message, name))
+
+    def stop(self):
+        self._running = False
 
     @asyncio.coroutine
     def _track(self, message, name):
@@ -148,10 +203,6 @@ class TgBot:
             logger.info("error submiting stats %d", response.status)
         yield from response.release()
 
-    def track(self, message, name="Message"):
-        if self.botan_token:
-            asyncio.async(self._track(message, name))
-
     def _process_message(self, message):
         chat = TgChat.from_message(self, message)
 
@@ -160,12 +211,11 @@ class TgBot:
                 self.track(message, mt)
                 return self._handlers[mt](chat, message[mt])
 
-        text = message.get("text")
-        if not text:
+        if "text" not in message:
             return
 
         for patterns, handler in self._commands:
-            m = re.search(patterns, text, re.I)
+            m = re.search(patterns, message["text"], re.I)
             if m:
                 self.track(message, handler.__name__)
                 return handler(chat, m)
@@ -195,39 +245,3 @@ class TgBot:
 
             if coro:
                 asyncio.async(coro)
-
-    @asyncio.coroutine
-    def loop(self):
-        """Return bot's main loop as coroutine
-
-        Use it with asyncio:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(bot.loop())
-
-        or:
-        loop.create_task(bot.loop())
-        """
-        self._running = True
-        while self._running:
-            updates = yield from self.api_call(
-                'getUpdates',
-                offset=self._offset + 1,
-                timeout=self.api_timeout
-            )
-            self._process_updates(updates)
-
-    def stop(self):
-        self._running = False
-
-    def run(self):
-        """Convenience method for running bots
-
-        Example:
-        if __name__ == '__main__':
-            bot.run()
-        """
-        loop = asyncio.get_event_loop()
-        try:
-            loop.run_until_complete(self.loop())
-        except KeyboardInterrupt:
-            self.stop()
