@@ -1,54 +1,26 @@
 import json
-
 from functools import partialmethod
 
 
-class TgSender(dict):
-    def __repr__(self):
-        uname = " (%s)" % self["username"] if "username" in self else ""
-        return self['first_name'] + uname
-
-
-class TgInlineQuery:
-    def __init__(self, bot, src):
-        self.bot = bot
-        self.sender = TgSender(src['from'])
-        self.query_id = src['id']
-        self.query = src['query']
-
-    def answer(self, results, **options):
-        return self.bot.api_call(
-            "answerInlineQuery",
-            inline_query_id=self.query_id,
-            results=json.dumps(results),
-            **options
-        )
-
-
 class TgChat:
-    def __init__(self, bot, chat_id, chat_type="private", src_message=None):
-        self.bot = bot
-        self.message = src_message
-        sender = src_message['from'] if src_message else {"first_name": "N/A"}
-        self.sender = TgSender(sender)
-        self.id = chat_id
-        self.type = chat_type
+    """
+    Wrapper for telegram chats, passed to most callbacks
+    """
 
-    @staticmethod
-    def from_message(bot, message):
-        chat = message["chat"]
-        return TgChat(bot, chat["id"], chat["type"], message)
+    def send_text(self, text, **options):
+        """
+        Send a text message to the chat, for available options see
+        https://core.telegram.org/bots/api#sendmessage
+        """
+        return self.bot.send_message(self.id, text, **options)
 
-    def send_text(self, text, **kwargs):
-        return self.bot.send_message(self.id, text, **kwargs)
-
-    def reply(self, text, markup=None, md=None):
+    def reply(self, text, markup=None, parse_mode=None):
         return self.send_text(
             text,
             reply_to_message_id=self.message["message_id"],
             disable_web_page_preview='true',
             reply_markup=json.dumps(markup),
-            parse_mode=md
+            parse_mode=parse_mode
         )
 
     def _send_to_chat(self, method, **options):
@@ -77,3 +49,24 @@ class TgChat:
 
     def is_group(self):
         return self.type == "group"
+
+    def __init__(self, bot, chat_id, chat_type="private", src_message=None):
+        self.bot = bot
+        self.message = src_message
+        sender = src_message['from'] if src_message else {"first_name": "N/A"}
+        self.sender = TgSender(sender)
+        self.id = chat_id
+        self.type = chat_type
+
+    @staticmethod
+    def from_message(bot, message):
+        chat = message["chat"]
+        return TgChat(bot, chat["id"], chat["type"], message)
+
+
+class TgSender(dict):
+    """A small wrapper for sender info, mostly used for logging"""
+
+    def __repr__(self):
+        uname = " (%s)" % self["username"] if "username" in self else ""
+        return self['first_name'] + uname

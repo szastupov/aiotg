@@ -5,7 +5,7 @@ import aiohttp
 import json
 
 from functools import partialmethod
-from . chat import TgChat, TgInlineQuery
+from . chat import TgChat, TgSender
 
 __author__ = "Stepan Zastupov"
 __copyright__ = "Copyright 2015, Stepan Zastupov"
@@ -172,7 +172,7 @@ class TgBot:
         """
         Dowload a file from Telegram servers
         """
-        headers = { "range": range } if range else None
+        headers = {"range": range} if range else None
         url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
         return aiohttp.get(url, headers=headers)
 
@@ -245,3 +245,24 @@ class TgBot:
 
             if coro:
                 asyncio.async(coro)
+
+
+class TgInlineQuery:
+    """
+    Incoming inline query
+    See https://core.telegram.org/bots/api#inline-mode for details
+    """
+
+    def __init__(self, bot, src):
+        self.bot = bot
+        self.sender = TgSender(src['from'])
+        self.query_id = src['id']
+        self.query = src['query']
+
+    def answer(self, results, **options):
+        return self.bot.api_call(
+            "answerInlineQuery",
+            inline_query_id=self.query_id,
+            results=json.dumps(results),
+            **options
+        )
