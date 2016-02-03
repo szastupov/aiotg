@@ -36,8 +36,6 @@ class TgBot:
 
     _running = False
     _offset = 0
-    _default = lambda c, m: None
-    _inline = lambda iq: None
 
     def __init__(self, api_token, api_timeout=API_TIMEOUT,
                  botan_token=None, name=None):
@@ -51,6 +49,8 @@ class TgBot:
 
         self._handlers = {mt: no_handle(mt) for mt in MESSAGE_TYPES}
         self._commands = []
+        self._default = lambda c, m: None
+        self._inline = lambda iq: None
 
     @asyncio.coroutine
     def loop(self):
