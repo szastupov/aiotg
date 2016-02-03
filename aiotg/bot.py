@@ -3,6 +3,7 @@ import logging
 import asyncio
 import aiohttp
 import json
+import io
 
 from functools import partialmethod
 from . chat import TgChat, TgSender
@@ -135,8 +136,25 @@ class TgBot:
         Call Telegram API
         See https://core.telegram.org/bots/api for the reference
         """
+        def _convert_params():
+            """
+            Split parameters to body/url parts if needed
+            """
+            for ftype in ['audio', 'voice', 'photo', 'document']:
+                if ftype in params and isinstance(params[ftype], io.IOBase):
+                    # File descriptor should be the only body parameter
+                    # (move other parameters to url/query part)
+                    data = {}
+                    data[ftype] = params[ftype]
+                    del params[ftype]
+                    return {'data': data, 'params': params, 'chunked': 1024}
+
+            # If there is no file descriptors just proceed with body params
+            return {'data': params}
+
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
-        response = await aiohttp.post(url, data=params)
+        post_params = _convert_params()
+        response = await aiohttp.post(url, **post_params)
 
         if response.status == 200:
             return (await response.json())
