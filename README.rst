@@ -36,4 +36,4 @@ Now run it with a proper API\_TOKEN and it should reply to /echo commands.
 For a more complete example, take a look at
 `WhatisBot <https://github.com/szastupov/whatisbot/blob/master/main.py>`__ or `Music Catalog Bot <https://github.com/szastupov/musicbot>`__.
 
-Have a question? Ask it on our `Telegram chat <https://telegram.me/joinchat/ABwEXjy3Tfmj2NAqEsQ1nw>`__.
+Have a question? Ask it on project's `Telegram chat <https://telegram.me/joinchat/ABwEXjy3Tfmj2NAqEsQ1nw>`__.
