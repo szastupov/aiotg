@@ -5,7 +5,7 @@ import aiohttp
 import json
 
 from functools import partialmethod
-from . chat import TgChat, TgSender
+from . chat import Chat, Sender
 
 __author__ = "Stepan Zastupov"
 __copyright__ = "Copyright 2015, Stepan Zastupov"
@@ -25,7 +25,7 @@ MESSAGE_TYPES = [
 logger = logging.getLogger("aiotg")
 
 
-class TgBot:
+class Bot:
     """Telegram bot framework designed for asyncio
 
     :param api_token: Telegram bot token, ask @BotFather for this
@@ -204,7 +204,7 @@ class TgBot:
         yield from response.release()
 
     def _process_message(self, message):
-        chat = TgChat.from_message(self, message)
+        chat = Chat.from_message(self, message)
 
         for mt in MESSAGE_TYPES:
             if mt in message:
@@ -226,7 +226,7 @@ class TgBot:
             return self._default(chat, message)
 
     def _process_inline_query(self, query):
-        iq = TgInlineQuery(self, query)
+        iq = InlineQuery(self, query)
         return self._inline(iq)
 
     def _process_updates(self, updates):
@@ -247,7 +247,13 @@ class TgBot:
                 asyncio.async(coro)
 
 
-class TgInlineQuery:
+class TgBot(Bot):
+    def __init__(self, *args, **kwargs):
+        logger.warning("TgBot is depricated, use Bot instead")
+        super().__init__(*args, **kwargs)
+
+
+class InlineQuery:
     """
     Incoming inline query
     See https://core.telegram.org/bots/api#inline-mode for details
@@ -255,7 +261,7 @@ class TgInlineQuery:
 
     def __init__(self, bot, src):
         self.bot = bot
-        self.sender = TgSender(src['from'])
+        self.sender = Sender(src['from'])
         self.query_id = src['id']
         self.query = src['query']
 
@@ -266,3 +272,9 @@ class TgInlineQuery:
             results=json.dumps(results),
             **options
         )
+
+
+class TgInlineQuery(InlineQuery):
+    def __init__(self, *args, **kwargs):
+        logger.warning("TgInlineQuery is depricated, use InlineQuery instead")
+        super().__init__(*args, **kwargs)

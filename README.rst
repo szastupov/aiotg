@@ -21,17 +21,15 @@ Then you can create a new bot in few lines:
 
 .. code:: python
 
-    import os
-    from aiotg import TgBot
+    from aiotg import Bot
 
-    bot = TgBot(os.environ["API_TOKEN"])
+    bot = Bot(api_token="...")
 
     @bot.command(r"/echo (.+)")
     def echo(chat, match):
         return chat.reply(match.group(1))
 
-    if __name__ == '__main__':
-        bot.run()
+    bot.run()
 
 Now run it with a proper API\_TOKEN and it should reply to /echo commands.
 

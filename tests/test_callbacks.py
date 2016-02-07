@@ -1,12 +1,13 @@
 import pytest
 import random
 
-from aiotg import TgBot, TgChat, TgInlineQuery
+from aiotg import Bot, Chat, InlineQuery
 from aiotg import MESSAGE_TYPES
 from testfixtures import LogCapture
 
 API_TOKEN = "test_token"
-bot = TgBot(API_TOKEN)
+bot = Bot(API_TOKEN)
+
 
 def custom_msg(msg):
     template = {
@@ -71,7 +72,7 @@ def test_inline():
 
 def test_updates():
     update = {
-        "update_id" : 0,
+        "update_id": 0,
         "message": text_msg("foo bar")
     }
     updates = { "result": [update], "ok": True }
@@ -119,13 +120,18 @@ class MockBot:
         self.calls[method] = params
 
     def send_message(self, chat_id, text, **kwargs):
-        return self.api_call("sendMessage", chat_id=chat_id, text=text, **kwargs)
+        return self.api_call(
+            "sendMessage",
+            chat_id=chat_id,
+            text=text,
+            **kwargs
+        )
 
 
 def test_chat_methods():
     bot = MockBot()
     chat_id = 42
-    chat = TgChat(bot, chat_id)
+    chat = Chat(bot, chat_id)
 
     chat.send_text("hello")
     assert "sendMessage" in bot.calls
@@ -140,16 +146,17 @@ def test_chat_methods():
 def test_chat_reply():
     bot = MockBot()
     msg = text_msg("Reply!")
-    chat = TgChat.from_message(bot, msg)
+    chat = Chat.from_message(bot, msg)
 
     chat.reply("Hi " + repr(chat.sender))
     assert "sendMessage" in bot.calls
     assert bot.calls["sendMessage"]["text"] == "Hi John"
 
+
 def test_inline_answer():
     bot = MockBot()
     src = inline_query("Answer!")
-    iq = TgInlineQuery(bot, src)
+    iq = InlineQuery(bot, src)
 
     results = [{
         "type": "article", "id": "000",

@@ -1,8 +1,12 @@
 import json
+import logging
 from functools import partialmethod
 
 
-class TgChat:
+logger = logging.getLogger("aiotg")
+
+
+class Chat:
     """
     Wrapper for telegram chats, passed to most callbacks
     """
@@ -54,19 +58,31 @@ class TgChat:
         self.bot = bot
         self.message = src_message
         sender = src_message['from'] if src_message else {"first_name": "N/A"}
-        self.sender = TgSender(sender)
+        self.sender = Sender(sender)
         self.id = chat_id
         self.type = chat_type
 
     @staticmethod
     def from_message(bot, message):
         chat = message["chat"]
-        return TgChat(bot, chat["id"], chat["type"], message)
+        return Chat(bot, chat["id"], chat["type"], message)
 
 
-class TgSender(dict):
+class TgChat(Chat):
+    def __init__(self, *args, **kwargs):
+        logger.warning("TgChat is depricated, use Chat instead")
+        super().__init__(*args, **kwargs)
+
+
+class Sender(dict):
     """A small wrapper for sender info, mostly used for logging"""
 
     def __repr__(self):
         uname = " (%s)" % self["username"] if "username" in self else ""
         return self['first_name'] + uname
+
+
+class TgSender(Sender):
+    def __init__(self, *args, **kwargs):
+        logger.warning("TgSender is depricated, use Sender instead")
+        super().__init__(*args, **kwargs)

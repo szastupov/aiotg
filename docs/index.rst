@@ -24,9 +24,9 @@ Getting Started
 Echo bot::
 
     import os
-    from aiotg import TgBot
+    from aiotg import Bot
 
-    bot = TgBot(os.environ["API_TOKEN"])
+    bot = Bot(os.environ["API_TOKEN"])
 
     @bot.command(r"/echo (.+)")
     def echo(chat, match):
