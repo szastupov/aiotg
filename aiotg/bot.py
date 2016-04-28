@@ -51,6 +51,7 @@ class Bot:
         self._commands = []
         self._default = lambda c, m: None
         self._inline = lambda iq: None
+        self._callback = lambda cq: None
 
     @asyncio.coroutine
     def loop(self):
@@ -114,6 +115,13 @@ class Bot:
         Set callback for inline queries
         """
         self._inline = callback
+        return callback
+
+    def callback(self, callback):
+        """
+        Set callback for callback queries
+        """
+        self._callback = callback
         return callback
 
     def handle(self, msg_type):
@@ -229,6 +237,11 @@ class Bot:
         iq = InlineQuery(self, query)
         return self._inline(iq)
 
+    def _process_callback_query(self, query):
+        chat = Chat.from_message(self, query["message"])
+        cq = CallbackQuery(self, query)
+        return self._callback(chat, cq)
+
     def _process_updates(self, updates):
         if not updates["ok"]:
             logger.error("getUpdates error: %s", updates.get("description"))
@@ -237,11 +250,14 @@ class Bot:
         for update in updates["result"]:
             logger.debug("update %s", update)
             self._offset = max(self._offset, update["update_id"])
+            coro = None
 
             if "message" in update:
                 coro = self._process_message(update["message"])
             elif "inline_query" in update:
                 coro = self._process_inline_query(update["inline_query"])
+            elif "callback_query" in update:
+                coro = self._process_callback_query(update["callback_query"])
 
             if coro:
                 asyncio.async(coro)
@@ -278,3 +294,16 @@ class TgInlineQuery(InlineQuery):
     def __init__(self, *args, **kwargs):
         logger.warning("TgInlineQuery is depricated, use InlineQuery instead")
         super().__init__(*args, **kwargs)
+
+
+class CallbackQuery:
+    def __init__(self, bot, src):
+        self.bot = bot
+        self.query_id = src['id']
+        self.data = src['data']
+
+    def answer(self):
+        return self.bot.api_call(
+            "answerCallbackQuery",
+            callback_query_id=self.query_id
+        )
