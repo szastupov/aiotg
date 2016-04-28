@@ -18,7 +18,7 @@ class Chat:
         """
         return self.bot.send_message(self.id, text, **options)
 
-    def reply(self, text, markup=None, parse_mode=None):
+    def reply(self, text, markup={}, parse_mode=None):
         return self.send_text(
             text,
             reply_to_message_id=self.message["message_id"],
