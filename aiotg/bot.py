@@ -51,7 +51,7 @@ class Bot:
         self._commands = []
         self._default = lambda c, m: None
         self._inline = lambda iq: None
-        self._callback = lambda cq: None
+        self._callback = lambda c, cq: None
 
     @asyncio.coroutine
     def loop(self):
@@ -106,6 +106,11 @@ class Bot:
         """
         Set callback for default command that is
         called on unrecognized commands for 1to1 chats
+
+        :Example:
+        >>> @bot.default
+        >>> def echo(chat, message):
+        >>>     return chat.reply(message["text"])
         """
         self._default = callback
         return callback
@@ -113,6 +118,13 @@ class Bot:
     def inline(self, callback):
         """
         Set callback for inline queries
+
+        :Example:
+        >>> @bot.inline
+        >>> def echo(iq):
+        >>>     return iq.answer([
+        >>>         {"type": "text", "title": "test", "id", "0"}
+        >>>     ])
         """
         self._inline = callback
         return callback
@@ -120,6 +132,11 @@ class Bot:
     def callback(self, callback):
         """
         Set callback for callback queries
+
+        :Example:
+        >>> @bot.callback
+        >>> def echo(chat, cq):
+        >>>     return cq.answer()
         """
         self._callback = callback
         return callback

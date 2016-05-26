@@ -12,23 +12,32 @@ bot = Bot(API_TOKEN)
 def custom_msg(msg):
     template = {
         "message_id": 0,
-        "from": { "first_name": "John" },
-        "chat": { "id": 0, "type": "private" }
+        "from": {"first_name": "John"},
+        "chat": {"id": 0, "type": "private"}
     }
     template.update(msg)
     return template
 
 
 def text_msg(text):
-    return custom_msg({ "text": text })
+    return custom_msg({"text": text})
 
 
 def inline_query(query):
     return {
-        "from": { "first_name": "John" },
+        "from": {"first_name": "John"},
         "offset": "",
         "query": query,
         "id": "9999"
+    }
+
+
+def callback_query(data):
+    return {
+        "from": {"first_name": "John"},
+        "data": data,
+        "id": "9999",
+        "message": custom_msg({})
     }
 
 
@@ -68,6 +77,22 @@ def test_inline():
 
     bot._process_inline_query(inline_query("foo bar"))
     assert called_with == "foo bar"
+
+
+def test_callback_default():
+    bot._process_callback_query(callback_query("foo"))
+
+
+def test_callback():
+    called_with = None
+
+    @bot.callback
+    def callback(chat, cq):
+        nonlocal called_with
+        called_with = cq.data
+
+    bot._process_callback_query(callback_query("foo"))
+    assert called_with == "foo"
 
 
 def test_updates():
