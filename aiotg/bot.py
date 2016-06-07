@@ -161,6 +161,7 @@ class Bot:
         See https://core.telegram.org/bots/api for the reference
         """
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
+        logger.debug("api_call %s, %s", method, params)
         response = await aiohttp.post(url, data=params)
 
         if response.status == 200:
