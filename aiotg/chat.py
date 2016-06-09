@@ -40,7 +40,7 @@ class Chat:
     send_document = partialmethod(_send_to_chat, "sendDocument")
     send_sticker = partialmethod(_send_to_chat, "sendSticker")
     send_voice = partialmethod(_send_to_chat, "sendVoice")
-    send_locaton = partialmethod(_send_to_chat, "sendLocation")
+    send_location = partialmethod(_send_to_chat, "sendLocation")
     send_chat_action = partialmethod(_send_to_chat, "sendChatAction")
 
     def forward_message(self, from_chat_id, message_id):
