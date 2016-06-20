@@ -33,6 +33,26 @@ Then you can create a new bot in few lines:
 
 Now run it with a proper API\_TOKEN and it should reply to /echo commands.
 
+The example above looks like a normal synchronous code but it actually returns a coroutine.
+If you want to make an external request (and that's what bots usually do) just use aiohttp and async/await syntax:
+
+.. code:: python
+
+    import aiohttp
+    from aiotg import Bot
+
+    bot = Bot(api_token="...")
+
+
+    @bot.command("bitcoin")
+    async def bitcoin(chat, match):
+        url = "https://api.bitcoinaverage.com/ticker/global/USD/"
+        async with aiohttp.get(url) as s:
+            info = await s.json()
+            await chat.send_text(info["24h_avg"])
+
+    bot.run()
+
 For a more complete example, take a look at
 `WhatisBot <https://github.com/szastupov/whatisbot/blob/master/main.py>`__ or `Music Catalog Bot <https://github.com/szastupov/musicbot>`__.
 
