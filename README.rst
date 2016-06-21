@@ -43,7 +43,6 @@ If you want to make an external request (and that's what bots usually do) just u
 
     bot = Bot(api_token="...")
 
-
     @bot.command("bitcoin")
     async def bitcoin(chat, match):
         url = "https://api.bitcoinaverage.com/ticker/global/USD/"
