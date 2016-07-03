@@ -27,6 +27,15 @@ class Chat:
             parse_mode=parse_mode
         )
 
+    def edit_text(self, message_id, text, markup={}, parse_mode=None):
+        return self.bot.edit_message_text(
+            self.id,
+            message_id,
+            text,
+            reply_markup=json.dumps(markup),
+            parse_mode=parse_mode
+        )
+
     def _send_to_chat(self, method, **options):
         return self.bot.api_call(
             method,
