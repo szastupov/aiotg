@@ -201,7 +201,7 @@ def test_edit_message():
     assert bot.calls["sendMessage"]["text"] == "hello"
 
     chat.edit_text(message_id, "bye")
-    assert "editMessageText" not in bot.calls
+    assert "editMessageText" in bot.calls
     assert bot.calls["editMessageText"]["text"] == "bye"
     assert bot.calls["editMessageText"]["chat_id"] == chat_id
     assert bot.calls["editMessageText"]["message_id"] == message_id
