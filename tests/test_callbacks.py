@@ -152,6 +152,14 @@ class MockBot:
             **kwargs
         )
 
+    def edit_message_text(self, chat_id, message_id, text, **kwargs):
+        return self.api_call(
+            "editMessageText",
+            message_id=message_id,
+            text=text,
+            **kwargs
+       )
+
 
 def test_chat_methods():
     bot = MockBot()
@@ -194,14 +202,10 @@ def test_inline_answer():
 def test_edit_message():
     bot = MockBot()
     chat_id = 42
+    message_id = 1337
     chat = Chat(bot, chat_id)
-
-    message_id = chat.send_text("hello")["result"]["message_id"]
-    assert "sendMessage" in bot.calls
-    assert bot.calls["sendMessage"]["text"] == "hello"
 
     chat.edit_text(message_id, "bye")
     assert "editMessageText" in bot.calls
     assert bot.calls["editMessageText"]["text"] == "bye"
-    assert bot.calls["editMessageText"]["chat_id"] == chat_id
     assert bot.calls["editMessageText"]["message_id"] == message_id
