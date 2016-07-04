@@ -3,3 +3,19 @@ venv
 build
 dist
 aiotg.egg-info
+.cache
+
+### macOS ###
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Must end with CRCR (^M^M in vim)
+Icon
+
+# Thumbnails
+._*
+
+### Temporary editor files ###
+*~
+*.swp
