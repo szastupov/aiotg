@@ -186,6 +186,17 @@ class Bot:
         """Send a text message to chat"""
         return self._send_message(chat_id=chat_id, text=text, **options)
 
+    _edit_message_text = partialmethod(api_call, "editMessageText")
+
+    def edit_message_text(self, chat_id, message_id, text, **options):
+        """Edit a text message in a chat"""
+        return self._edit_message_text(
+            chat_id=chat_id,
+            message_id=message_id,
+            text=text,
+            **options
+        )
+
     @asyncio.coroutine
     def get_file(self, file_id):
         """
