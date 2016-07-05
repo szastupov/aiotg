@@ -94,7 +94,7 @@ class Bot:
 
     def command(self, regexp):
         """
-        Decorator to register a new command
+        Register a new command
 
         :param str regexp: Regular expression matching the command to register
 
