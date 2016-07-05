@@ -172,7 +172,6 @@ class Bot:
         See https://core.telegram.org/bots/api for reference.
 
         :param str method: Telegram API method
-        :param bytes rawdata: Raw data, if present
         :param params: Arguments for the method call
         """
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
