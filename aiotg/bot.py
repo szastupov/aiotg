@@ -165,7 +165,7 @@ class Bot:
             return callback
         return wrap
 
-    async def api_call(self, method, rawdata=None, **params):
+    async def api_call(self, method, **params):
         """
         Call Telegram API.
 
@@ -178,14 +178,7 @@ class Bot:
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         logger.debug("api_call %s, %s", method, params)
 
-        response = None
-        if rawdata is not None:
-            with aiohttp.MultipartWriter('mixed') as mpwriter:
-                mpwriter.append(rawdata)
-                mpwriter.append(params)
-                response = await aiohttp.post(url, data=mpwriter)
-        else:
-            response = await aiohttp.post(url, data=params)
+        response = await aiohttp.post(url, data=params)
 
         if response.status == 200:
             return (await response.json())
