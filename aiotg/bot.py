@@ -28,10 +28,10 @@ logger = logging.getLogger("aiotg")
 class Bot:
     """Telegram bot framework designed for asyncio
 
-    :param api_token: Telegram bot token, ask @BotFather for this
-    :param api_timeout: Timeout for long polling
-    :param botan_token: Token for http://botan.io
-    :param name: Bot name
+    :param str api_token: Telegram bot token, ask @BotFather for this
+    :param int api_timeout: Timeout for long polling
+    :param str botan_token: Token for http://botan.io
+    :param str name: Bot name
     """
 
     _running = False
@@ -56,13 +56,16 @@ class Bot:
     @asyncio.coroutine
     def loop(self):
         """
-        Return bot's main loop as coroutine
+        Return bot's main loop as coroutine. Use with asyncio.
 
-        Use it with asyncio:
+        :Example:
+
         >>> loop = asyncio.get_event_loop()
         >>> loop.run_until_complete(bot.loop())
 
-        or:
+        or
+
+        >>> loop = asyncio.get_event_loop()
         >>> loop.create_task(bot.loop())
         """
         self._running = True
@@ -79,6 +82,7 @@ class Bot:
         Convenience method for running bots
 
         :Example:
+
         >>> if __name__ == '__main__':
         >>>     bot.run()
         """
@@ -92,7 +96,10 @@ class Bot:
         """
         Register a new command
 
+        :param str regexp: Regular expression matching the command to register
+
         :Example:
+
         >>> @bot.command(r"/echo (.+)")
         >>> def echo(chat, match):
         >>>     return chat.reply(match.group(1))
@@ -104,10 +111,11 @@ class Bot:
 
     def default(self, callback):
         """
-        Set callback for default command that is
-        called on unrecognized commands for 1to1 chats
+        Set callback for default command that is called on unrecognized
+        commands for 1-to-1 chats
 
         :Example:
+
         >>> @bot.default
         >>> def echo(chat, message):
         >>>     return chat.reply(message["text"])
@@ -120,6 +128,7 @@ class Bot:
         Set callback for inline queries
 
         :Example:
+
         >>> @bot.inline
         >>> def echo(iq):
         >>>     return iq.answer([
@@ -134,6 +143,7 @@ class Bot:
         Set callback for callback queries
 
         :Example:
+
         >>> @bot.callback
         >>> def echo(chat, cq):
         >>>     return cq.answer()
@@ -158,7 +168,11 @@ class Bot:
     async def api_call(self, method, **params):
         """
         Call Telegram API
-        See https://core.telegram.org/bots/api for the reference
+
+        See https://core.telegram.org/bots/api for reference
+
+        :param method: Telegram API method
+        :param params: Arguments for the method call
         """
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         logger.debug("api_call %s, %s", method, params)
@@ -183,13 +197,27 @@ class Bot:
     _send_message = partialmethod(api_call, "sendMessage")
 
     def send_message(self, chat_id, text, **options):
-        """Send a text message to chat"""
+        """
+        Send a text message to chat
+
+        :param int chat_id: ID of the chat to send the message to
+        :param str text: Text to send
+        :param options: Additional sendMessage options
+            (see https://core.telegram.org/bots/api#sendmessage)
+        """
         return self._send_message(chat_id=chat_id, text=text, **options)
 
     _edit_message_text = partialmethod(api_call, "editMessageText")
 
     def edit_message_text(self, chat_id, message_id, text, **options):
-        """Edit a text message in a chat"""
+        """
+        Edit a text message in a chat
+
+        :param int chat_id: ID of the chat the message to edit is in
+        :param int message_id: ID of the message to edit
+        :param str text: Text to edit the message to
+        :param options: Additional API options
+        """
         return self._edit_message_text(
             chat_id=chat_id,
             message_id=message_id,
@@ -200,7 +228,10 @@ class Bot:
     @asyncio.coroutine
     def get_file(self, file_id):
         """
-        https://core.telegram.org/bots/api#getfile
+        Get basic information about a file and prepare it for downloading.
+
+        :param int file_id: File identifier to get information about
+        :return: File object (see https://core.telegram.org/bots/api#file)
         """
         json = yield from self.api_call("getFile", file_id=file_id)
         return json["result"]
