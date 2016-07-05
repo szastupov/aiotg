@@ -1,8 +1,12 @@
 from setuptools import setup, find_packages
 
+version_file = open('VERSION')
+version = version_file.read().strip()
+version_file.close()
+
 setup(
     name='aiotg',
-    version='0.7.7',
+    version=version,
     description='Asynchronous Python API for building Telegram bots',
     url='https://github.com/szastupov/aiotg',
 

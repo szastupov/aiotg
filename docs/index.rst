@@ -1,5 +1,5 @@
-aiotg
-=====
+aiotg |version|
+===============
 
 Asynchronous Python API for building Telegram bots, featuring:
 
