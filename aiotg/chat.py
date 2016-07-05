@@ -67,15 +67,14 @@ class Chat:
         """
         Send an mp3 audio file to the chat.
 
-        :param bytes audio: ``bytes`` object containing the audio data
+        :param audio: Object containing the audio data
         :param options: Additional sendAudio options (see
             https://core.telegram.org/bots/api#sendaudio)
 
         :Example:
 
         >>> with open("foo.mp3", "rb") as f:
-        >>>     buf = f.read()
-        >>>     chat.send_audio(buf, performer='Bar Fighters', title='Eversong')
+        >>>     chat.send_audio(f, performer="Bar Fighters", title="Eversong")
         """
         return self.bot.api_call(
             "sendAudio",
@@ -84,9 +83,72 @@ class Chat:
             **options
         )
 
-    send_photo = partialmethod(_send_to_chat, "sendPhoto")
-    send_video = partialmethod(_send_to_chat, "sendVideo")
-    send_document = partialmethod(_send_to_chat, "sendDocument")
+    def send_photo(self, photo, caption="", **options):
+        """
+        Send a photo to the chat.
+
+        :param photo: Object containing the photo data
+        :param str caption: Photo caption (optional)
+        :param options: Additional sendPhoto options (see
+            https://core.telegram.org/bots/api#sendphoto)
+
+        :Example:
+
+        >>> with open("foo.png", "rb") as f:
+        >>>     chat.send_photo(f, caption="Would you look at this!")
+        """
+        return self.bot.api_call(
+            "sendPhoto",
+            chat_id=str(self.id),
+            photo=photo,
+            caption=caption,
+            **options
+        )
+
+    def send_video(self, video, caption="", **options):
+        """
+        Send an mp4 video file to the chat.
+
+        :param video: Object containing the video data
+        :param str caption: Video caption (optional)
+        :param options: Additional sendVideo options (see
+            https://core.telegram.org/bots/api#sendvideo)
+
+        :Example:
+
+        >>> with open("foo.mp4", "rb") as f:
+        >>>     chat.send_video(f)
+        """
+        return self.bot.api_call(
+            "sendVideo",
+            chat_id=str(self.id),
+            video=video,
+            caption=caption,
+            **options
+        )
+
+    def send_document(self, document, caption="", **options):
+        """
+        Send a general file.
+
+        :param document: Object containing the document data
+        :param str caption: Document caption (optional)
+        :param options: Additional sendDocument options (see
+            https://core.telegram.org/bots/api#senddocument)
+
+        :Example:
+
+        >>> with open("file.doc", "rb") as f:
+        >>>     chat.send_document(f)
+        """
+        return self.bot.api_call(
+            "sendDocument",
+            chat_id=str(self.id),
+            document=document,
+            caption=caption,
+            **options
+        )
+
     send_sticker = partialmethod(_send_to_chat, "sendSticker")
     send_voice = partialmethod(_send_to_chat, "sendVoice")
     send_location = partialmethod(_send_to_chat, "sendLocation")
