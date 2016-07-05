@@ -1,7 +1,6 @@
 from setuptools import setup, find_packages
-import os
 
-version_file = open(os.path.join('VERSION'))
+version_file = open('VERSION')
 version = version_file.read().strip()
 
 setup(
