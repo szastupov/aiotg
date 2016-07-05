@@ -170,10 +170,31 @@ def test_chat_methods():
     assert "sendMessage" in bot.calls
     assert bot.calls["sendMessage"]["text"] == "hello"
 
-    # Just test a single wrapper, the rest are same
-    chat.send_photo()
+def test_send_methods():
+    bot = MockBot()
+    chat_id = 42
+    chat = Chat(bot, chat_id)
+
+    chat.send_audio(b"foo")
+    assert "sendAudio" in bot.calls
+
+    chat.send_voice(b"foo")
+    assert "sendVoice" in bot.calls
+
+    chat.send_photo(b"foo")
     assert "sendPhoto" in bot.calls
-    assert isinstance(bot.calls["sendPhoto"]["chat_id"], str)
+
+    chat.send_video(b"foo")
+    assert "sendVideo" in bot.calls
+
+    chat.send_document(b"foo")
+    assert "sendDocument" in bot.calls
+
+    chat.send_location(13.0, 37.0)
+    assert "sendLocation" in bot.calls
+
+    chat.send_chat_action("typing")
+    assert "sendChatAction" in bot.calls
 
 
 def test_chat_reply():
