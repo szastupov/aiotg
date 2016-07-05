@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 
 version_file = open('VERSION')
 version = version_file.read().strip()
+version_file.close()
 
 setup(
     name='aiotg',
