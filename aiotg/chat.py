@@ -63,7 +63,27 @@ class Chat:
             **options
         )
 
-    send_audio = partialmethod(_send_to_chat, "sendAudio")
+    def send_audio(self, audio, **options):
+        """
+        Send an mp3 audio file to the chat.
+
+        :param bytes audio: ``bytes`` object containing the audio data
+        :param options: Additional sendAudio options (see
+            https://core.telegram.org/bots/api#sendaudio)
+
+        :Example:
+
+        >>> with open("foo.mp3", "rb") as f:
+        >>>     buf = f.read()
+        >>>     chat.send_audio(buf, performer='Bar Fighters', title='Eversong')
+        """
+        return self.bot.api_call(
+            "sendAudio",
+            chat_id=str(self.id),
+            audio=audio,
+            **options
+        )
+
     send_photo = partialmethod(_send_to_chat, "sendPhoto")
     send_video = partialmethod(_send_to_chat, "sendVideo")
     send_document = partialmethod(_send_to_chat, "sendDocument")
