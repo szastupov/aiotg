@@ -167,15 +167,17 @@ class Bot:
 
     async def api_call(self, method, **params):
         """
-        Call Telegram API
+        Call Telegram API.
 
-        See https://core.telegram.org/bots/api for reference
+        See https://core.telegram.org/bots/api for reference.
 
-        :param method: Telegram API method
+        :param str method: Telegram API method
+        :param bytes rawdata: Raw data, if present
         :param params: Arguments for the method call
         """
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         logger.debug("api_call %s, %s", method, params)
+
         response = await aiohttp.post(url, data=params)
 
         if response.status == 200:
