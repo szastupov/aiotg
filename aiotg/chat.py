@@ -56,7 +56,7 @@ class Chat:
             parse_mode=parse_mode
         )
 
-    def _send_to_chat(self, docstring, method, **options):
+    def _send_to_chat(self, method, **options):
         return self.bot.api_call(
             method,
             chat_id=str(self.id),
