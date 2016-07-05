@@ -63,6 +63,8 @@ class Chat:
             **options
         )
 
+    send_sticker = partialmethod(_send_to_chat, "sendSticker")
+
     def send_audio(self, audio, **options):
         """
         Send an mp3 audio file to the chat.
@@ -149,10 +151,64 @@ class Chat:
             **options
         )
 
-    send_sticker = partialmethod(_send_to_chat, "sendSticker")
-    send_voice = partialmethod(_send_to_chat, "sendVoice")
-    send_location = partialmethod(_send_to_chat, "sendLocation")
-    send_chat_action = partialmethod(_send_to_chat, "sendChatAction")
+    def send_voice(self, voice, **options):
+        """
+        Send an OPUS-encoded .ogg audio file.
+
+        :param voice: Object containing the audio data
+        :param options: Additional sendVoice options (see
+            https://core.telegram.org/bots/api#sendvoice)
+
+        :Example:
+
+        >>> with open("voice.ogg", "rb") as f:
+        >>>     chat.send_voice(f)
+        """
+        return self.bot.api_call(
+            "sendVoice",
+            chat_id=self.id,
+            voice=voice,
+            **options
+        )
+
+    def send_location(self, latitude, longitude, **options):
+        """
+        Send a point on the map.
+
+        :param float latitude: Latitude of the location
+        :param float longitude: Longitude of the location
+        :param options: Additional sendLocation options (see
+            https://core.telegram.org/bots/api#sendlocation)
+        """
+        return self.bot.api_call(
+            "sendLocation",
+            chat_id=self.id,
+            latitude=latitude,
+            longitude=longitude,
+            **options
+        )
+
+    def send_chat_action(self, action):
+        """
+        Send a chat action, to tell the user that something is happening on the
+        bot's side.
+
+        Available actions:
+
+        *  `typing` for text messages
+        *  `upload_photo` for photos
+        *  `record_video` and `upload_video` for videos
+        *  `record_audio` and `upload_audio` for audio files
+        *  `upload_document` for general files
+        *  `find_location` for location data
+
+        :param str action: Type of action to broadcast
+        """
+        return self.bot.api_call(
+            "sendChatAction",
+            chat_id=self.id,
+            action=action
+        )
 
     def forward_message(self, from_chat_id, message_id):
         """
