@@ -13,12 +13,23 @@ class Chat:
 
     def send_text(self, text, **options):
         """
-        Send a text message to the chat, for available options see
-        https://core.telegram.org/bots/api#sendmessage
+        Send a text message to the chat.
+
+        :param str text: Text of the message to send
+        :param options: Additional sendMessage options (see
+            https://core.telegram.org/bots/api#sendmessage
         """
         return self.bot.send_message(self.id, text, **options)
 
     def reply(self, text, markup={}, parse_mode=None):
+        """
+        Reply to the message this `Chat` object is based on.
+
+        :param str text: Text of the message to send
+        :param dict markup: Markup options
+        :param str parse_mode: Text parsing mode (``"Markdown"``, ``"HTML"`` or
+            ``None``)
+        """
         return self.send_text(
             text,
             reply_to_message_id=self.message["message_id"],
@@ -28,6 +39,15 @@ class Chat:
         )
 
     def edit_text(self, message_id, text, markup={}, parse_mode=None):
+        """
+        Edit the message in this chat.
+
+        :param int message_id: ID of the message to edit
+        :param str text: Text to edit the message to
+        :param dict markup: Markup options
+        :param str parse_mode: Text parsing mode (``"Markdown"``, ``"HTML"`` or
+            ``None``)
+        """
         return self.bot.edit_message_text(
             self.id,
             message_id,
@@ -36,7 +56,7 @@ class Chat:
             parse_mode=parse_mode
         )
 
-    def _send_to_chat(self, method, **options):
+    def _send_to_chat(self, docstring, method, **options):
         return self.bot.api_call(
             method,
             chat_id=str(self.id),
@@ -53,6 +73,12 @@ class Chat:
     send_chat_action = partialmethod(_send_to_chat, "sendChatAction")
 
     def forward_message(self, from_chat_id, message_id):
+        """
+        Forward a message from another chat to this chat.
+
+        :param int from_chat_id: ID of the chat to forward the message from
+        :param int message_id: ID of the message to forward
+        """
         return self.bot.api_call(
             "forwardMessage",
             chat_id=self.id,
@@ -61,6 +87,11 @@ class Chat:
         )
 
     def is_group(self):
+        """
+        Check if this chat is a group.
+
+        :return: ``True`` if this chat is a group, ``False`` otherwise
+        """
         return self.type == "group"
 
     def __init__(self, bot, chat_id, chat_type="private", src_message=None):
@@ -73,6 +104,13 @@ class Chat:
 
     @staticmethod
     def from_message(bot, message):
+        """
+        Create a ``Chat`` object from a message.
+
+        :param Bot bot: ``Bot`` object the message and chat belong to
+        :param dict message: Message to base the object on
+        :return: A chat object based on the message
+        """
         chat = message["chat"]
         return Chat(bot, chat["id"], chat["type"], message)
 
