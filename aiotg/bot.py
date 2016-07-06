@@ -156,6 +156,7 @@ class Bot:
         Set handler for specific message type
 
         :Example:
+
         >>> @bot.handle("audio")
         >>> def handle(chat, audio):
         >>>     pass

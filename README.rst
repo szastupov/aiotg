@@ -55,4 +55,4 @@ If you want to make an external request (and that's what bots usually do) just u
 For a more complete example, take a look at
 `WhatisBot <https://github.com/szastupov/whatisbot/blob/master/main.py>`__ or `Music Catalog Bot <https://github.com/szastupov/musicbot>`__.
 
-Have a question? Ask it on project's `Telegram chat <https://telegram.me/joinchat/ABwEXjy3Tfmj2NAqEsQ1nw>`__.
+For more information on how to use the project, see the project's `documentation <https://aiotg.sijmenschoon.nl/>`__. Have a question? Ask it on project's `Telegram chat <https://telegram.me/joinchat/ABwEXjy3Tfmj2NAqEsQ1nw>`__.
