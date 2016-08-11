@@ -52,6 +52,21 @@ If you want to make an external request (and that's what bots usually do) just u
 
     bot.run()
 
+
+But what if you just want to write a quick integration and don't need to provide a conversational interface? We've got you covered!
+You can send messages (or any other media) by constructing a Chat object with user_id or channel name. We even saved you some extra keystrokes by providing handy Channel constructors:
+
+.. code:: python
+    ...
+    channel = bot.channel("@yourchannel")
+    private = bot.private("1836126")
+
+    async def greeter():
+        await channel.send_text("Hello from channel!")
+        await private.send_text("Why not greet personally?")
+    ...
+
+
 For a more complete example, take a look at
 `WhatisBot <https://github.com/szastupov/whatisbot/blob/master/main.py>`__ or `Music Catalog Bot <https://github.com/szastupov/musicbot>`__.
 

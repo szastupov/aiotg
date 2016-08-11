@@ -166,6 +166,30 @@ class Bot:
             return callback
         return wrap
 
+    def channel(self, channel_name):
+        """
+        Construct a Chat object used to post to channel
+
+        :param str channel_name: Channel name
+        """
+        return Chat(self, channel_name, "channel")
+
+    def private(self, user_id):
+        """
+        Construct a Chat object used to post direct messages
+
+        :param str user_id: User id
+        """
+        return Chat(self, user_id, "private")
+
+    def group(self, group_id):
+        """
+        Construct a Chat object used to post group messages
+
+        :param str group_id: Group chat id
+        """
+        return Chat(self, group_id, "group")
+
     async def api_call(self, method, **params):
         """
         Call Telegram API.

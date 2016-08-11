@@ -137,6 +137,17 @@ def test_handle(mt):
     assert called_with == value
 
 
+@pytest.mark.parametrize("ctype,id", [
+    ("channel", "@foobar"),
+    ("private", "111111"),
+    ("group", "222222")
+])
+def test_channel_constructors(ctype, id):
+    chat = getattr(bot, ctype)(id)
+    assert chat.id == id
+    assert chat.type == ctype
+
+
 class MockBot:
     def __init__(self):
         self.calls = {}
