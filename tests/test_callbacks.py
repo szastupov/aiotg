@@ -169,7 +169,7 @@ class MockBot:
             message_id=message_id,
             text=text,
             **kwargs
-       )
+        )
 
 
 def test_chat_methods():
@@ -180,6 +180,7 @@ def test_chat_methods():
     chat.send_text("hello")
     assert "sendMessage" in bot.calls
     assert bot.calls["sendMessage"]["text"] == "hello"
+
 
 def test_send_methods():
     bot = MockBot()
@@ -230,6 +231,7 @@ def test_inline_answer():
     iq.answer(results)
     assert "answerInlineQuery" in bot.calls
     assert isinstance(bot.calls["answerInlineQuery"]["results"], str)
+
 
 def test_edit_message():
     bot = MockBot()

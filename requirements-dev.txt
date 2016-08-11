@@ -3,4 +3,5 @@ chardet
 pytest
 testfixtures
 sphinx
+flake8
 -e .

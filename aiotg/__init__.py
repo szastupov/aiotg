@@ -1,1 +1,1 @@
-from aiotg.bot import *
+from aiotg.bot import *  # noqa
