@@ -57,6 +57,7 @@ But what if you just want to write a quick integration and don't need to provide
 You can send messages (or any other media) by constructing a Chat object with user_id or channel name. We even saved you some extra keystrokes by providing handy Channel constructors:
 
 .. code:: python
+
     ...
     channel = bot.channel("@yourchannel")
     private = bot.private("1836126")
