@@ -60,7 +60,7 @@ You can send messages (or any other media) by constructing a Chat object with us
 
     ...
     channel = bot.channel("@yourchannel")
-    private = bot.private("1836126")
+    private = bot.private("1111111")
 
     async def greeter():
         await channel.send_text("Hello from channel!")
