@@ -205,6 +205,9 @@ def test_send_methods():
     chat.send_location(13.0, 37.0)
     assert "sendLocation" in bot.calls
 
+    chat.send_venue(13.0, 37.0, b"foo", b"foo")
+    assert "sendLocation" in bot.calls
+
     chat.send_chat_action("typing")
     assert "sendChatAction" in bot.calls
 

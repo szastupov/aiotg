@@ -18,7 +18,7 @@ RETRY_CODES = [429, 500, 502, 503, 504]
 BOTAN_URL = "https://api.botan.io/track"
 
 MESSAGE_TYPES = [
-    "location", "photo", "document", "audio", "voice", "sticker", "contact"
+    "location", "photo", "document", "audio", "voice", "sticker", "contact", "venue"
 ]
 
 
@@ -276,7 +276,7 @@ class Bot:
         Set botak_token to make it work
         """
         if self.botan_token:
-            asyncio.async(self._track(message, name))
+            asyncio.ensure_future(self._track(message, name))
 
     def stop(self):
         self._running = False
@@ -346,7 +346,7 @@ class Bot:
                 coro = self._process_callback_query(update["callback_query"])
 
             if coro:
-                asyncio.async(coro)
+                asyncio.ensure_future(coro)
 
 
 class TgBot(Bot):
