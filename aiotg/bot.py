@@ -18,7 +18,8 @@ RETRY_CODES = [429, 500, 502, 503, 504]
 BOTAN_URL = "https://api.botan.io/track"
 
 MESSAGE_TYPES = [
-    "location", "photo", "document", "audio", "voice", "sticker", "contact"
+    "location", "photo", "document", "audio", "voice", "sticker", "contact",
+    "venue"
 ]
 
 

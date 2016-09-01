@@ -188,6 +188,27 @@ class Chat:
             **options
         )
 
+    def send_venue(self, latitude, longitude, title, address, **options):
+        """
+        Send information about a venue.
+
+        :param float latitude: Latitude of the location
+        :param float longitude: Longitude of the location
+        :param str title: Name of the venue
+        :param str address: Address of the venue
+        :param options: Additional sendVenue options (see
+            https://core.telegram.org/bots/api#sendvenue)
+        """
+        return self.bot.api_call(
+            "sendVenue",
+            chat_id=self.id,
+            latitude=latitude,
+            longitude=longitude,
+            title=title,
+            address=address,
+            **options
+        )
+
     def send_chat_action(self, action):
         """
         Send a chat action, to tell the user that something is happening on the
