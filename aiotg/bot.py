@@ -54,8 +54,7 @@ class Bot:
         self._inline = lambda iq: None
         self._callback = lambda c, cq: None
 
-    @asyncio.coroutine
-    def loop(self):
+    async def loop(self):
         """
         Return bot's main loop as coroutine. Use with asyncio.
 
@@ -71,7 +70,7 @@ class Bot:
         """
         self._running = True
         while self._running:
-            updates = yield from self.api_call(
+            updates = await self.api_call(
                 'getUpdates',
                 offset=self._offset + 1,
                 timeout=self.api_timeout
@@ -206,13 +205,13 @@ class Bot:
         response = await aiohttp.post(url, data=params)
 
         if response.status == 200:
-            return (await response.json())
+            return await response.json()
         elif response.status in RETRY_CODES:
             logger.info("Server returned %d, retrying in %d sec.",
                         response.status, RETRY_TIMEOUT)
             await response.release()
             await asyncio.sleep(RETRY_TIMEOUT)
-            return (await self.api_call(method, **params))
+            return await self.api_call(method, **params)
         else:
             if response.headers['content-type'] == 'application/json':
                 err_msg = (await response.json())["description"]
@@ -252,15 +251,14 @@ class Bot:
             **options
         )
 
-    @asyncio.coroutine
-    def get_file(self, file_id):
+    async def get_file(self, file_id):
         """
         Get basic information about a file and prepare it for downloading.
 
         :param int file_id: File identifier to get information about
         :return: File object (see https://core.telegram.org/bots/api#file)
         """
-        json = yield from self.api_call("getFile", file_id=file_id)
+        json = await self.api_call("getFile", file_id=file_id)
         return json["result"]
 
     def download_file(self, file_path, range=None):
@@ -282,9 +280,8 @@ class Bot:
     def stop(self):
         self._running = False
 
-    @asyncio.coroutine
-    def _track(self, message, name):
-        response = yield from aiohttp.post(
+    async def _track(self, message, name):
+        response = await aiohttp.post(
             BOTAN_URL,
             params={
                 "token": self.botan_token,
@@ -296,7 +293,7 @@ class Bot:
         )
         if response.status != 200:
             logger.info("error submiting stats %d", response.status)
-        yield from response.release()
+        await response.release()
 
     def _process_message(self, message):
         chat = Chat.from_message(self, message)
