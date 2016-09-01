@@ -220,6 +220,15 @@ class Bot:
             logger.error(err_msg)
             raise RuntimeError(err_msg)
 
+    _get_me = partialmethod(api_call, "getMe")
+
+    def get_me(self):
+        """
+        Returns basic information about the bot
+        (see https://core.telegram.org/bots/api#getme)
+        """
+        return self._get_me()
+
     _send_message = partialmethod(api_call, "sendMessage")
 
     def send_message(self, chat_id, text, **options):

@@ -171,6 +171,11 @@ class MockBot:
             **kwargs
         )
 
+    def get_me(self):
+        return self.api_call(
+            "getMe"
+        )
+
 
 def test_chat_methods():
     bot = MockBot()
