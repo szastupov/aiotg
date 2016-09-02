@@ -209,6 +209,23 @@ class Chat:
             **options
         )
 
+    def send_contact(self, phone_number, first_name, **options):
+        """
+        Send phone contacts.
+
+        :param str phone_number: Contact's phone number
+        :param str first_name: Contact's first name
+        :param options: Additional sendContact options (see
+            https://core.telegram.org/bots/api#sendcontact)
+        """
+        return self.bot.api_call(
+            "sendContact",
+            chat_id=self.id,
+            phone_number=phone_number,
+            first_name=first_name,
+            **options
+        )
+
     def send_chat_action(self, action):
         """
         Send a chat action, to tell the user that something is happening on the
