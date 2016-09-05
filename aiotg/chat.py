@@ -76,7 +76,7 @@ class Chat:
         :Example:
 
         >>> with open("foo.mp3", "rb") as f:
-        >>>     chat.send_audio(f, performer="Bar Fighters", title="Eversong")
+        >>>     await chat.send_audio(f, performer="Bar Fighters", title="Eversong")
         """
         return self.bot.api_call(
             "sendAudio",
@@ -97,7 +97,7 @@ class Chat:
         :Example:
 
         >>> with open("foo.png", "rb") as f:
-        >>>     chat.send_photo(f, caption="Would you look at this!")
+        >>>     await chat.send_photo(f, caption="Would you look at this!")
         """
         return self.bot.api_call(
             "sendPhoto",
@@ -119,7 +119,7 @@ class Chat:
         :Example:
 
         >>> with open("foo.mp4", "rb") as f:
-        >>>     chat.send_video(f)
+        >>>     await chat.send_video(f)
         """
         return self.bot.api_call(
             "sendVideo",
@@ -141,7 +141,7 @@ class Chat:
         :Example:
 
         >>> with open("file.doc", "rb") as f:
-        >>>     chat.send_document(f)
+        >>>     await chat.send_document(f)
         """
         return self.bot.api_call(
             "sendDocument",
@@ -162,7 +162,7 @@ class Chat:
         :Example:
 
         >>> with open("voice.ogg", "rb") as f:
-        >>>     chat.send_voice(f)
+        >>>     await chat.send_voice(f)
         """
         return self.bot.api_call(
             "sendVoice",
