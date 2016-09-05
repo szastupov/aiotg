@@ -76,7 +76,7 @@ class Chat:
         :Example:
 
         >>> with open("foo.mp3", "rb") as f:
-        >>>     await chat.send_audio(f, performer="Bar Fighters", title="Eversong")
+        >>>     await chat.send_audio(f, performer="Foo", title="Eversong")
         """
         return self.bot.api_call(
             "sendAudio",
