@@ -213,6 +213,9 @@ def test_send_methods():
     chat.send_venue(13.0, 37.0, b"foo", b"foo")
     assert "sendVenue" in bot.calls
 
+    chat.send_contact("+79260000000", b"foo")
+    assert "sendContact" in bot.calls
+
     chat.send_chat_action("typing")
     assert "sendChatAction" in bot.calls
 
