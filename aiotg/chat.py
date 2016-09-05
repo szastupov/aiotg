@@ -63,6 +63,45 @@ class Chat:
             **options
         )
 
+    def get_chat(self):
+        """
+        Get information about the chat.
+        """
+        return self.bot.api_call(
+            "getChat",
+            chat_id=str(self.id)
+        )
+
+    def get_chat_administrators(self):
+        """
+        Get a list of administrators in a chat. Chat must not be private.
+        """
+        return self.bot.api_call(
+            "getChatAdministrators",
+            chat_id=str(self.id)
+        )
+
+    def get_chat_members_count(self):
+        """
+        Get the number of members in a chat.
+        """
+        return self.bot.api_call(
+            "getChatMembersCount",
+            chat_id=str(self.id)
+        )
+
+    def get_chat_member(self, user_id):
+        """
+        Get information about a member of a chat.
+
+        :param int user_id: Unique identifier of the target user
+        """
+        return self.bot.api_call(
+            "getChatMember",
+            chat_id=str(self.id),
+            user_id=str(user_id)
+        )
+
     send_sticker = partialmethod(_send_to_chat, "sendSticker")
 
     def send_audio(self, audio, **options):
