@@ -74,7 +74,7 @@ class Chat:
 
     def get_chat_administrators(self):
         """
-        Get a list of administrators in a chat. Chat must be not private.
+        Get a list of administrators in a chat. Chat must not be private.
         """
         return self.bot.api_call(
             "getChatAdministrators",
@@ -94,12 +94,12 @@ class Chat:
         """
         Get information about a member of a chat.
 
-        :param user_id: int Unique identifier of the target user
+        :param int user_id: Unique identifier of the target user
         """
         return self.bot.api_call(
             "getChatMember",
             chat_id=str(self.id),
-            user_id=int(user_id)
+            user_id=str(user_id)
         )
 
     send_sticker = partialmethod(_send_to_chat, "sendSticker")
