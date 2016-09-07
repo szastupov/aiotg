@@ -263,13 +263,15 @@ def test_edit_message():
     assert bot.calls["editMessageText"]["text"] == "bye"
     assert bot.calls["editMessageText"]["message_id"] == message_id
 
+
 def test_edit_reply_markup():
     bot = MockBot()
     chat_id = 42
     message_id = 1337
     chat = Chat(bot, chat_id)
 
-    chat.edit_reply_markup(message_id, {'inline_keyboard': [['ok','cancel']]})
+    chat.edit_reply_markup(message_id, {'inline_keyboard': [['ok', 'cancel']]})
     assert "editMessageReplyMarkup" in bot.calls
-    assert bot.calls["editMessageReplyMarkup"]["reply_markup"] == '{"inline_keyboard": [["ok", "cancel"]]}'
-    assert bot.calls["editMessageReplyMarkup"]["message_id"] == message_id
+    call = bot.calls["editMessageReplyMarkup"]
+    assert call["reply_markup"] == '{"inline_keyboard": [["ok", "cancel"]]}'
+    assert call["message_id"] == message_id
