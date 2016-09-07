@@ -171,6 +171,14 @@ class MockBot:
             **kwargs
         )
 
+    def edit_message_reply_markup(self, chat_id, message_id, reply_markup, **kwargs):
+        return self.api_call(
+            "editMessageReplyMarkup",
+            message_id=message_id,
+            reply_markup=reply_markup,
+            **kwargs
+        )
+
     def get_me(self):
         return self.api_call(
             "getMe"
@@ -254,3 +262,14 @@ def test_edit_message():
     assert "editMessageText" in bot.calls
     assert bot.calls["editMessageText"]["text"] == "bye"
     assert bot.calls["editMessageText"]["message_id"] == message_id
+
+def test_edit_reply_markup():
+    bot = MockBot()
+    chat_id = 42
+    message_id = 1337
+    chat = Chat(bot, chat_id)
+
+    chat.edit_reply_markup(message_id, {'inline_keyboard': [['ok','cancel']]})
+    assert "editMessageReplyMarkup" in bot.calls
+    assert bot.calls["editMessageReplyMarkup"]["reply_markup"] == '{"inline_keyboard": [["ok", "cancel"]]}'
+    assert bot.calls["editMessageReplyMarkup"]["message_id"] == message_id

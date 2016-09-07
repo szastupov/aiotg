@@ -259,6 +259,24 @@ class Bot:
             **options
         )
 
+    _edit_message_reply_markup = partialmethod(api_call, "editMessageReplyMarkup")
+
+    def edit_message_reply_markup(self, chat_id, message_id, reply_markup, **options):
+        """
+        Edit a reply markup of message in a chat
+
+        :param int chat_id: ID of the chat the message to edit is in
+        :param int message_id: ID of the message to edit
+        :param str reply_markup: New inline keyboard markup for the message
+        :param options: Additional API options
+        """
+        return self._edit_message_reply_markup(
+            chat_id=chat_id,
+            message_id=message_id,
+            reply_markup=reply_markup,
+            **options
+        )
+
     async def get_file(self, file_id):
         """
         Get basic information about a file and prepare it for downloading.
