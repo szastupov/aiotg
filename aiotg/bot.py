@@ -271,16 +271,31 @@ class Bot:
 
     def download_file(self, file_path, range=None):
         """
-        Dowload a file from Telegram servers
+        Download a file from Telegram servers
         """
         headers = {"range": range} if range else None
         url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
         return aiohttp.get(url, headers=headers)
 
+    _get_user_profile_photos = partialmethod(api_call, "getUserProfilePhotos")
+
+    def get_user_profile_photos(self, user_id, **options):
+        """
+        Get a list of profile pictures for a user
+
+        :param int user_id: Unique identifier of the target user
+        :param options: Additional getUserProfilePhotos options (see
+            https://core.telegram.org/bots/api#getuserprofilephotos)
+        """
+        return self._get_user_profile_photos(
+            user_id=str(user_id),
+            **options
+        )
+
     def track(self, message, name="Message"):
         """
         Track message using http://botan.io
-        Set botak_token to make it work
+        Set botan_token to make it work
         """
         if self.botan_token:
             asyncio.ensure_future(self._track(message, name))
