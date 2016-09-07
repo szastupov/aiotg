@@ -56,6 +56,19 @@ class Chat:
             parse_mode=parse_mode
         )
 
+    def edit_reply_markup(self, message_id, markup):
+        """
+        Edit only reply markup of the message in this chat.
+
+        :param int message_id: ID of the message to edit
+        :param dict markup: Markup options
+        """
+        return self.bot.edit_message_reply_markup(
+            self.id,
+            message_id,
+            reply_markup=json.dumps(markup)
+        )
+
     def _send_to_chat(self, method, **options):
         return self.bot.api_call(
             method,
