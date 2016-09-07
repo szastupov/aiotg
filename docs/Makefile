@@ -190,3 +190,9 @@ pseudoxml:
 	$(SPHINXBUILD) -b pseudoxml $(ALLSPHINXOPTS) $(BUILDDIR)/pseudoxml
 	@echo
 	@echo "Build finished. The pseudo-XML files are in $(BUILDDIR)/pseudoxml."
+
+aiotg.docset:
+	doc2dash -n aiotg _build/html/
+
+aiotg.tgz: aiotg.docset
+	tar --exclude='.DS_Store' -cvzf $@ $^
