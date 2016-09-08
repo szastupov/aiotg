@@ -228,6 +228,18 @@ class Bot:
         json_result = await self.api_call("getMe")
         return json_result["result"]
 
+    async def leave_chat(self, chat_id):
+        """
+        Use this method for your bot to leave a group, supergroup or channel.
+        Returns True on success.
+
+        :param int chat_id: Unique identifier for the target chat
+        or username of the target supergroup or channel
+        (in the format @channelusername)
+        """
+        json_result = await self.api_call("leaveChat", chat_id=chat_id)
+        return json_result["result"]
+
     _send_message = partialmethod(api_call, "sendMessage")
 
     def send_message(self, chat_id, text, **options):
