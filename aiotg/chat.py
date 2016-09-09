@@ -314,6 +314,32 @@ class Chat:
             message_id=message_id
         )
 
+    def kick_chat_member(self, user_id):
+        """
+        Use this method to kick a user from a group or a supergroup.
+        The bot must be an administrator in the group for this to work.
+
+        :param int user_id: Unique identifier of the target user
+        """
+        return self.bot.api_call(
+            "kickChatMember",
+            chat_id=self.id,
+            user_id=user_id
+        )
+
+    def unban_chat_member(self, user_id):
+        """
+       Use this method to unban a previously kicked user in a supergroup.
+       The bot must be an administrator in the group for this to work.
+
+        :param int user_id: Unique identifier of the target user
+        """
+        return self.bot.api_call(
+            "unbanChatMember",
+            chat_id=self.id,
+            user_id=user_id
+        )
+
     def is_group(self):
         """
         Check if this chat is a group.
