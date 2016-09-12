@@ -329,8 +329,8 @@ class Chat:
 
     def unban_chat_member(self, user_id):
         """
-       Use this method to unban a previously kicked user in a supergroup.
-       The bot must be an administrator in the group for this to work.
+        Use this method to unban a previously kicked user in a supergroup.
+        The bot must be an administrator in the group for this to work.
 
         :param int user_id: Unique identifier of the target user
         """
