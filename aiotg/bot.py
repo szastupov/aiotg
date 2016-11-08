@@ -19,9 +19,10 @@ BOTAN_URL = "https://api.botan.io/track"
 
 MESSAGE_TYPES = [
     "location", "photo", "document", "audio", "voice", "sticker", "contact",
-    "venue"
+    "venue", "video", "game", "contact", "delete_chat_photo", "new_chat_photo",
+    "delete_chat_photo", "new_chat_member", "left_chat_member",
+    "new_chat_title"
 ]
-
 
 logger = logging.getLogger("aiotg")
 
