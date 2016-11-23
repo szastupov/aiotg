@@ -1,7 +1,16 @@
 language: python
 python:
-  - "3.5"
-install: "pip install -r requirements-dev.txt"
+  - '3.5'
+install: pip install -r requirements-dev.txt
 script:
   - py.test
   - flake8
+deploy:
+  provider: pypi
+  user: szastupov
+  password:
+    secure: M0B8RfnElBf/8duZ1Up7J6CvinahwvZ3dbzl/K16T4qjp/o0E2LSNIQwrWcOfQp8r7MRtoISsZcN/XxhjttOx5cjF1pORi5tBxeXpMkpELADv/1TvJKBkw8NM61bG794e2jEXiwk/O7OK3rzjRtx7L8RiVIzjE3EnJ049YXm9iV+rIt3SZxqazqlx4rSHm4gVm+0RjmMdwemo6scDGdsoaK6VbAh+DXHx3dZK3YjC2owHOzON5Bkfjm2Vra/rTLP6Z63GG9J8JrxbjuK+BkFRntNlP1LiKGpbiD7Qsmsw5bdYSrq5k7vrVpvSmXuiIWZ9x15p8MEQvsmdWCytLM5OCS/oGxS0BTD6uwxZe6YpGLicZVDGfUkKnoTXrN5jliFoF4HMcudTB/w0wmpZ99na6JVneoTFxTogCvFKcubhMx46dsFE/DsupJhsNrCnI/vowwjktVjXx5/Ja9HFN6RbQGC14ZJtGg3k6Blrnx4JgsXwdGFj5vz8ntMmmzcQzWdXshQFBAYg8gxoxvc5Cc1UwIxsDcJo0MwAvipz1JgDh/cu1B9HMCRqafRqrIyryXOpTlVeJtvMVkMw1jUDLH1kwOPOlJNHA5Fk9g513Exqq2bSsNH44fJfMir4vYIV7agPVJbmvsNffaX7BLHCpDaMj5Vmy8G7WrfCe/elJf4Sms=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: szastupov/aiotg
