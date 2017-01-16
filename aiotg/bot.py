@@ -440,8 +440,9 @@ class CallbackQuery:
         self.query_id = src['id']
         self.data = src['data']
 
-    def answer(self):
+    def answer(self, **options):
         return self.bot.api_call(
             "answerCallbackQuery",
-            callback_query_id=self.query_id
+            callback_query_id=self.query_id,
+            **options
         )
