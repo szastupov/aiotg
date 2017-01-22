@@ -83,6 +83,9 @@ class Bot:
             self._process_updates(updates)
 
     def webhook_loop(self, loop):
+        """
+        Starts aiohttp web server.
+        """
         app = web.Application(loop=loop)
         async def handle(request):
             update = await request.json()
@@ -92,6 +95,15 @@ class Bot:
         web.run_app(app)
 
     def set_webhook(self, url, **options):
+        """
+        Register you webhook url for Telegram service.
+
+        :Example:
+
+        >>> bot.set_webhook(url='https://yourserver.com/webhook/<token>')
+
+        Additional documentation on https://core.telegram.org/bots/api#setwebhook
+        """
         self.webhook_url = url
         return asyncio.get_event_loop().run_until_complete(self.api_call(
             'setWebhook',
@@ -100,6 +112,9 @@ class Bot:
         ))
 
     def stop_webhook(self):
+        """
+        Unregister webhook url. Activates getUpdates
+        """
         self.set_webhook(url="")
 
     def run(self):
