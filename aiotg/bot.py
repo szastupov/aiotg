@@ -87,6 +87,7 @@ class Bot:
         Starts aiohttp web server.
         """
         app = web.Application(loop=loop)
+
         async def handle(request):
             update = await request.json()
             self._process_update(update)
