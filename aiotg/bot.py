@@ -1,7 +1,10 @@
 import re
 import logging
 import asyncio
+from urllib.parse import urlparse
+
 import aiohttp
+from aiohttp import web
 import json
 
 from functools import partialmethod
@@ -45,6 +48,7 @@ class Bot:
         self.api_timeout = api_timeout
         self.botan_token = botan_token
         self.name = name
+        self.webhook_url = None
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
@@ -78,6 +82,26 @@ class Bot:
             )
             self._process_updates(updates)
 
+    def webhook_loop(self, loop):
+        app = web.Application(loop=loop)
+        async def handle(request):
+            update = await request.json()
+            self._process_update(update)
+            return web.Response()
+        app.router.add_route('POST', urlparse(self.webhook_url).path, handle)
+        web.run_app(app)
+
+    def set_webhook(self, url, **options):
+        self.webhook_url = url
+        return asyncio.get_event_loop().run_until_complete(self.api_call(
+            'setWebhook',
+            url=url,
+            **options
+        ))
+
+    def stop_webhook(self):
+        self.set_webhook(url="")
+
     def run(self):
         """
         Convenience method for running bots
@@ -89,7 +113,10 @@ class Bot:
         """
         loop = asyncio.get_event_loop()
         try:
-            loop.run_until_complete(self.loop())
+            if self.webhook_url:
+                self.webhook_loop(loop)
+            else:
+                loop.run_until_complete(self.loop())
         except KeyboardInterrupt:
             self.stop()
 
@@ -386,19 +413,22 @@ class Bot:
             return
 
         for update in updates["result"]:
-            logger.debug("update %s", update)
-            self._offset = max(self._offset, update["update_id"])
-            coro = None
+            self._process_update(update)
 
-            if "message" in update:
-                coro = self._process_message(update["message"])
-            elif "inline_query" in update:
-                coro = self._process_inline_query(update["inline_query"])
-            elif "callback_query" in update:
-                coro = self._process_callback_query(update["callback_query"])
+    def _process_update(self, update):
+        logger.debug("update %s", update)
+        self._offset = max(self._offset, update["update_id"])
+        coro = None
 
-            if coro:
-                asyncio.ensure_future(coro)
+        if "message" in update:
+            coro = self._process_message(update["message"])
+        elif "inline_query" in update:
+            coro = self._process_inline_query(update["inline_query"])
+        elif "callback_query" in update:
+            coro = self._process_callback_query(update["callback_query"])
+
+        if coro:
+            asyncio.ensure_future(coro)
 
 
 class TgBot(Bot):
