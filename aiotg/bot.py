@@ -82,7 +82,7 @@ class Bot:
             )
             self._process_updates(updates)
 
-    def webhook_loop(self, loop):
+    def webhook_loop(self, webhook_url, loop):
         """
         Starts aiohttp web server.
         """
@@ -92,45 +92,38 @@ class Bot:
             update = await request.json()
             self._process_update(update)
             return web.Response()
-        app.router.add_route('POST', urlparse(self.webhook_url).path, handle)
-        web.run_app(app)
 
-    def set_webhook(self, url, **options):
+        app.router.add_route('POST', urlparse(webhook_url).path, handle)
+        web.run_app(app, port=urlparse(webhook_url).port)
+
+    async def _set_webhook(self, webhook_url, **options):
         """
         Register you webhook url for Telegram service.
 
-        :Example:
-
-        >>> bot.set_webhook(url='https://yourserver.com/webhook/<token>')
-
         Additional documentation on https://core.telegram.org/bots/api#setwebhook
         """
-        self.webhook_url = url
-        return asyncio.get_event_loop().run_until_complete(self.api_call(
+        return await self.api_call(
             'setWebhook',
-            url=url,
+            url=webhook_url,
             **options
-        ))
+        )
 
-    def stop_webhook(self):
-        """
-        Unregister webhook url. Activates getUpdates
-        """
-        self.set_webhook(url="")
-
-    def run(self):
+    def run(self, webhook_url=""):
         """
         Convenience method for running bots
 
         :Example:
 
         >>> if __name__ == '__main__':
-        >>>     bot.run()
+        >>>     bot.run(webhook_url="webhook_url='https://yourserver.com/webhooktoken")
+
+        Use empty string for webhook_url to switch to getUpdates mode
         """
         loop = asyncio.get_event_loop()
         try:
-            if self.webhook_url:
-                self.webhook_loop(loop)
+            loop.run_until_complete(self._set_webhook(webhook_url))
+            if webhook_url:
+                self.webhook_loop(webhook_url, loop)
             else:
                 loop.run_until_complete(self.loop())
         except KeyboardInterrupt:
