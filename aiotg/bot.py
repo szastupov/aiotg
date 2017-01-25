@@ -82,7 +82,7 @@ class Bot:
             )
             self._process_updates(updates)
 
-    def webhook_loop(self, webhook_url, loop):
+    def _webhook_loop(self, webhook_url, loop):
         """
         Starts aiohttp web server.
         """
@@ -137,7 +137,7 @@ class Bot:
         try:
             loop.run_until_complete(self._set_webhook(webhook_url, **options))
             if webhook_url:
-                self.webhook_loop(webhook_url, loop)
+                self._webhook_loop(webhook_url, loop)
         except KeyboardInterrupt:
             self.stop()
 
