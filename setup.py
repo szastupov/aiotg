@@ -28,5 +28,5 @@ setup(
 
     packages=find_packages(exclude=['examples', 'docs', 'tests*']),
 
-    install_requires=['aiohttp>=0.17.2']
+    install_requires=['aiohttp>=1.0.0']
 )

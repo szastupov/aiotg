@@ -99,8 +99,6 @@ class Bot:
     async def _set_webhook(self, webhook_url, **options):
         """
         Register you webhook url for Telegram service.
-
-        Additional documentation on https://core.telegram.org/bots/api#setwebhook
         """
         return await self.api_call(
             'setWebhook',
@@ -108,26 +106,46 @@ class Bot:
             **options
         )
 
-    def run(self, webhook_url=""):
+    def run(self):
         """
-        Convenience method for running bots
+        Convenience method for running bots in getUpdates mode
 
         :Example:
 
         >>> if __name__ == '__main__':
-        >>>     bot.run(webhook_url="webhook_url='https://yourserver.com/webhooktoken")
+        >>>     bot.run()
 
-        Use empty string for webhook_url to switch to getUpdates mode
         """
         loop = asyncio.get_event_loop()
         try:
-            loop.run_until_complete(self._set_webhook(webhook_url))
-            if webhook_url:
-                self.webhook_loop(webhook_url, loop)
-            else:
-                loop.run_until_complete(self.loop())
+            loop.run_until_complete(self.loop())
         except KeyboardInterrupt:
             self.stop()
+
+    def run_webhook(self, webhook_url, **options):
+        """
+        Convenience method for running bots in webhook mode
+
+        :Example:
+
+        >>> if __name__ == '__main__':
+        >>>     bot.run_webhook(webhook_url="https://yourserver.com/webhooktoken")
+
+        Additional documentation on https://core.telegram.org/bots/api#setwebhook
+        """
+        loop = asyncio.get_event_loop()
+        try:
+            loop.run_until_complete(self._set_webhook(webhook_url, **options))
+            if webhook_url:
+                self.webhook_loop(webhook_url, loop)
+        except KeyboardInterrupt:
+            self.stop()
+
+    def stop_webhook(self):
+        """
+        Use to switch from Webhook to getUpdates mode
+        """
+        self.run_webhook(webhook_url="")
 
     def command(self, regexp):
         """
