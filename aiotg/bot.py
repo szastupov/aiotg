@@ -1,7 +1,10 @@
 import re
 import logging
 import asyncio
+from urllib.parse import urlparse
+
 import aiohttp
+from aiohttp import web
 import json
 
 from functools import partialmethod
@@ -45,6 +48,7 @@ class Bot:
         self.api_timeout = api_timeout
         self.botan_token = botan_token
         self.name = name
+        self.webhook_url = None
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
@@ -78,20 +82,70 @@ class Bot:
             )
             self._process_updates(updates)
 
+    def _webhook_loop(self, webhook_url, loop):
+        """
+        Starts aiohttp web server.
+        """
+        app = web.Application(loop=loop)
+
+        async def handle(request):
+            update = await request.json()
+            self._process_update(update)
+            return web.Response()
+
+        app.router.add_route('POST', urlparse(webhook_url).path, handle)
+        web.run_app(app, port=urlparse(webhook_url).port)
+
+    async def _set_webhook(self, webhook_url, **options):
+        """
+        Register you webhook url for Telegram service.
+        """
+        return await self.api_call(
+            'setWebhook',
+            url=webhook_url,
+            **options
+        )
+
     def run(self):
         """
-        Convenience method for running bots
+        Convenience method for running bots in getUpdates mode
 
         :Example:
 
         >>> if __name__ == '__main__':
         >>>     bot.run()
+
         """
         loop = asyncio.get_event_loop()
         try:
             loop.run_until_complete(self.loop())
         except KeyboardInterrupt:
             self.stop()
+
+    def run_webhook(self, webhook_url, **options):
+        """
+        Convenience method for running bots in webhook mode
+
+        :Example:
+
+        >>> if __name__ == '__main__':
+        >>>     bot.run_webhook(webhook_url="https://yourserver.com/webhooktoken")
+
+        Additional documentation on https://core.telegram.org/bots/api#setwebhook
+        """
+        loop = asyncio.get_event_loop()
+        try:
+            loop.run_until_complete(self._set_webhook(webhook_url, **options))
+            if webhook_url:
+                self._webhook_loop(webhook_url, loop)
+        except KeyboardInterrupt:
+            self.stop()
+
+    def stop_webhook(self):
+        """
+        Use to switch from Webhook to getUpdates mode
+        """
+        self.run_webhook(webhook_url="")
 
     def command(self, regexp):
         """
@@ -386,19 +440,22 @@ class Bot:
             return
 
         for update in updates["result"]:
-            logger.debug("update %s", update)
-            self._offset = max(self._offset, update["update_id"])
-            coro = None
+            self._process_update(update)
 
-            if "message" in update:
-                coro = self._process_message(update["message"])
-            elif "inline_query" in update:
-                coro = self._process_inline_query(update["inline_query"])
-            elif "callback_query" in update:
-                coro = self._process_callback_query(update["callback_query"])
+    def _process_update(self, update):
+        logger.debug("update %s", update)
+        self._offset = max(self._offset, update["update_id"])
+        coro = None
 
-            if coro:
-                asyncio.ensure_future(coro)
+        if "message" in update:
+            coro = self._process_message(update["message"])
+        elif "inline_query" in update:
+            coro = self._process_inline_query(update["inline_query"])
+        elif "callback_query" in update:
+            coro = self._process_callback_query(update["callback_query"])
+
+        if coro:
+            asyncio.ensure_future(coro)
 
 
 class TgBot(Bot):
