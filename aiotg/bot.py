@@ -288,9 +288,9 @@ class Bot:
         Use this method for your bot to leave a group, supergroup or channel.
         Returns True on success.
 
-        :param int chat_id: Unique identifier for the target chat
-        or username of the target supergroup or channel
-        (in the format @channelusername)
+        :param int chat_id: Unique identifier for the target chat \
+            or username of the target supergroup or channel \
+            (in the format @channelusername)
         """
         json_result = await self.api_call("leaveChat", chat_id=chat_id)
         return json_result["result"]
