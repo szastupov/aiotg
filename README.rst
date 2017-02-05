@@ -71,13 +71,13 @@ You can send messages (or any other media) by constructing a Chat object with us
 Examples
 ________
 
-- `Async IO <examples/async.py>`__
-- `Send image <examples/getimage.py>`__
-- `Post to channel <examples/post_to_channel.py>`__
-- `Webhooks mode <examples/webhook.py>`__
-- `Sender id <examples/whoami.py>`__
+- `Async IO <https://github.com/szastupov/aiotg/blob/master/examples/async.py>`__
+- `Send image <https://github.com/szastupov/aiotg/blob/master/examples/getimage.py>`__
+- `Post to channel <https://github.com/szastupov/aiotg/blob/master/examples/post_to_channel.py>`__
+- `Webhooks mode <https://github.com/szastupov/aiotg/blob/master/examples/webhook.py>`__
+- `Sender id <https://github.com/szastupov/aiotg/blob/master/examples/whoami.py>`__
 
 For a real world example, take a look at
 `WhatisBot <https://github.com/szastupov/whatisbot/blob/master/main.py>`__ or `Music Catalog Bot <https://github.com/szastupov/musicbot>`__.
 
-For more information on how to use the project, see the project's `documentation <https://aiotg.sijmenschoon.nl/>`__. Have a question? Ask it on project's `Telegram chat <https://telegram.me/joinchat/ABwEXjy3Tfmj2NAqEsQ1nw>`__.
+For more information on how to use the project, see the project's `documentation <http://szastupov.github.io/aiotg/index.html>`__. Have a question? Ask it on project's `Telegram chat <https://telegram.me/joinchat/ABwEXjy3Tfmj2NAqEsQ1nw>`__.
