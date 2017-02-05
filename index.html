@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>aiotg 0.7.15 &#8212; aiotg 0.7.15 documentation</title>
+    <title>aiotg &#8212; aiotg 0.7.15 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -42,47 +42,76 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="aiotg-version">
-<h1>aiotg 0.7.15<a class="headerlink" href="#aiotg-version" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="aiotg">
+<h1>aiotg<a class="headerlink" href="#aiotg" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://travis-ci.org/szastupov/aiotg"><img alt="https://travis-ci.org/szastupov/aiotg.svg?branch=master" src="https://travis-ci.org/szastupov/aiotg.svg?branch=master" /></a>
 <p>Asynchronous Python API for building Telegram bots, featuring:</p>
-<div class="section" id="features">
-<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Easy and declarative API</li>
 <li>Hassle-free setup - no need for SSL certificates or static IP</li>
 <li>Built-in support for analytics via botan.io</li>
 <li>Automatic handling of Telegram API throttling or timeouts</li>
 </ul>
-</div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">aiotg</span>
+<p>Install it with pip:</p>
+<div class="code sh highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">aiotg</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="getting-started">
-<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
-<p>Echo bot:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">aiotg</span> <span class="k">import</span> <span class="n">Bot</span>
+<p>Then you can create a new bot in few lines:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">aiotg</span> <span class="k">import</span> <span class="n">Bot</span>
 
-<span class="n">bot</span> <span class="o">=</span> <span class="n">Bot</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;API_TOKEN&quot;</span><span class="p">])</span>
+<span class="n">bot</span> <span class="o">=</span> <span class="n">Bot</span><span class="p">(</span><span class="n">api_token</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">)</span>
 
 <span class="nd">@bot</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/echo (.+)&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">echo</span><span class="p">(</span><span class="n">chat</span><span class="p">,</span> <span class="n">match</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">chat</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">bot</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="n">bot</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Now run it with a proper API_TOKEN and it should reply to /echo commands.</p>
-<p>For a more complete example, take a look at
-<a class="reference external" href="https://github.com/szastupov/whatisbot/blob/master/main.py">WhatisBot</a> or <a class="reference external" href="https://github.com/szastupov/musicbot">Music Catalog Bot</a>.</p>
-<p>Have a question? Ask it on our <a class="reference external" href="https://telegram.me/joinchat/ABwEXgGJsOukSVJDgVBeFg">Telegram chat</a>.</p>
+<p>The example above looks like a normal synchronous code but it actually returns a coroutine.
+If you want to make an external request (and that&#8217;s what bots usually do) just use aiohttp and async/await syntax:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">aiohttp</span>
+<span class="kn">from</span> <span class="nn">aiotg</span> <span class="k">import</span> <span class="n">Bot</span>
+
+<span class="n">bot</span> <span class="o">=</span> <span class="n">Bot</span><span class="p">(</span><span class="n">api_token</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">)</span>
+
+<span class="nd">@bot</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;bitcoin&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">bitcoin</span><span class="p">(</span><span class="n">chat</span><span class="p">,</span> <span class="n">match</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://api.bitcoinaverage.com/ticker/global/USD/&quot;</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">s</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">chat</span><span class="o">.</span><span class="n">send_text</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;24h_avg&quot;</span><span class="p">])</span>
+
+<span class="n">bot</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
 </div>
+<p>But what if you just want to write a quick integration and don&#8217;t need to provide a conversational interface? We&#8217;ve got you covered!
+You can send messages (or any other media) by constructing a Chat object with user_id or channel name. We even saved you some extra keystrokes by providing handy Channel constructors:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="n">channel</span> <span class="o">=</span> <span class="n">bot</span><span class="o">.</span><span class="n">channel</span><span class="p">(</span><span class="s2">&quot;@yourchannel&quot;</span><span class="p">)</span>
+<span class="n">private</span> <span class="o">=</span> <span class="n">bot</span><span class="o">.</span><span class="n">private</span><span class="p">(</span><span class="s2">&quot;1111111&quot;</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">greeter</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">channel</span><span class="o">.</span><span class="n">send_text</span><span class="p">(</span><span class="s2">&quot;Hello from channel!&quot;</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">private</span><span class="o">.</span><span class="n">send_text</span><span class="p">(</span><span class="s2">&quot;Why not greet personally?&quot;</span><span class="p">)</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/szastupov/aiotg/blob/master/examples/async.py">Async IO</a></li>
+<li><a class="reference external" href="https://github.com/szastupov/aiotg/blob/master/examples/getimage.py">Send image</a></li>
+<li><a class="reference external" href="https://github.com/szastupov/aiotg/blob/master/examples/post_to_channel.py">Post to channel</a></li>
+<li><a class="reference external" href="https://github.com/szastupov/aiotg/blob/master/examples/webhook.py">Webhooks mode</a></li>
+<li><a class="reference external" href="https://github.com/szastupov/aiotg/blob/master/examples/whoami.py">Sender id</a></li>
+</ul>
+<p>For a real world example, take a look at
+<a class="reference external" href="https://github.com/szastupov/whatisbot/blob/master/main.py">WhatisBot</a> or <a class="reference external" href="https://github.com/szastupov/musicbot">Music Catalog Bot</a>.</p>
+<p>For more information on how to use the project, see the project&#8217;s <a class="reference external" href="http://szastupov.github.io/aiotg/index.html">documentation</a>. Have a question? Ask it on project&#8217;s <a class="reference external" href="https://telegram.me/joinchat/ABwEXjy3Tfmj2NAqEsQ1nw">Telegram chat</a>.</p>
 <div class="section" id="reference">
-<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<h3>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="aiotg.html">aiotg reference</a><ul>
@@ -93,6 +122,7 @@
 </ul>
 </li>
 </ul>
+</div>
 </div>
 </div>
 </div>
@@ -113,11 +143,11 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">aiotg 0.7.15</a><ul>
-<li><a class="reference internal" href="#features">Features</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#">aiotg</a><ul>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
 <li><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>

@@ -1,46 +1,4 @@
-aiotg |version|
-===============
-
-Asynchronous Python API for building Telegram bots, featuring:
-
-Features
---------
-
-- Easy and declarative API
-- Hassle-free setup - no need for SSL certificates or static IP
-- Built-in support for analytics via botan.io
-- Automatic handling of Telegram API throttling or timeouts
-
-Installation
-------------
-
-::
-
-    pip install aiotg
-
-Getting Started
----------------
-
-Echo bot::
-
-    import os
-    from aiotg import Bot
-
-    bot = Bot(os.environ["API_TOKEN"])
-
-    @bot.command(r"/echo (.+)")
-    def echo(chat, match):
-        return chat.reply(match.group(1))
-
-    if __name__ == '__main__':
-        bot.run()
-
-Now run it with a proper API\_TOKEN and it should reply to /echo commands.
-
-For a more complete example, take a look at
-`WhatisBot <https://github.com/szastupov/whatisbot/blob/master/main.py>`__ or `Music Catalog Bot <https://github.com/szastupov/musicbot>`__.
-
-Have a question? Ask it on our `Telegram chat <https://telegram.me/joinchat/ABwEXgGJsOukSVJDgVBeFg>`__.
+.. include:: ../README.rst
 
 Reference
 ---------------
@@ -48,6 +6,7 @@ Reference
 .. toctree::
    :maxdepth: 2
 
+   includeme
    aiotg.rst
 
 
