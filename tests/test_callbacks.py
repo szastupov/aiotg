@@ -148,41 +148,13 @@ def test_channel_constructors(ctype, id):
     assert chat.type == ctype
 
 
-class MockBot:
+class MockBot(Bot):
     def __init__(self):
+        super().__init__(API_TOKEN)
         self.calls = {}
 
     def api_call(self, method, **params):
         self.calls[method] = params
-
-    def send_message(self, chat_id, text, **kwargs):
-        return self.api_call(
-            "sendMessage",
-            chat_id=chat_id,
-            text=text,
-            **kwargs
-        )
-
-    def edit_message_text(self, chat_id, message_id, text, **kwargs):
-        return self.api_call(
-            "editMessageText",
-            message_id=message_id,
-            text=text,
-            **kwargs
-        )
-
-    def edit_message_reply_markup(self, chat_id, message_id, reply_markup, **kwargs):
-        return self.api_call(
-            "editMessageReplyMarkup",
-            message_id=message_id,
-            reply_markup=reply_markup,
-            **kwargs
-        )
-
-    def get_me(self):
-        return self.api_call(
-            "getMe"
-        )
 
 
 def test_chat_methods():
@@ -275,3 +247,10 @@ def test_edit_reply_markup():
     call = bot.calls["editMessageReplyMarkup"]
     assert call["reply_markup"] == '{"inline_keyboard": [["ok", "cancel"]]}'
     assert call["message_id"] == message_id
+
+
+def test_webhooks():
+    webhook_url = 'http://localhost:9999/webhook'
+    bot = MockBot()
+    bot._set_webhook(webhook_url)
+    assert "setWebhook" in bot.calls

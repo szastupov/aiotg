@@ -83,31 +83,6 @@ class Bot:
             )
             self._process_updates(updates)
 
-    def _webhook_loop(self, webhook_url, loop):
-        """
-        Starts aiohttp web server.
-        """
-        app = web.Application(loop=loop)
-        port = os.environ.get('PORT', urlparse(webhook_url).port)
-
-        async def handle(request):
-            update = await request.json()
-            self._process_update(update)
-            return web.Response()
-
-        app.router.add_route('POST', urlparse(webhook_url).path, handle)
-        web.run_app(app, port=int(port))
-
-    async def _set_webhook(self, webhook_url, **options):
-        """
-        Register you webhook url for Telegram service.
-        """
-        return await self.api_call(
-            'setWebhook',
-            url=webhook_url,
-            **options
-        )
-
     def run(self):
         """
         Convenience method for running bots in getUpdates mode
@@ -297,8 +272,6 @@ class Bot:
         json_result = await self.api_call("leaveChat", chat_id=chat_id)
         return json_result["result"]
 
-    _send_message = partialmethod(api_call, "sendMessage")
-
     def send_message(self, chat_id, text, **options):
         """
         Send a text message to chat
@@ -308,9 +281,7 @@ class Bot:
         :param options: Additional sendMessage options
             (see https://core.telegram.org/bots/api#sendmessage)
         """
-        return self._send_message(chat_id=chat_id, text=text, **options)
-
-    _edit_message_text = partialmethod(api_call, "editMessageText")
+        return self.api_call("sendMessage", chat_id=chat_id, text=text, **options)
 
     def edit_message_text(self, chat_id, message_id, text, **options):
         """
@@ -321,14 +292,13 @@ class Bot:
         :param str text: Text to edit the message to
         :param options: Additional API options
         """
-        return self._edit_message_text(
+        return self.api_call(
+            "editMessageText",
             chat_id=chat_id,
             message_id=message_id,
             text=text,
             **options
         )
-
-    _edit_message_reply_markup = partialmethod(api_call, "editMessageReplyMarkup")
 
     def edit_message_reply_markup(self, chat_id, message_id, reply_markup, **options):
         """
@@ -339,7 +309,8 @@ class Bot:
         :param str reply_markup: New inline keyboard markup for the message
         :param options: Additional API options
         """
-        return self._edit_message_reply_markup(
+        return self.api_call(
+            "editMessageReplyMarkup",
             chat_id=chat_id,
             message_id=message_id,
             reply_markup=reply_markup,
@@ -389,6 +360,30 @@ class Bot:
 
     def stop(self):
         self._running = False
+
+    async def _webhook_handle(self, request):
+        update = await request.json()
+        self._process_update(update)
+        return web.Response()
+
+    def _webhook_loop(self, webhook_url, loop):
+        """
+        Starts aiohttp web server.
+        """
+        app = web.Application(loop=loop)
+        port = int(os.environ.get('PORT', 0)) or urlparse(webhook_url).port
+        app.router.add_route('POST', urlparse(webhook_url).path, self._webhook_handle)
+        web.run_app(app, port=port)
+
+    def _set_webhook(self, webhook_url, **options):
+        """
+        Register you webhook url for Telegram service.
+        """
+        return self.api_call(
+            'setWebhook',
+            url=webhook_url,
+            **options
+        )
 
     async def _track(self, message, name):
         response = await aiohttp.post(
