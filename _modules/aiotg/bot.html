@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>aiotg.bot &#8212; aiotg 0.7.15 documentation</title>
+    <title>aiotg.bot &#8212; aiotg 0.7.16 documentation</title>
     
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.7.15',
+        VERSION:     '0.7.16',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -42,7 +42,8 @@
           <div class="body" role="main">
             
   <h1>Source code for aiotg.bot</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlparse</span>
@@ -126,30 +127,6 @@
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_updates</span><span class="p">(</span><span class="n">updates</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_webhook_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">webhook_url</span><span class="p">,</span> <span class="n">loop</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Starts aiohttp web server.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">app</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
-
-        <span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-            <span class="n">update</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_process_update</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">()</span>
-
-        <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">handle</span><span class="p">)</span>
-        <span class="n">web</span><span class="o">.</span><span class="n">run_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">urlparse</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">)</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
-
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_set_webhook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">webhook_url</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Register you webhook url for Telegram service.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span>
-            <span class="s1">&#39;setWebhook&#39;</span><span class="p">,</span>
-            <span class="n">url</span><span class="o">=</span><span class="n">webhook_url</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">options</span>
-        <span class="p">)</span>
-
 <div class="viewcode-block" id="Bot.run"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convenience method for running bots in getUpdates mode</span>
@@ -178,12 +155,9 @@
 <span class="sd">        Additional documentation on https://core.telegram.org/bots/api#setwebhook</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_webhook</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">webhook_url</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_webhook_loop</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+        <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_webhook</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">webhook_url</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_webhook_loop</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Bot.stop_webhook"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.stop_webhook">[docs]</a>    <span class="k">def</span> <span class="nf">stop_webhook</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -339,8 +313,6 @@
         <span class="n">json_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s2">&quot;leaveChat&quot;</span><span class="p">,</span> <span class="n">chat_id</span><span class="o">=</span><span class="n">chat_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">json_result</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span></div>
 
-    <span class="n">_send_message</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">api_call</span><span class="p">,</span> <span class="s2">&quot;sendMessage&quot;</span><span class="p">)</span>
-
 <div class="viewcode-block" id="Bot.send_message"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send a text message to chat</span>
@@ -350,9 +322,7 @@
 <span class="sd">        :param options: Additional sendMessage options</span>
 <span class="sd">            (see https://core.telegram.org/bots/api#sendmessage)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_message</span><span class="p">(</span><span class="n">chat_id</span><span class="o">=</span><span class="n">chat_id</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span></div>
-
-    <span class="n">_edit_message_text</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">api_call</span><span class="p">,</span> <span class="s2">&quot;editMessageText&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s2">&quot;sendMessage&quot;</span><span class="p">,</span> <span class="n">chat_id</span><span class="o">=</span><span class="n">chat_id</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Bot.edit_message_text"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.edit_message_text">[docs]</a>    <span class="k">def</span> <span class="nf">edit_message_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="n">message_id</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -363,14 +333,13 @@
 <span class="sd">        :param str text: Text to edit the message to</span>
 <span class="sd">        :param options: Additional API options</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edit_message_text</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span>
+            <span class="s2">&quot;editMessageText&quot;</span><span class="p">,</span>
             <span class="n">chat_id</span><span class="o">=</span><span class="n">chat_id</span><span class="p">,</span>
             <span class="n">message_id</span><span class="o">=</span><span class="n">message_id</span><span class="p">,</span>
             <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div>
-
-    <span class="n">_edit_message_reply_markup</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">api_call</span><span class="p">,</span> <span class="s2">&quot;editMessageReplyMarkup&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Bot.edit_message_reply_markup"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.edit_message_reply_markup">[docs]</a>    <span class="k">def</span> <span class="nf">edit_message_reply_markup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="n">message_id</span><span class="p">,</span> <span class="n">reply_markup</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -381,7 +350,8 @@
 <span class="sd">        :param str reply_markup: New inline keyboard markup for the message</span>
 <span class="sd">        :param options: Additional API options</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edit_message_reply_markup</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span>
+            <span class="s2">&quot;editMessageReplyMarkup&quot;</span><span class="p">,</span>
             <span class="n">chat_id</span><span class="o">=</span><span class="n">chat_id</span><span class="p">,</span>
             <span class="n">message_id</span><span class="o">=</span><span class="n">message_id</span><span class="p">,</span>
             <span class="n">reply_markup</span><span class="o">=</span><span class="n">reply_markup</span><span class="p">,</span>
@@ -431,6 +401,30 @@
 
 <div class="viewcode-block" id="Bot.stop"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_webhook_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">update</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_process_update</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_webhook_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">webhook_url</span><span class="p">,</span> <span class="n">loop</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Starts aiohttp web server.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PORT&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="ow">or</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">)</span><span class="o">.</span><span class="n">port</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_webhook_handle</span><span class="p">)</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">run_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_webhook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">webhook_url</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Register you webhook url for Telegram service.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span>
+            <span class="s1">&#39;setWebhook&#39;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">webhook_url</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">options</span>
+        <span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_track</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
