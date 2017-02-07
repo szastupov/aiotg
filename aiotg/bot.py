@@ -1,3 +1,4 @@
+import os
 import re
 import logging
 import asyncio
@@ -87,6 +88,7 @@ class Bot:
         Starts aiohttp web server.
         """
         app = web.Application(loop=loop)
+        port = os.environ.get('PORT', urlparse(webhook_url).port)
 
         async def handle(request):
             update = await request.json()
@@ -94,7 +96,7 @@ class Bot:
             return web.Response()
 
         app.router.add_route('POST', urlparse(webhook_url).path, handle)
-        web.run_app(app, port=urlparse(webhook_url).port)
+        web.run_app(app, port=int(port))
 
     async def _set_webhook(self, webhook_url, **options):
         """
