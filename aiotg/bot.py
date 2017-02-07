@@ -111,12 +111,9 @@ class Bot:
         Additional documentation on https://core.telegram.org/bots/api#setwebhook
         """
         loop = asyncio.get_event_loop()
-        try:
-            loop.run_until_complete(self._set_webhook(webhook_url, **options))
-            if webhook_url:
-                self._webhook_loop(webhook_url, loop)
-        except KeyboardInterrupt:
-            self.stop()
+        loop.run_until_complete(self._set_webhook(webhook_url, **options))
+        if webhook_url:
+            self._webhook_loop(webhook_url, loop)
 
     def stop_webhook(self):
         """

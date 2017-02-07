@@ -3,6 +3,7 @@ import random
 
 from aiotg import Bot, Chat, InlineQuery
 from aiotg import MESSAGE_TYPES
+from aiotg.mock import MockBot
 from testfixtures import LogCapture
 
 API_TOKEN = "test_token"
@@ -148,15 +149,6 @@ def test_channel_constructors(ctype, id):
     assert chat.type == ctype
 
 
-class MockBot(Bot):
-    def __init__(self):
-        super().__init__(API_TOKEN)
-        self.calls = {}
-
-    def api_call(self, method, **params):
-        self.calls[method] = params
-
-
 def test_chat_methods():
     bot = MockBot()
     chat_id = 42
@@ -247,10 +239,3 @@ def test_edit_reply_markup():
     call = bot.calls["editMessageReplyMarkup"]
     assert call["reply_markup"] == '{"inline_keyboard": [["ok", "cancel"]]}'
     assert call["message_id"] == message_id
-
-
-def test_webhooks():
-    webhook_url = 'http://localhost:9999/webhook'
-    bot = MockBot()
-    bot._set_webhook(webhook_url)
-    assert "setWebhook" in bot.calls
