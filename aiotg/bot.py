@@ -96,7 +96,7 @@ class Bot:
             return web.Response()
 
         app.router.add_route('POST', urlparse(webhook_url).path, handle)
-        web.run_app(app, port=port)
+        web.run_app(app, port=int(port))
 
     async def _set_webhook(self, webhook_url, **options):
         """
