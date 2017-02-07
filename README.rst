@@ -69,7 +69,7 @@ You can send messages (or any other media) by constructing a Chat object with us
 
 
 Examples
-________
+---------------
 
 - `Async IO <https://github.com/szastupov/aiotg/blob/master/examples/async.py>`__
 - `Send image <https://github.com/szastupov/aiotg/blob/master/examples/getimage.py>`__
