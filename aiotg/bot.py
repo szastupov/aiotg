@@ -111,9 +111,12 @@ class Bot:
         Additional documentation on https://core.telegram.org/bots/api#setwebhook
         """
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(self._set_webhook(webhook_url, **options))
+        loop.run_until_complete(self.set_webhook(webhook_url, **options))
         if webhook_url:
-            self._webhook_loop(webhook_url, loop)
+            url = urlparse(webhook_url)
+            app = self.create_webhook_app(url.path, loop)
+            port = int(os.environ.get('PORT', 0)) or url.port
+            web.run_app(app, port=port)
 
     def stop_webhook(self):
         """
@@ -358,21 +361,29 @@ class Bot:
     def stop(self):
         self._running = False
 
-    async def _webhook_handle(self, request):
+    async def webhook_handle(self, request):
+        """
+        aiohttp.web handle for processing web hooks
+
+        :Example:
+
+        >>> from aiohttp import web
+        >>> app = web.Application()
+        >>> app.router.add_route('/webhook')
+        """
         update = await request.json()
         self._process_update(update)
         return web.Response()
 
-    def _webhook_loop(self, webhook_url, loop):
+    def create_webhook_app(self, path, loop=None):
         """
-        Starts aiohttp web server.
+        Shorthand for creating aiohttp.web.Application with registered webhook hanlde
         """
         app = web.Application(loop=loop)
-        port = int(os.environ.get('PORT', 0)) or urlparse(webhook_url).port
-        app.router.add_route('POST', urlparse(webhook_url).path, self._webhook_handle)
-        web.run_app(app, port=port)
+        app.router.add_route('POST', path, self.webhook_handle)
+        return app
 
-    def _set_webhook(self, webhook_url, **options):
+    def set_webhook(self, webhook_url, **options):
         """
         Register you webhook url for Telegram service.
         """

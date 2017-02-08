@@ -1,5 +1,7 @@
-import asyncio
 import requests
+import asyncio
+from urllib.parse import urlparse
+from aiohttp import web
 from aiotg.mock import MockBot
 from threading import Thread
 
@@ -9,9 +11,10 @@ webhook_url = 'http://localhost:9999/webhook'
 
 
 def bot_loop(bot):
+    url = urlparse(webhook_url)
     loop = asyncio.new_event_loop()
-    print("running bot loop")
-    bot._webhook_loop(webhook_url, loop)
+    app = bot.create_webhook_app(url.path, loop)
+    web.run_app(app, port=url.port)
 
 
 def test_webhooks():
@@ -25,7 +28,7 @@ def test_webhooks():
         # Let's check sender repr as well
         assert repr(chat.sender) == "John"
 
-    bot._set_webhook(webhook_url)
+    bot.set_webhook(webhook_url)
     assert "setWebhook" in bot.calls
 
     thread = Thread(target=bot_loop, args=[bot], daemon=True)
