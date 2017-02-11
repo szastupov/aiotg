@@ -124,6 +124,12 @@ class Bot:
         """
         self.run_webhook(webhook_url="")
 
+    def add_command(self, regexp, fn):
+        """
+        Manually register regexp based command
+        """
+        self._commands.append((regexp, fn))
+
     def command(self, regexp):
         """
         Register a new command
@@ -137,7 +143,7 @@ class Bot:
         >>>     return chat.reply(match.group(1))
         """
         def decorator(fn):
-            self._commands.append((regexp, fn))
+            self.add_command(regexp, fn)
             return fn
         return decorator
 
