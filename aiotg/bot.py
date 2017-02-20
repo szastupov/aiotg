@@ -50,6 +50,7 @@ class Bot:
         self.botan_token = botan_token
         self.name = name
         self.webhook_url = None
+        self.session = aiohttp.ClientSession()
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
@@ -240,7 +241,7 @@ class Bot:
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         logger.debug("api_call %s, %s", method, params)
 
-        response = await aiohttp.post(url, data=params)
+        response = await self.session.post(url, data=params)
 
         if response.status == 200:
             return await response.json()
@@ -339,7 +340,7 @@ class Bot:
         """
         headers = {"range": range} if range else None
         url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
-        return aiohttp.get(url, headers=headers)
+        return self.session.get(url, headers=headers)
 
     _get_user_profile_photos = partialmethod(api_call, "getUserProfilePhotos")
 
@@ -400,7 +401,7 @@ class Bot:
         )
 
     async def _track(self, message, name):
-        response = await aiohttp.post(
+        response = await self.session.post(
             BOTAN_URL,
             params={
                 "token": self.botan_token,
