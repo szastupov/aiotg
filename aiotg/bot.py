@@ -61,6 +61,9 @@ class Bot:
         self._inline = lambda iq: None
         self._callback = lambda c, cq: None
 
+    def __del__(self):
+        self.session.close()
+
     async def loop(self):
         """
         Return bot's main loop as coroutine. Use with asyncio.
