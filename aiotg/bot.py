@@ -12,7 +12,7 @@ from functools import partialmethod
 from . chat import Chat, Sender
 
 __author__ = "Stepan Zastupov"
-__copyright__ = "Copyright 2015, Stepan Zastupov"
+__copyright__ = "Copyright 2015-2017 Stepan Zastupov"
 __license__ = "MIT"
 
 API_URL = "https://api.telegram.org"
