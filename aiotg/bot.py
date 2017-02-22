@@ -62,7 +62,11 @@ class Bot:
         self._callback = lambda c, cq: None
 
     def __del__(self):
-        self.session.close()
+        try:
+            self.session.close()
+        except:
+            # 😶
+            pass
 
     async def loop(self):
         """
