@@ -50,7 +50,7 @@ class Bot:
         self.botan_token = botan_token
         self.name = name
         self.webhook_url = None
-        self.session = aiohttp.ClientSession()
+        self._session = None
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
@@ -60,13 +60,6 @@ class Bot:
         self._default = lambda c, m: None
         self._inline = lambda iq: None
         self._callback = lambda c, cq: None
-
-    def __del__(self):
-        try:
-            self.session.close()
-        except:
-            # 😶
-            pass
 
     async def loop(self):
         """
@@ -406,6 +399,20 @@ class Bot:
             url=webhook_url,
             **options
         )
+
+    @property
+    def session(self):
+        if not self._session:
+            self._session = aiohttp.ClientSession()
+        return self._session
+
+    def __del__(self):
+        try:
+            if self._session:
+                self._session.close()
+        except:
+            # 😶
+            pass
 
     async def _track(self, message, name):
         response = await self.session.post(
