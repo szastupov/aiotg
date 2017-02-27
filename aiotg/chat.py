@@ -70,6 +70,12 @@ class Chat:
         )
 
     def _send_to_chat(self, method, **options):
+        if("chat_id" in options):
+            return self.bot.api_call(
+            method,
+            **options
+        )
+        
         return self.bot.api_call(
             method,
             chat_id=str(self.id),
