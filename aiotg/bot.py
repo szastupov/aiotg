@@ -116,8 +116,9 @@ class Bot:
         if webhook_url:
             url = urlparse(webhook_url)
             app = self.create_webhook_app(url.path, loop)
+            host = os.environ.get('HOST', '0.0.0.0')
             port = int(os.environ.get('PORT', 0)) or url.port
-            web.run_app(app, port=port)
+            web.run_app(app, host=host, port=port)
 
     def stop_webhook(self):
         """
