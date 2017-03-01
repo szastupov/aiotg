@@ -6,7 +6,6 @@ Reference
 .. toctree::
    :maxdepth: 2
 
-   includeme
    aiotg.rst
 
 
