@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>aiotg reference &#8212; aiotg 0.7.16 documentation</title>
+    <title>aiotg reference &#8212; aiotg 0.7.21 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.16',
+        VERSION:     '0.7.21',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -68,6 +68,12 @@
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="aiotg.bot.Bot.add_command">
+<code class="descname">add_command</code><span class="sig-paren">(</span><em>regexp</em>, <em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/bot.html#Bot.add_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.bot.Bot.add_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manually register regexp based command</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="aiotg.bot.Bot.api_call">
 <code class="descname">api_call</code><span class="sig-paren">(</span><em>method</em>, <em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/bot.html#Bot.api_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.bot.Bot.api_call" title="Permalink to this definition">¶</a></dt>
@@ -139,6 +145,12 @@
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">chat</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="method">
+<dt id="aiotg.bot.Bot.create_webhook_app">
+<code class="descname">create_webhook_app</code><span class="sig-paren">(</span><em>path</em>, <em>loop=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/bot.html#Bot.create_webhook_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.bot.Bot.create_webhook_app" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shorthand for creating aiohttp.web.Application with registered webhook hanlde</p>
 </dd></dl>
 
 <dl class="method">
@@ -412,6 +424,17 @@ Returns True on success.</p>
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="aiotg.bot.Bot.session">
+<code class="descname">session</code><a class="headerlink" href="#aiotg.bot.Bot.session" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="aiotg.bot.Bot.set_webhook">
+<code class="descname">set_webhook</code><span class="sig-paren">(</span><em>webhook_url</em>, <em>**options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/bot.html#Bot.set_webhook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.bot.Bot.set_webhook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register you webhook url for Telegram service.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="aiotg.bot.Bot.stop">
 <code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/bot.html#Bot.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.bot.Bot.stop" title="Permalink to this definition">¶</a></dt>
@@ -428,6 +451,25 @@ Returns True on success.</p>
 <code class="descname">track</code><span class="sig-paren">(</span><em>message</em>, <em>name='Message'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/bot.html#Bot.track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.bot.Bot.track" title="Permalink to this definition">¶</a></dt>
 <dd><p>Track message using <a class="reference external" href="http://botan.io">http://botan.io</a>
 Set botan_token to make it work</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aiotg.bot.Bot.webhook_handle">
+<code class="descname">webhook_handle</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/bot.html#Bot.webhook_handle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.bot.Bot.webhook_handle" title="Permalink to this definition">¶</a></dt>
+<dd><p>aiohttp.web handle for processing web hooks</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">aiohttp</span> <span class="k">import</span> <span class="n">web</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;/webhook&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </dd></dl>

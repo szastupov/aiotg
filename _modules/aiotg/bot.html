@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>aiotg.bot &#8212; aiotg 0.7.16 documentation</title>
+    <title>aiotg.bot &#8212; aiotg 0.7.21 documentation</title>
     
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.7.16',
+        VERSION:     '0.7.21',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -56,7 +56,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="n">chat</span> <span class="kn">import</span> <span class="nn">Chat</span><span class="o">,</span> <span class="nn">Sender</span>
 
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Stepan Zastupov&quot;</span>
-<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2015, Stepan Zastupov&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2015-2017 Stepan Zastupov&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
 <span class="n">API_URL</span> <span class="o">=</span> <span class="s2">&quot;https://api.telegram.org&quot;</span>
@@ -94,6 +94,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">botan_token</span> <span class="o">=</span> <span class="n">botan_token</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">webhook_url</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">def</span> <span class="nf">no_handle</span><span class="p">(</span><span class="n">mt</span><span class="p">):</span>
             <span class="k">return</span> <span class="k">lambda</span> <span class="n">chat</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;no handle for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">mt</span><span class="p">)</span>
@@ -155,15 +156,25 @@
 <span class="sd">        Additional documentation on https://core.telegram.org/bots/api#setwebhook</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
-        <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_webhook</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">))</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_webhook</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">webhook_url</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_webhook_loop</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span></div>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">)</span>
+            <span class="n">app</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_webhook_app</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HOST&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0.0.0&#39;</span><span class="p">)</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PORT&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="ow">or</span> <span class="n">url</span><span class="o">.</span><span class="n">port</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">run_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Bot.stop_webhook"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.stop_webhook">[docs]</a>    <span class="k">def</span> <span class="nf">stop_webhook</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Use to switch from Webhook to getUpdates mode</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_webhook</span><span class="p">(</span><span class="n">webhook_url</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Bot.add_command"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.add_command">[docs]</a>    <span class="k">def</span> <span class="nf">add_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regexp</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Manually register regexp based command</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_commands</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">regexp</span><span class="p">,</span> <span class="n">fn</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Bot.command"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.command">[docs]</a>    <span class="k">def</span> <span class="nf">command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regexp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -178,7 +189,7 @@
 <span class="sd">        &gt;&gt;&gt;     return chat.reply(match.group(1))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_commands</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">regexp</span><span class="p">,</span> <span class="n">fn</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">regexp</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">fn</span>
         <span class="k">return</span> <span class="n">decorator</span></div>
 
@@ -275,7 +286,7 @@
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">/bot</span><span class="si">{1}</span><span class="s2">/</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">API_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;api_call </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
 
-        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
             <span class="k">return</span> <span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
@@ -374,7 +385,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;range&quot;</span><span class="p">:</span> <span class="nb">range</span><span class="p">}</span> <span class="k">if</span> <span class="nb">range</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">/file/bot</span><span class="si">{1}</span><span class="s2">/</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">API_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></div>
 
     <span class="n">_get_user_profile_photos</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">api_call</span><span class="p">,</span> <span class="s2">&quot;getUserProfilePhotos&quot;</span><span class="p">)</span>
 
@@ -402,21 +413,29 @@
 <div class="viewcode-block" id="Bot.stop"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_webhook_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+<div class="viewcode-block" id="Bot.webhook_handle"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.webhook_handle">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">webhook_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        aiohttp.web handle for processing web hooks</span>
+
+<span class="sd">        :Example:</span>
+
+<span class="sd">        &gt;&gt;&gt; from aiohttp import web</span>
+<span class="sd">        &gt;&gt;&gt; app = web.Application()</span>
+<span class="sd">        &gt;&gt;&gt; app.router.add_route(&#39;/webhook&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">update</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_process_update</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">_webhook_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">webhook_url</span><span class="p">,</span> <span class="n">loop</span><span class="p">):</span>
+<div class="viewcode-block" id="Bot.create_webhook_app"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.create_webhook_app">[docs]</a>    <span class="k">def</span> <span class="nf">create_webhook_app</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Starts aiohttp web server.</span>
+<span class="sd">        Shorthand for creating aiohttp.web.Application with registered webhook hanlde</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">app</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
-        <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PORT&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="ow">or</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">)</span><span class="o">.</span><span class="n">port</span>
-        <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_webhook_handle</span><span class="p">)</span>
-        <span class="n">web</span><span class="o">.</span><span class="n">run_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">)</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">webhook_handle</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">app</span></div>
 
-    <span class="k">def</span> <span class="nf">_set_webhook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">webhook_url</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="Bot.set_webhook"><a class="viewcode-back" href="../../aiotg.html#aiotg.bot.Bot.set_webhook">[docs]</a>    <span class="k">def</span> <span class="nf">set_webhook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">webhook_url</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Register you webhook url for Telegram service.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -424,10 +443,24 @@
             <span class="s1">&#39;setWebhook&#39;</span><span class="p">,</span>
             <span class="n">url</span><span class="o">=</span><span class="n">webhook_url</span><span class="p">,</span>
             <span class="o">**</span><span class="n">options</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">session</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span>
+
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="c1"># 😶</span>
+            <span class="k">pass</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_track</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
             <span class="n">BOTAN_URL</span><span class="p">,</span>
             <span class="n">params</span><span class="o">=</span><span class="p">{</span>
                 <span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">botan_token</span><span class="p">,</span>
