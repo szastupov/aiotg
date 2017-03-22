@@ -3,17 +3,19 @@ import asyncio
 from urllib.parse import urlparse
 from aiohttp import web
 from aiotg.mock import MockBot
-from threading import Thread
+from threading import Thread, Event
 
 # ⚠️  beware, this test is a total hack ⚠️
 
-webhook_url = 'http://localhost:9999/webhook'
+webhook_url = 'http://localhost:6666/webhook'
+server_started = Event()
 
 
 def bot_loop(bot):
     url = urlparse(webhook_url)
     loop = asyncio.new_event_loop()
     app = bot.create_webhook_app(url.path, loop)
+    server_started.set()
     web.run_app(app, port=url.port)
 
 
@@ -33,6 +35,7 @@ def test_webhooks():
 
     thread = Thread(target=bot_loop, args=[bot], daemon=True)
     thread.start()
+    server_started.wait()
 
     update = {
         "update_id": 0,
