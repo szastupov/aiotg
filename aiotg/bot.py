@@ -10,6 +10,7 @@ import json
 
 from functools import partialmethod
 from . chat import Chat, Sender
+from . reloader import run_with_reloader
 
 __author__ = "Stepan Zastupov"
 __copyright__ = "Copyright 2015-2017 Stepan Zastupov"
@@ -99,6 +100,34 @@ class Bot:
             loop.run_until_complete(self.loop())
         except KeyboardInterrupt:
             self.stop()
+
+    def run_with_reloader(self, **kwargs):
+        """
+        Convenience method for running bots in getUpdates mode
+        Watches file changes and reloads
+
+        :Example:
+
+        >>> if __name__ == '__main__':
+        >>>     bot.run_with_reloader()
+
+        """
+        loop = asyncio.get_event_loop()
+
+        try:
+            loop.run_until_complete(
+                run_with_reloader( loop, self.loop, self.stop, **kwargs ))
+
+        # User cancel
+        except KeyboardInterrupt:
+            logger.debug("User cancelled")
+            self.stop()
+
+        # Stop loop
+        finally:
+            logger.debug("Closing loop")
+            loop.stop()
+            loop.close()
 
     def run_webhook(self, webhook_url, **options):
         """
