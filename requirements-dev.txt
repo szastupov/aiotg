@@ -1,5 +1,7 @@
 aiohttp
+aionotify
 chardet
+paco
 pytest
 testfixtures
 sphinx
