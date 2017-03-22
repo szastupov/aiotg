@@ -47,7 +47,7 @@ def reload():
         )
         os._exit(os.EX_OK)
 
-async def run_with_reloader( loop, coroutine, cleanup=lambda _:_, *args, **kwargs ):
+async def run_with_reloader( loop, coroutine, cleanup=None, *args, **kwargs ):
     """ Run coroutine with reloader """
 
     watcher = await setup_watcher( loop, *args, **kwargs )
@@ -56,7 +56,7 @@ async def run_with_reloader( loop, coroutine, cleanup=lambda _:_, *args, **kwarg
     result = await race([coroutine, watcher.get_event])
 
     # Cleanup
-    cleanup()
+    cleanup and cleanup()
     watcher.close()
 
     # If change event, then reload
