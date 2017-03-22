@@ -11,6 +11,7 @@ from paco import race
 
 logger = logging.getLogger("aiotg")
 
+
 async def setup_watcher(
         loop,
         path=realpath(getcwd()),
@@ -31,6 +32,7 @@ async def setup_watcher(
     logger.debug("Init watcher for file changes in {}".format( path ))
     return watcher
 
+
 def reload():
     """ Reload process """
     try:
@@ -46,6 +48,7 @@ def reload():
             [sys.executable] + sys.argv,
         )
         os._exit(os.EX_OK)
+
 
 async def run_with_reloader( loop, coroutine, cleanup=None, *args, **kwargs ):
     """ Run coroutine with reloader """
