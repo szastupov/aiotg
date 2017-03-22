@@ -89,7 +89,7 @@ class Bot:
         """
         Convenience method for running bots in getUpdates mode
 
-        :param bool reload: Run with reloader
+        :param bool reload: Automatically reload bot on code change
         :Example:
 
         >>> if __name__ == '__main__':
