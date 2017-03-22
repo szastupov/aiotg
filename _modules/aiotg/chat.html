@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>aiotg.chat &#8212; aiotg 0.7.21 documentation</title>
+    <title>aiotg.chat &#8212; aiotg 0.7.22 documentation</title>
     
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.7.21',
+        VERSION:     '0.7.22',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -50,12 +50,12 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;aiotg&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="Chat"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat">[docs]</a><span class="k">class</span> <span class="nc">Chat</span><span class="p">:</span>
+<div class="viewcode-block" id="Chat"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat">[docs]</a><span class="k">class</span> <span class="nc">Chat</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Wrapper for telegram chats, passed to most callbacks</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Chat.send_text"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.send_text">[docs]</a>    <span class="k">def</span> <span class="nf">send_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.send_text"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_text">[docs]</a>    <span class="k">def</span> <span class="nf">send_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send a text message to the chat.</span>
 
@@ -65,7 +65,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.reply"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.reply">[docs]</a>    <span class="k">def</span> <span class="nf">reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="p">{},</span> <span class="n">parse_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.reply"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.reply">[docs]</a>    <span class="k">def</span> <span class="nf">reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="p">{},</span> <span class="n">parse_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reply to the message this `Chat` object is based on.</span>
 
@@ -82,7 +82,7 @@
             <span class="n">parse_mode</span><span class="o">=</span><span class="n">parse_mode</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.edit_text"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.edit_text">[docs]</a>    <span class="k">def</span> <span class="nf">edit_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message_id</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="p">{},</span> <span class="n">parse_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.edit_text"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.edit_text">[docs]</a>    <span class="k">def</span> <span class="nf">edit_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message_id</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="p">{},</span> <span class="n">parse_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Edit the message in this chat.</span>
 
@@ -100,7 +100,7 @@
             <span class="n">parse_mode</span><span class="o">=</span><span class="n">parse_mode</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.edit_reply_markup"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.edit_reply_markup">[docs]</a>    <span class="k">def</span> <span class="nf">edit_reply_markup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message_id</span><span class="p">,</span> <span class="n">markup</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.edit_reply_markup"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.edit_reply_markup">[docs]</a>    <span class="k">def</span> <span class="nf">edit_reply_markup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message_id</span><span class="p">,</span> <span class="n">markup</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Edit only reply markup of the message in this chat.</span>
 
@@ -120,7 +120,7 @@
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="Chat.get_chat"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.get_chat">[docs]</a>    <span class="k">def</span> <span class="nf">get_chat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.get_chat"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.get_chat">[docs]</a>    <span class="k">def</span> <span class="nf">get_chat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get information about the chat.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -129,7 +129,7 @@
             <span class="n">chat_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.get_chat_administrators"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.get_chat_administrators">[docs]</a>    <span class="k">def</span> <span class="nf">get_chat_administrators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.get_chat_administrators"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.get_chat_administrators">[docs]</a>    <span class="k">def</span> <span class="nf">get_chat_administrators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a list of administrators in a chat. Chat must not be private.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -138,7 +138,7 @@
             <span class="n">chat_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.get_chat_members_count"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.get_chat_members_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_chat_members_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.get_chat_members_count"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.get_chat_members_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_chat_members_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the number of members in a chat.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -147,7 +147,7 @@
             <span class="n">chat_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.get_chat_member"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.get_chat_member">[docs]</a>    <span class="k">def</span> <span class="nf">get_chat_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.get_chat_member"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.get_chat_member">[docs]</a>    <span class="k">def</span> <span class="nf">get_chat_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get information about a member of a chat.</span>
 
@@ -161,7 +161,7 @@
 
     <span class="n">send_sticker</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">_send_to_chat</span><span class="p">,</span> <span class="s2">&quot;sendSticker&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Chat.send_audio"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.send_audio">[docs]</a>    <span class="k">def</span> <span class="nf">send_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.send_audio"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_audio">[docs]</a>    <span class="k">def</span> <span class="nf">send_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send an mp3 audio file to the chat.</span>
 
@@ -181,7 +181,7 @@
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.send_photo"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.send_photo">[docs]</a>    <span class="k">def</span> <span class="nf">send_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.send_photo"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_photo">[docs]</a>    <span class="k">def</span> <span class="nf">send_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send a photo to the chat.</span>
 
@@ -203,7 +203,7 @@
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.send_video"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.send_video">[docs]</a>    <span class="k">def</span> <span class="nf">send_video</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">video</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.send_video"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_video">[docs]</a>    <span class="k">def</span> <span class="nf">send_video</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">video</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send an mp4 video file to the chat.</span>
 
@@ -225,7 +225,7 @@
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.send_document"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.send_document">[docs]</a>    <span class="k">def</span> <span class="nf">send_document</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">document</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.send_document"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_document">[docs]</a>    <span class="k">def</span> <span class="nf">send_document</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">document</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send a general file.</span>
 
@@ -247,7 +247,7 @@
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.send_voice"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.send_voice">[docs]</a>    <span class="k">def</span> <span class="nf">send_voice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">voice</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.send_voice"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_voice">[docs]</a>    <span class="k">def</span> <span class="nf">send_voice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">voice</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send an OPUS-encoded .ogg audio file.</span>
 
@@ -267,7 +267,7 @@
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.send_location"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.send_location">[docs]</a>    <span class="k">def</span> <span class="nf">send_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.send_location"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_location">[docs]</a>    <span class="k">def</span> <span class="nf">send_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send a point on the map.</span>
 
@@ -284,7 +284,7 @@
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.send_venue"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.send_venue">[docs]</a>    <span class="k">def</span> <span class="nf">send_venue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.send_venue"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_venue">[docs]</a>    <span class="k">def</span> <span class="nf">send_venue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send information about a venue.</span>
 
@@ -305,7 +305,7 @@
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.send_contact"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.send_contact">[docs]</a>    <span class="k">def</span> <span class="nf">send_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phone_number</span><span class="p">,</span> <span class="n">first_name</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.send_contact"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_contact">[docs]</a>    <span class="k">def</span> <span class="nf">send_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phone_number</span><span class="p">,</span> <span class="n">first_name</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send phone contacts.</span>
 
@@ -322,7 +322,7 @@
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.send_chat_action"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.send_chat_action">[docs]</a>    <span class="k">def</span> <span class="nf">send_chat_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.send_chat_action"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_chat_action">[docs]</a>    <span class="k">def</span> <span class="nf">send_chat_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send a chat action, to tell the user that something is happening on the</span>
 <span class="sd">        bot&#39;s side.</span>
@@ -344,7 +344,7 @@
             <span class="n">action</span><span class="o">=</span><span class="n">action</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.forward_message"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.forward_message">[docs]</a>    <span class="k">def</span> <span class="nf">forward_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_chat_id</span><span class="p">,</span> <span class="n">message_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.forward_message"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.forward_message">[docs]</a>    <span class="k">def</span> <span class="nf">forward_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_chat_id</span><span class="p">,</span> <span class="n">message_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Forward a message from another chat to this chat.</span>
 
@@ -358,7 +358,7 @@
             <span class="n">message_id</span><span class="o">=</span><span class="n">message_id</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.kick_chat_member"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.kick_chat_member">[docs]</a>    <span class="k">def</span> <span class="nf">kick_chat_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.kick_chat_member"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.kick_chat_member">[docs]</a>    <span class="k">def</span> <span class="nf">kick_chat_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Use this method to kick a user from a group or a supergroup.</span>
 <span class="sd">        The bot must be an administrator in the group for this to work.</span>
@@ -371,7 +371,7 @@
             <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.unban_chat_member"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.unban_chat_member">[docs]</a>    <span class="k">def</span> <span class="nf">unban_chat_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.unban_chat_member"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.unban_chat_member">[docs]</a>    <span class="k">def</span> <span class="nf">unban_chat_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Use this method to unban a previously kicked user in a supergroup.</span>
 <span class="sd">        The bot must be an administrator in the group for this to work.</span>
@@ -384,7 +384,7 @@
             <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.is_group"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.is_group">[docs]</a>    <span class="k">def</span> <span class="nf">is_group</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.is_group"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.is_group">[docs]</a>    <span class="k">def</span> <span class="nf">is_group</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if this chat is a group.</span>
 
@@ -401,7 +401,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">chat_type</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Chat.from_message"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Chat.from_message">[docs]</a>    <span class="k">def</span> <span class="nf">from_message</span><span class="p">(</span><span class="n">bot</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.from_message"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.from_message">[docs]</a>    <span class="k">def</span> <span class="nf">from_message</span><span class="p">(</span><span class="n">bot</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a ``Chat`` object from a message.</span>
 
@@ -413,13 +413,13 @@
         <span class="k">return</span> <span class="n">Chat</span><span class="p">(</span><span class="n">bot</span><span class="p">,</span> <span class="n">chat</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">chat</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">message</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="TgChat"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.TgChat">[docs]</a><span class="k">class</span> <span class="nc">TgChat</span><span class="p">(</span><span class="n">Chat</span><span class="p">):</span>
+<div class="viewcode-block" id="TgChat"><a class="viewcode-back" href="../../index.html#aiotg.chat.TgChat">[docs]</a><span class="k">class</span> <span class="nc">TgChat</span><span class="p">(</span><span class="n">Chat</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;TgChat is depricated, use Chat instead&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Sender"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.Sender">[docs]</a><span class="k">class</span> <span class="nc">Sender</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Sender"><a class="viewcode-back" href="../../index.html#aiotg.chat.Sender">[docs]</a><span class="k">class</span> <span class="nc">Sender</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A small wrapper for sender info, mostly used for logging&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -427,7 +427,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;first_name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">uname</span></div>
 
 
-<div class="viewcode-block" id="TgSender"><a class="viewcode-back" href="../../aiotg.html#aiotg.chat.TgSender">[docs]</a><span class="k">class</span> <span class="nc">TgSender</span><span class="p">(</span><span class="n">Sender</span><span class="p">):</span>
+<div class="viewcode-block" id="TgSender"><a class="viewcode-back" href="../../index.html#aiotg.chat.TgSender">[docs]</a><span class="k">class</span> <span class="nc">TgSender</span><span class="p">(</span><span class="n">Sender</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;TgSender is depricated, use Sender instead&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
