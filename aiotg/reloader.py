@@ -27,6 +27,8 @@ async def setup_watcher(
 
     # Setup watcher
     await watcher.setup( loop )
+
+    logger.debug("Init watcher for file changes in {}".format( path ))
     return watcher
 
 def reload():
@@ -49,10 +51,9 @@ async def run_with_reloader( loop, coroutine, cleanup=lambda _:_, *args, **kwarg
     """ Run coroutine with reloader """
 
     watcher = await setup_watcher( loop, *args, **kwargs )
-    logger.debug("Init watcher for file changes")
 
     # Run watcher and coroutine together
-    result = race([await watcher.get_event(), await coroutine()])
+    result = await race([coroutine, watcher.get_event])
 
     # Cleanup
     cleanup()
