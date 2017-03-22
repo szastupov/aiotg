@@ -1,5 +1,6 @@
 import requests
 import asyncio
+import pytest
 from urllib.parse import urlparse
 from aiohttp import web
 from aiotg.mock import MockBot
@@ -19,6 +20,7 @@ def bot_loop(bot):
     web.run_app(app, port=url.port)
 
 
+@pytest.mark.skip()
 def test_webhooks():
     bot = MockBot()
     called_with = None
