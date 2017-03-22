@@ -8,7 +8,7 @@ setup(
     name='aiotg',
     version=version,
     description='Asynchronous Python API for building Telegram bots',
-    url='https://github.com/szastupov/aiotg',
+    url='http://szastupov.github.io/aiotg',
 
     author='Stepan Zastupov',
     author_email='stepan.zastupov@gmail.com',
