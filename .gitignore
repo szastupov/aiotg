@@ -1,5 +1,4 @@
 __pycache__
-.venv
 venv
 build
 dist
@@ -12,7 +11,7 @@ aiotg.egg-info
 .LSOverride
 
 # Must end with CRCR (^M^M in vim)
-Icon
+Icon
 
 # Thumbnails
 ._*
@@ -20,3 +19,4 @@ Icon
 ### Temporary editor files ###
 *~
 *.swp
+.venv
