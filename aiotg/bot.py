@@ -85,10 +85,11 @@ class Bot:
             )
             self._process_updates(updates)
 
-    def run(self):
+    def run(self, reload=False):
         """
         Convenience method for running bots in getUpdates mode
 
+        :param bool reload: Run with reloader
         :Example:
 
         >>> if __name__ == '__main__':
@@ -96,27 +97,13 @@ class Bot:
 
         """
         loop = asyncio.get_event_loop()
-        try:
-            loop.run_until_complete(self.loop())
-        except KeyboardInterrupt:
-            self.stop()
-
-    def run_with_reloader(self, **kwargs):
-        """
-        Convenience method for running bots in getUpdates mode
-        Watches file changes and reloads
-
-        :Example:
-
-        >>> if __name__ == '__main__':
-        >>>     bot.run_with_reloader()
-
-        """
-        loop = asyncio.get_event_loop()
 
         try:
-            loop.run_until_complete(
-                run_with_reloader( loop, self.loop, self.stop, **kwargs ))
+            if not reload:
+                loop.run_until_complete(self.loop())
+
+            else:
+                self._run_with_reloader( loop )
 
         # User cancel
         except KeyboardInterrupt:
@@ -443,6 +430,12 @@ class Bot:
         except:
             # 😶
             pass
+
+    def _run_with_reloader(self, loop, **kwargs):
+        """ Private helper method to run bot with reloader """
+
+        loop.run_until_complete(
+            run_with_reloader( loop, self.loop, self.stop, **kwargs ))
 
     async def _track(self, message, name):
         response = await self.session.post(
