@@ -28,5 +28,5 @@ setup(
 
     packages=find_packages(exclude=['examples', 'docs', 'tests*']),
 
-    install_requires=['aiohttp>=1.0.0', 'paco>=0.1.11', 'aionotify>=0.2.0']
+    install_requires=['aiohttp>=1.0.0', 'paco>=0.1.11', 'watchdog>=0.8.3']
 )

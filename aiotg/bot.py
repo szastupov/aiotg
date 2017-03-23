@@ -99,11 +99,12 @@ class Bot:
         loop = asyncio.get_event_loop()
 
         try:
-            if not reload:
-                loop.run_until_complete(self.loop())
+            if reload:
+                logger.setLevel( logging.DEBUG )
+                self._run_with_reloader( loop )
 
             else:
-                self._run_with_reloader( loop )
+                loop.run_until_complete(self.loop())
 
         # User cancel
         except KeyboardInterrupt:
