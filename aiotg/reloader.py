@@ -59,9 +59,9 @@ def setup_watcher(
     watcher.schedule( handler, path=path, recursive=True )
     watcher.start()
 
-    print("Running with reloader. Should not be used in production")
+    logger.warning("Running with reloader. Should not be used in production")
 
-    logger.info("Init watcher for file changes in {}".format( path ))
+    logger.debug("Init watcher for file changes in {}".format( path ))
     return watcher, handler
 
 
@@ -84,13 +84,6 @@ def reload():
 
 async def run_with_reloader( loop, coroutine, cleanup=None, *args, **kwargs ):
     """ Run coroutine with reloader """
-
-    # Add stdout stream handler to logger
-    stream = logging.StreamHandler()
-    logger.addHandler( stream )
-
-    # Set logging level (reloader should only run in dev environment)
-    logger.setLevel( logging.INFO )
 
     watcher, handler = setup_watcher( loop, *args, **kwargs )
 

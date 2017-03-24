@@ -11,4 +11,4 @@ def getimage(chat, match):
 
 
 if __name__ == '__main__':
-    bot.run()
+    bot.run(debug=True)

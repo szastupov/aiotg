@@ -85,10 +85,11 @@ class Bot:
             )
             self._process_updates(updates)
 
-    def run(self, reload=False):
+    def run(self, debug=False, reload=None):
         """
         Convenience method for running bots in getUpdates mode
 
+        :param bool debug: Enable debug logging and automatic reloading
         :param bool reload: Automatically reload bot on code change
         :Example:
 
@@ -98,6 +99,11 @@ class Bot:
         """
         loop = asyncio.get_event_loop()
 
+        logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
+
+        if reload is None:
+            reload = debug
+
         try:
             if reload:
                 self._run_with_reloader( loop )
@@ -105,7 +111,7 @@ class Bot:
             else:
                 loop.run_until_complete(self.loop())
 
-        # User cancel
+        # User cancels
         except KeyboardInterrupt:
             logger.debug("User cancelled")
             self.stop()
