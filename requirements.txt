@@ -1,5 +1,4 @@
 aiohttp==1.0.0
-appdirs==1.4.3
 async-timeout==1.2.0
 chardet==2.3.0
 multidict==2.1.4
