@@ -100,7 +100,6 @@ class Bot:
 
         try:
             if reload:
-                logger.setLevel( logging.DEBUG )
                 self._run_with_reloader( loop )
 
             else:
