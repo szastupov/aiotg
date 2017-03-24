@@ -54,6 +54,7 @@
 
 <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partialmethod</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="n">chat</span> <span class="kn">import</span> <span class="nn">Chat</span><span class="o">,</span> <span class="nn">Sender</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="n">reloader</span> <span class="kn">import</span> <span class="nn">run_with_reloader</span>
 
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Stepan Zastupov&quot;</span>
 <span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2015-2017 Stepan Zastupov&quot;</span>
@@ -128,10 +129,12 @@
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_updates</span><span class="p">(</span><span class="n">updates</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Bot.run"><a class="viewcode-back" href="../../index.html#aiotg.bot.Bot.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Bot.run"><a class="viewcode-back" href="../../index.html#aiotg.bot.Bot.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reload</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convenience method for running bots in getUpdates mode</span>
 
+<span class="sd">        :param bool debug: Enable debug logging and automatic reloading</span>
+<span class="sd">        :param bool reload: Automatically reload bot on code change</span>
 <span class="sd">        :Example:</span>
 
 <span class="sd">        &gt;&gt;&gt; if __name__ == &#39;__main__&#39;:</span>
@@ -139,10 +142,29 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">reload</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reload</span> <span class="o">=</span> <span class="n">debug</span>
+
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">reload</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_run_with_reloader</span><span class="p">(</span> <span class="n">loop</span> <span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">())</span>
+
+        <span class="c1"># User cancels</span>
         <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;User cancelled&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+        <span class="c1"># Stop loop</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Closing loop&quot;</span><span class="p">)</span>
+            <span class="n">loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Bot.run_webhook"><a class="viewcode-back" href="../../index.html#aiotg.bot.Bot.run_webhook">[docs]</a>    <span class="k">def</span> <span class="nf">run_webhook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">webhook_url</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -445,6 +467,12 @@
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div>
 
+<div class="viewcode-block" id="Bot.delete_webhook"><a class="viewcode-back" href="../../index.html#aiotg.bot.Bot.delete_webhook">[docs]</a>    <span class="k">def</span> <span class="nf">delete_webhook</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Tell Telegram to switch back to getUpdates mode</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s1">&#39;deleteWebhook&#39;</span><span class="p">)</span></div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">session</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">:</span>
@@ -458,6 +486,12 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="c1"># 😶</span>
             <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_run_with_reloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loop</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Private helper method to run bot with reloader &quot;&quot;&quot;</span>
+
+        <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span>
+            <span class="n">run_with_reloader</span><span class="p">(</span> <span class="n">loop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">))</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_track</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
