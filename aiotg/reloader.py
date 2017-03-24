@@ -6,7 +6,7 @@ import sys
 from os.path import realpath
 
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler as EventHandler
+from watchdog.events import PatternMatchingEventHandler as EventHandler
 from watchdog.events import FileSystemEvent as Event
 from paco import race
 
@@ -16,7 +16,11 @@ logger = logging.getLogger("aiotg.reloader")
 
 # Event handler class for watchdog
 class Handler( EventHandler ):
+    # Private
     _future_resolved = False
+
+    # Common filetypes to watch
+    patterns = ["*.py", "*.txt", "*.aiml", "*.json", "*.cfg", "*.xml", "*.html"]
 
     def __init__( self, *args, **kwargs ):
 
