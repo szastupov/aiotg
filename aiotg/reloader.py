@@ -10,7 +10,8 @@ from watchdog.events import FileSystemEventHandler as EventHandler
 from watchdog.events import FileSystemEvent as Event
 from paco import race
 
-logger = logging.getLogger("aiotg")
+# Use a separate logger
+logger = logging.getLogger("aiotg.reloader")
 
 
 # Event handler class for watchdog
@@ -56,7 +57,7 @@ def setup_watcher(
 
     print("Running with reloader. Should not be used in production")
 
-    logger.debug("Init watcher for file changes in {}".format( path ))
+    logger.info("Init watcher for file changes in {}".format( path ))
     return watcher, handler
 
 
@@ -80,8 +81,12 @@ def reload():
 async def run_with_reloader( loop, coroutine, cleanup=None, *args, **kwargs ):
     """ Run coroutine with reloader """
 
+    # Add stdout stream handler to logger
+    stream = logging.StreamHandler()
+    logger.addHandler( stream )
+
     # Set logging level (reloader should only run in dev environment)
-    logger.setLevel( logging.DEBUG )
+    logger.setLevel( logging.INFO )
 
     watcher, handler = setup_watcher( loop, *args, **kwargs )
 
@@ -94,5 +99,5 @@ async def run_with_reloader( loop, coroutine, cleanup=None, *args, **kwargs ):
 
     # If change event, then reload
     if isinstance( result, Event ):
-        logger.debug("Reloading")
+        logger.info("Reloading")
         reload()
