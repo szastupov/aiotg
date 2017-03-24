@@ -423,6 +423,12 @@ class Bot:
             **options
         )
 
+    def delete_webhook(self):
+        '''
+        Tell Telegram to switch back to getUpdates mode
+        '''
+        return self.api_call('deleteWebhook')
+
     @property
     def session(self):
         if not self._session:

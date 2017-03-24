@@ -21,7 +21,7 @@ def bot_loop(bot):
 
 
 @pytest.mark.skip()
-def test_webhooks():
+def test_webhooks_integration():
     bot = MockBot()
     called_with = None
 
@@ -51,3 +51,15 @@ def test_webhooks():
 
     requests.post(webhook_url, json=update)
     assert called_with == "foo"
+
+
+def test_set_webhook():
+    bot = MockBot()
+    bot.set_webhook(webhook_url)
+    assert "setWebhook" in bot.calls
+
+
+def test_delete_webhook():
+    bot = MockBot()
+    bot.delete_webhook()
+    assert "deleteWebhook" in bot.calls
