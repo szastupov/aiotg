@@ -10,6 +10,7 @@ import json
 
 from functools import partialmethod
 from . chat import Chat, Sender
+from . reloader import run_with_reloader
 
 __author__ = "Stepan Zastupov"
 __copyright__ = "Copyright 2015-2017 Stepan Zastupov"
@@ -84,10 +85,11 @@ class Bot:
             )
             self._process_updates(updates)
 
-    def run(self):
+    def run(self, reload=False):
         """
         Convenience method for running bots in getUpdates mode
 
+        :param bool reload: Automatically reload bot on code change
         :Example:
 
         >>> if __name__ == '__main__':
@@ -95,10 +97,24 @@ class Bot:
 
         """
         loop = asyncio.get_event_loop()
+
         try:
-            loop.run_until_complete(self.loop())
+            if reload:
+                self._run_with_reloader( loop )
+
+            else:
+                loop.run_until_complete(self.loop())
+
+        # User cancel
         except KeyboardInterrupt:
+            logger.debug("User cancelled")
             self.stop()
+
+        # Stop loop
+        finally:
+            logger.debug("Closing loop")
+            loop.stop()
+            loop.close()
 
     def run_webhook(self, webhook_url, **options):
         """
@@ -414,6 +430,12 @@ class Bot:
         except:
             # 😶
             pass
+
+    def _run_with_reloader(self, loop, **kwargs):
+        """ Private helper method to run bot with reloader """
+
+        loop.run_until_complete(
+            run_with_reloader( loop, self.loop, self.stop, **kwargs ))
 
     async def _track(self, message, name):
         response = await self.session.post(

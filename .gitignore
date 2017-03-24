@@ -19,3 +19,4 @@ Icon
 ### Temporary editor files ###
 *~
 *.swp
+.venv
