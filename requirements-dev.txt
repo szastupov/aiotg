@@ -1,9 +1,9 @@
 aiohttp
-aionotify
 chardet
 paco
 pytest
 testfixtures
 sphinx
+watchdog
 flake8
 -e .
