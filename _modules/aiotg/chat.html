@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>aiotg.chat &#8212; aiotg 0.7.22 documentation</title>
+    <title>aiotg.chat &#8212; aiotg 0.8.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.7.22',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -44,7 +44,6 @@
   <h1>Source code for aiotg.chat</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partialmethod</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;aiotg&quot;</span><span class="p">)</span>
@@ -113,13 +112,6 @@
             <span class="n">reply_markup</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">markup</span><span class="p">)</span>
         <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_send_to_chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span>
-            <span class="n">method</span><span class="p">,</span>
-            <span class="n">chat_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
-            <span class="o">**</span><span class="n">options</span>
-        <span class="p">)</span>
-
 <div class="viewcode-block" id="Chat.get_chat"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.get_chat">[docs]</a>    <span class="k">def</span> <span class="nf">get_chat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get information about the chat.</span>
@@ -159,7 +151,20 @@
             <span class="n">user_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
         <span class="p">)</span></div>
 
-    <span class="n">send_sticker</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">_send_to_chat</span><span class="p">,</span> <span class="s2">&quot;sendSticker&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Chat.send_sticker"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_sticker">[docs]</a>    <span class="k">def</span> <span class="nf">send_sticker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sticker</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send a sticker to the chat.</span>
+
+<span class="sd">        :param sticker: Sticker to send (file or string)</span>
+<span class="sd">        :param options: Additional sendSticker options (see</span>
+<span class="sd">            https://core.telegram.org/bots/api#sendsticker)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span>
+            <span class="s2">&quot;sendSticker&quot;</span><span class="p">,</span>
+            <span class="n">chat_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+            <span class="n">sticker</span><span class="o">=</span><span class="n">sticker</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">options</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Chat.send_audio"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.send_audio">[docs]</a>    <span class="k">def</span> <span class="nf">send_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>aiotg.bot &#8212; aiotg 0.7.22 documentation</title>
+    <title>aiotg.bot &#8212; aiotg 0.8.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.7.22',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,6 @@
 <span class="kn">from</span> <span class="nn">aiohttp</span> <span class="k">import</span> <span class="n">web</span>
 <span class="kn">import</span> <span class="nn">json</span>
 
-<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partialmethod</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="n">chat</span> <span class="kn">import</span> <span class="nn">Chat</span><span class="o">,</span> <span class="nn">Sender</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="n">reloader</span> <span class="kn">import</span> <span class="nn">run_with_reloader</span>
 
@@ -409,8 +408,6 @@
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">/file/bot</span><span class="si">{1}</span><span class="s2">/</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">API_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></div>
 
-    <span class="n">_get_user_profile_photos</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">api_call</span><span class="p">,</span> <span class="s2">&quot;getUserProfilePhotos&quot;</span><span class="p">)</span>
-
 <div class="viewcode-block" id="Bot.get_user_profile_photos"><a class="viewcode-back" href="../../index.html#aiotg.bot.Bot.get_user_profile_photos">[docs]</a>    <span class="k">def</span> <span class="nf">get_user_profile_photos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a list of profile pictures for a user</span>
@@ -419,7 +416,8 @@
 <span class="sd">        :param options: Additional getUserProfilePhotos options (see</span>
 <span class="sd">            https://core.telegram.org/bots/api#getuserprofilephotos)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_user_profile_photos</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span>
+            <span class="s2">&quot;getUserProfilePhotos&quot;</span><span class="p">,</span>
             <span class="n">user_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span>
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div>
