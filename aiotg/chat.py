@@ -1,6 +1,5 @@
 import json
 import logging
-from functools import partialmethod
 
 
 logger = logging.getLogger("aiotg")
@@ -69,13 +68,6 @@ class Chat:
             reply_markup=json.dumps(markup)
         )
 
-    def _send_to_chat(self, method, **options):
-        return self.bot.api_call(
-            method,
-            chat_id=str(self.id),
-            **options
-        )
-
     def get_chat(self):
         """
         Get information about the chat.
@@ -115,7 +107,20 @@ class Chat:
             user_id=str(user_id)
         )
 
-    send_sticker = partialmethod(_send_to_chat, "sendSticker")
+    def send_sticker(self, sticker, **options):
+        """
+        Send a sticker to the chat.
+
+        :param sticker: Sticker to send (file or string)
+        :param options: Additional sendSticker options (see
+            https://core.telegram.org/bots/api#sendsticker)
+        """
+        return self.bot.api_call(
+            "sendSticker",
+            chat_id=str(self.id),
+            sticker=sticker,
+            **options
+        )
 
     def send_audio(self, audio, **options):
         """

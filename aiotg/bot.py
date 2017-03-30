@@ -8,7 +8,6 @@ import aiohttp
 from aiohttp import web
 import json
 
-from functools import partialmethod
 from . chat import Chat, Sender
 from . reloader import run_with_reloader
 
@@ -365,8 +364,6 @@ class Bot:
         url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
         return self.session.get(url, headers=headers)
 
-    _get_user_profile_photos = partialmethod(api_call, "getUserProfilePhotos")
-
     def get_user_profile_photos(self, user_id, **options):
         """
         Get a list of profile pictures for a user
@@ -375,7 +372,8 @@ class Bot:
         :param options: Additional getUserProfilePhotos options (see
             https://core.telegram.org/bots/api#getuserprofilephotos)
         """
-        return self._get_user_profile_photos(
+        return self.api_call(
+            "getUserProfilePhotos",
             user_id=str(user_id),
             **options
         )

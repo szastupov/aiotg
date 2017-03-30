@@ -173,6 +173,9 @@ def test_send_methods():
     chat.send_photo(b"foo")
     assert "sendPhoto" in bot.calls
 
+    chat.send_sticker(b"foo")
+    assert "sendSticker" in bot.calls
+
     chat.send_video(b"foo")
     assert "sendVideo" in bot.calls
 
