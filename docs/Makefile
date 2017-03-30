@@ -197,6 +197,6 @@ aiotg.docset:
 aiotg.tgz: aiotg.docset
 	tar --exclude='.DS_Store' -cvzf $@ $^
 
-publish: html
+publish: clean html
 	touch _build/html/.nojekyll
 	gh-pages -td _build/html/
