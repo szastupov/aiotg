@@ -1,6 +1,9 @@
 import json
 import logging
+from typing import Union, IO
 
+
+File = Union[str, IO]
 
 logger = logging.getLogger("aiotg")
 
@@ -10,7 +13,7 @@ class Chat:
     Wrapper for telegram chats, passed to most callbacks
     """
 
-    def send_text(self, text, **options):
+    def send_text(self, text: str, **options):
         """
         Send a text message to the chat.
 
@@ -20,7 +23,7 @@ class Chat:
         """
         return self.bot.send_message(self.id, text, **options)
 
-    def reply(self, text, markup={}, parse_mode=None):
+    def reply(self, text: str, markup={}, parse_mode=None):
         """
         Reply to the message this `Chat` object is based on.
 
@@ -107,7 +110,7 @@ class Chat:
             user_id=str(user_id)
         )
 
-    def send_sticker(self, sticker, **options):
+    def send_sticker(self, sticker: File, **options):
         """
         Send a sticker to the chat.
 
@@ -122,7 +125,7 @@ class Chat:
             **options
         )
 
-    def send_audio(self, audio, **options):
+    def send_audio(self, audio: File, **options):
         """
         Send an mp3 audio file to the chat.
 
@@ -142,7 +145,7 @@ class Chat:
             **options
         )
 
-    def send_photo(self, photo, caption="", **options):
+    def send_photo(self, photo: File, caption="", **options):
         """
         Send a photo to the chat.
 
@@ -164,7 +167,7 @@ class Chat:
             **options
         )
 
-    def send_video(self, video, caption="", **options):
+    def send_video(self, video: File, caption="", **options):
         """
         Send an mp4 video file to the chat.
 
@@ -186,7 +189,7 @@ class Chat:
             **options
         )
 
-    def send_document(self, document, caption="", **options):
+    def send_document(self, document: File, caption="", **options):
         """
         Send a general file.
 
@@ -208,7 +211,7 @@ class Chat:
             **options
         )
 
-    def send_voice(self, voice, **options):
+    def send_voice(self, voice: File, **options):
         """
         Send an OPUS-encoded .ogg audio file.
 
@@ -228,7 +231,7 @@ class Chat:
             **options
         )
 
-    def send_location(self, latitude, longitude, **options):
+    def send_location(self, latitude: float, longitude: float, **options):
         """
         Send a point on the map.
 
@@ -245,7 +248,7 @@ class Chat:
             **options
         )
 
-    def send_venue(self, latitude, longitude, title, address, **options):
+    def send_venue(self, latitude: float, longitude: float, title: str, address: str, **options):
         """
         Send information about a venue.
 
@@ -266,7 +269,7 @@ class Chat:
             **options
         )
 
-    def send_contact(self, phone_number, first_name, **options):
+    def send_contact(self, phone_number: str, first_name: str, **options):
         """
         Send phone contacts.
 
@@ -283,7 +286,7 @@ class Chat:
             **options
         )
 
-    def send_chat_action(self, action):
+    def send_chat_action(self, action: str):
         """
         Send a chat action, to tell the user that something is happening on the
         bot's side.

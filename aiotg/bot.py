@@ -3,6 +3,7 @@ import re
 import logging
 import asyncio
 from urllib.parse import urlparse
+from typing import Callable, Match, Coroutine, List, Tuple, Optional  # noqa
 
 import aiohttp
 from aiohttp import web
@@ -30,6 +31,9 @@ MESSAGE_TYPES = [
 
 logger = logging.getLogger("aiotg")
 
+CommandCallback = Callable[[Chat, Match], Optional[Coroutine]]
+DefaultCallback = Callable[[Chat, dict], Optional[Coroutine]]
+
 
 class Bot:
     """Telegram bot framework designed for asyncio
@@ -43,21 +47,21 @@ class Bot:
     _running = False
     _offset = 0
 
-    def __init__(self, api_token, api_timeout=API_TIMEOUT,
-                 botan_token=None, name=None):
+    def __init__(self, api_token: str, api_timeout=API_TIMEOUT,
+                 botan_token=None, name=None) -> None:
         self.api_token = api_token
         self.api_timeout = api_timeout
         self.botan_token = botan_token
         self.name = name
-        self.webhook_url = None
-        self._session = None
+        self.webhook_url = None  # type: str
+        self._session = None  # type: aiohttp.ClientSession
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
 
         self._handlers = {mt: no_handle(mt) for mt in MESSAGE_TYPES}
-        self._commands = []
-        self._default = lambda c, m: None
+        self._commands = []  # type: List[Tuple[str, CommandCallback]]
+        self._default = None  # type: DefaultCallback
         self._inline = lambda iq: None
         self._callback = lambda c, cq: None
 
@@ -121,7 +125,7 @@ class Bot:
             loop.stop()
             loop.close()
 
-    def run_webhook(self, webhook_url, **options):
+    def run_webhook(self, webhook_url: str, **options):
         """
         Convenience method for running bots in webhook mode
 
@@ -147,13 +151,13 @@ class Bot:
         """
         self.run_webhook(webhook_url="")
 
-    def add_command(self, regexp, fn):
+    def add_command(self, regexp: str, fn: CommandCallback):
         """
         Manually register regexp based command
         """
         self._commands.append((regexp, fn))
 
-    def command(self, regexp):
+    def command(self, regexp: str):
         """
         Register a new command
 
@@ -170,7 +174,7 @@ class Bot:
             return fn
         return decorator
 
-    def default(self, callback):
+    def default(self, callback: DefaultCallback):
         """
         Set callback for default command that is called on unrecognized
         commands for 1-to-1 chats
@@ -227,7 +231,7 @@ class Bot:
             return callback
         return wrap
 
-    def channel(self, channel_name):
+    def channel(self, channel_name) -> Chat:
         """
         Construct a Chat object used to post to channel
 
@@ -235,7 +239,7 @@ class Bot:
         """
         return Chat(self, channel_name, "channel")
 
-    def private(self, user_id):
+    def private(self, user_id) -> Chat:
         """
         Construct a Chat object used to post direct messages
 
@@ -243,7 +247,7 @@ class Bot:
         """
         return Chat(self, user_id, "private")
 
-    def group(self, group_id):
+    def group(self, group_id) -> Chat:
         """
         Construct a Chat object used to post group messages
 
@@ -251,7 +255,7 @@ class Bot:
         """
         return Chat(self, group_id, "group")
 
-    async def api_call(self, method, **params):
+    async def api_call(self, method: str, **params):
         """
         Call Telegram API.
 
@@ -480,7 +484,7 @@ class Bot:
                 return handler(chat, m)
 
         # No match, run default if it's a 1to1 chat
-        if not chat.is_group():
+        if not chat.is_group() and self._default:
             self.track(message, "default")
             return self._default(chat, message)
 
