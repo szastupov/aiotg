@@ -105,7 +105,8 @@ class Bot:
 
         try:
             if reload:
-                self._run_with_reloader( loop )
+                loop.run_until_complete(
+                    run_with_reloader(loop, self.loop(), self.stop))
 
             else:
                 loop.run_until_complete(self.loop())
@@ -440,12 +441,6 @@ class Bot:
         except:
             # 😶
             pass
-
-    def _run_with_reloader(self, loop, **kwargs):
-        """ Private helper method to run bot with reloader """
-
-        loop.run_until_complete(
-            run_with_reloader( loop, self.loop, self.stop, **kwargs ))
 
     async def _track(self, message, name):
         response = await self.session.post(

@@ -8,7 +8,6 @@ from os.path import realpath
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler as EventHandler
 from watchdog.events import FileSystemEvent as Event
-from paco import race
 
 # Use a separate logger
 logger = logging.getLogger("aiotg.reloader")
@@ -26,7 +25,6 @@ class Handler( EventHandler ):
 
         # awaitable future to race on
         self.changed = asyncio.Future()
-        asyncio.ensure_future( self.changed )
 
         # Continue init for EventHandler
         return super( Handler, self).__init__( *args, **kwargs )
@@ -37,10 +35,6 @@ class Handler( EventHandler ):
         if isinstance( event, Event ) and not self._future_resolved:
             self.changed.set_result( event )
             self._future_resolved = True
-
-    # Coroutine for racing
-    async def change( self ):
-        return await self.changed
 
 
 def setup_watcher(
@@ -88,13 +82,15 @@ async def run_with_reloader( loop, coroutine, cleanup=None, *args, **kwargs ):
     watcher, handler = setup_watcher( loop, *args, **kwargs )
 
     # Run watcher and coroutine together
-    result = await race([coroutine, handler.change])
+    done, pending = await asyncio.wait([coroutine, handler.changed],
+                                       return_when=asyncio.FIRST_COMPLETED)
 
     # Cleanup
     cleanup and cleanup()
     watcher.stop()
 
-    # If change event, then reload
-    if isinstance( result, Event ):
-        logger.info("Reloading")
-        reload()
+    for fut in done:
+        # If change event, then reload
+        if isinstance(fut.result(), Event):
+            logger.info("Reloading")
+            reload()

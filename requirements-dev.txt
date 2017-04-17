@@ -1,6 +1,5 @@
 aiohttp
 chardet
-paco
 pytest
 testfixtures
 sphinx
