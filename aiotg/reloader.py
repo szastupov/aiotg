@@ -21,10 +21,11 @@ class Handler( EventHandler ):
     # Common filetypes to watch
     patterns = ["*.py", "*.txt", "*.aiml", "*.json", "*.cfg", "*.xml", "*.html"]
 
-    def __init__( self, *args, **kwargs ):
+    def __init__( self, loop, *args, **kwargs ):
+        self.loop = loop
 
         # awaitable future to race on
-        self.changed = asyncio.Future()
+        self.changed = asyncio.Future(loop=loop)
 
         # Continue init for EventHandler
         return super( Handler, self).__init__( *args, **kwargs )
@@ -33,7 +34,7 @@ class Handler( EventHandler ):
 
         # Resolve future
         if isinstance( event, Event ) and not self._future_resolved:
-            self.changed.set_result( event )
+            self.loop.call_soon_threadsafe(self.changed.set_result, event)
             self._future_resolved = True
 
 
@@ -46,7 +47,7 @@ def setup_watcher(
     """ Prepare watcher and set it up with the loop """
 
     # Create watcher
-    handler = Handler()
+    handler = Handler(loop)
     watcher = Observer()
 
     # Setup
