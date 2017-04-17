@@ -1,4 +1,3 @@
-import requests
 import asyncio
 import pytest
 from urllib.parse import urlparse
@@ -49,6 +48,7 @@ def test_webhooks_integration():
         }
     }
 
+    import requests
     requests.post(webhook_url, json=update)
     assert called_with == "foo"
 
