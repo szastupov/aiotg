@@ -101,7 +101,7 @@ def test_updates():
         "update_id": 0,
         "message": text_msg("foo bar")
     }
-    updates = { "result": [update], "ok": True }
+    updates = {"result": [update], "ok": True}
     called_with = None
 
     @bot.default
@@ -134,7 +134,7 @@ def test_handle(mt):
         called_with = media
 
     value = random.random()
-    bot._process_message(custom_msg({ mt: value }))
+    bot._process_message(custom_msg({mt: value}))
     assert called_with == value
 
 

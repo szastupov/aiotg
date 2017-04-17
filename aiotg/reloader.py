@@ -14,26 +14,26 @@ logger = logging.getLogger("aiotg.reloader")
 
 
 # Event handler class for watchdog
-class Handler( EventHandler ):
+class Handler(EventHandler):
     # Private
     _future_resolved = False
 
     # Common filetypes to watch
     patterns = ["*.py", "*.txt", "*.aiml", "*.json", "*.cfg", "*.xml", "*.html"]
 
-    def __init__( self, loop, *args, **kwargs ):
+    def __init__(self, loop, *args, **kwargs):
         self.loop = loop
 
         # awaitable future to race on
         self.changed = asyncio.Future(loop=loop)
 
         # Continue init for EventHandler
-        return super( Handler, self).__init__( *args, **kwargs )
+        return super(Handler, self).__init__(*args, **kwargs)
 
-    def on_any_event( self, event ):
+    def on_any_event(self, event):
 
         # Resolve future
-        if isinstance( event, Event ) and not self._future_resolved:
+        if isinstance(event, Event) and not self._future_resolved:
             self.loop.call_soon_threadsafe(self.changed.set_result, event)
             self._future_resolved = True
 
@@ -51,12 +51,12 @@ def setup_watcher(
     watcher = Observer()
 
     # Setup
-    watcher.schedule( handler, path=path, recursive=True )
+    watcher.schedule(handler, path=path, recursive=True)
     watcher.start()
 
     logger.warning("Running with reloader. Should not be used in production")
 
-    logger.debug("Init watcher for file changes in {}".format( path ))
+    logger.debug("Init watcher for file changes in {}".format(path))
     return watcher, handler
 
 
@@ -77,10 +77,10 @@ def reload():
         os._exit(os.EX_OK)
 
 
-async def run_with_reloader( loop, coroutine, cleanup=None, *args, **kwargs ):
+async def run_with_reloader(loop, coroutine, cleanup=None, *args, **kwargs):
     """ Run coroutine with reloader """
 
-    watcher, handler = setup_watcher( loop, *args, **kwargs )
+    watcher, handler = setup_watcher(loop, *args, **kwargs)
 
     # Run watcher and coroutine together
     done, pending = await asyncio.wait([coroutine, handler.changed],
