@@ -4,6 +4,7 @@ build
 dist
 aiotg.egg-info
 .cache
+.eggs
 
 ### macOS ###
 *.DS_Store

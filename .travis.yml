@@ -2,10 +2,11 @@ language: python
 python:
   - '3.5'
   - '3.6'
-install: pip install -r requirements-dev.txt
+install:
+  - pip install .
 script:
-  - py.test
-  - flake8
+  - python setup.py -q test
+  - python setup.py -q flake8
 deploy:
   provider: pypi
   user: szastupov

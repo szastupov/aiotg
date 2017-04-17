@@ -1,8 +1,0 @@
-aiohttp
-chardet
-pytest
-testfixtures
-sphinx
-watchdog
-flake8
--e .
