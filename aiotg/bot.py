@@ -252,7 +252,7 @@ class Bot:
         """
         return Chat(self, group_id, "group")
 
-    async def api_call(self, method, **params):
+    def api_call(self, method, **params):
         """
         Call Telegram API.
 
@@ -261,6 +261,11 @@ class Bot:
         :param str method: Telegram API method
         :param params: Arguments for the method call
         """
+        coro = self._api_call(method, **params)
+        # Explicitly ensure that API call is executed
+        return asyncio.ensure_future(coro)
+
+    async def _api_call(self, method, **params):
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         logger.debug("api_call %s, %s", method, params)
 
