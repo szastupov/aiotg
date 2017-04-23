@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import os
 import sys
 
@@ -8,9 +7,6 @@ from os.path import realpath
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler as EventHandler
 from watchdog.events import FileSystemEvent as Event
-
-# Use a separate logger
-logger = logging.getLogger("aiotg.reloader")
 
 
 # Event handler class for watchdog
@@ -38,26 +34,13 @@ class Handler(EventHandler):
             self._future_resolved = True
 
 
-def setup_watcher(
-        loop,
-        path=realpath(os.getcwd()),
-        *args,
-        **kwargs):
+def clear_screen():
+    if os.name == 'nt':
+        seq = '\x1Bc'
+    else:
+        seq = '\x1B[2J\x1B[H'
 
-    """ Prepare watcher and set it up with the loop """
-
-    # Create watcher
-    handler = Handler(loop)
-    watcher = Observer()
-
-    # Setup
-    watcher.schedule(handler, path=path, recursive=True)
-    watcher.start()
-
-    logger.warning("Running with reloader. Should not be used in production")
-
-    logger.debug("Init watcher for file changes in {}".format(path))
-    return watcher, handler
+    sys.stdout.write(seq)
 
 
 def reload():
@@ -80,7 +63,20 @@ def reload():
 async def run_with_reloader(loop, coroutine, cleanup=None, *args, **kwargs):
     """ Run coroutine with reloader """
 
-    watcher, handler = setup_watcher(loop, *args, **kwargs)
+    clear_screen()
+    print("🤖  Running in debug mode with live reloading")
+    print("    (don't forget to disable it for production)")
+
+    # Create watcher
+    handler = Handler(loop)
+    watcher = Observer()
+
+    # Setup
+    path = realpath(os.getcwd())
+    watcher.schedule(handler, path=path, recursive=True)
+    watcher.start()
+
+    print("    (watching {})".format(path))
 
     # Run watcher and coroutine together
     done, pending = await asyncio.wait([coroutine, handler.changed],
@@ -93,5 +89,5 @@ async def run_with_reloader(loop, coroutine, cleanup=None, *args, **kwargs):
     for fut in done:
         # If change event, then reload
         if isinstance(fut.result(), Event):
-            logger.info("Reloading")
+            print("Reloading...")
             reload()
