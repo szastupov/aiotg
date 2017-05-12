@@ -1,13 +1,15 @@
 import pytest
 import random
 
-from aiotg import Bot, Chat, InlineQuery
+from aiotg import Chat, InlineQuery
 from aiotg import MESSAGE_TYPES
 from aiotg.mock import MockBot
 from testfixtures import LogCapture
 
+from aiotg.ext import ExtendedBot
+
 API_TOKEN = "test_token"
-bot = Bot(API_TOKEN)
+bot = ExtendedBot(API_TOKEN)
 
 
 def custom_msg(msg):
@@ -68,10 +70,10 @@ def test_default():
     assert called_with == "foo bar"
 
 
-def test_inline():
+def test_default_inline():
     called_with = None
 
-    @bot.inline
+    @bot.default_inline
     def inline(query):
         nonlocal called_with
         called_with = query.query
@@ -80,19 +82,43 @@ def test_inline():
     assert called_with == "foo bar"
 
 
+def test_inline():
+    called_with = None
+
+    @bot.inline(r'query-(\w+)')
+    def inline(query, match):
+        nonlocal called_with
+        called_with = match.group(1)
+
+    bot._process_inline_query(inline_query("query-foo"))
+    assert called_with == "foo"
+
+
 def test_callback_default():
     bot._process_callback_query(callback_query("foo"))
 
 
-def test_callback():
+def test_default_callback():
     called_with = None
 
-    @bot.callback
+    @bot.default_callback
     def callback(chat, cq):
         nonlocal called_with
         called_with = cq.data
 
     bot._process_callback_query(callback_query("foo"))
+    assert called_with == "foo"
+
+
+def test_callback():
+    called_with = None
+
+    @bot.callback(r'click-(\w+)')
+    def click_callback(chat, cq, match):
+        nonlocal called_with
+        called_with = match.group(1)
+
+    bot._process_callback_query(callback_query("click-foo"))
     assert called_with == "foo"
 
 
