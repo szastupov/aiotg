@@ -1,15 +1,14 @@
 import pytest
 import random
 
-from aiotg import Chat, InlineQuery
+from aiotg import Bot, Chat, InlineQuery
 from aiotg import MESSAGE_TYPES
 from aiotg.mock import MockBot
 from testfixtures import LogCapture
 
-from aiotg.ext import ExtendedBot
 
 API_TOKEN = "test_token"
-bot = ExtendedBot(API_TOKEN)
+bot = Bot(API_TOKEN)
 
 
 def custom_msg(msg):
@@ -73,7 +72,7 @@ def test_default():
 def test_default_inline():
     called_with = None
 
-    @bot.default_inline
+    @bot.inline
     def inline(query):
         nonlocal called_with
         called_with = query.query
@@ -101,7 +100,7 @@ def test_callback_default():
 def test_default_callback():
     called_with = None
 
-    @bot.default_callback
+    @bot.callback
     def callback(chat, cq):
         nonlocal called_with
         called_with = cq.data
