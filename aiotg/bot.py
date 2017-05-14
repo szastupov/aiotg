@@ -57,9 +57,11 @@ class Bot:
 
         self._handlers = {mt: no_handle(mt) for mt in MESSAGE_TYPES}
         self._commands = []
-        self._default = lambda c, m: None
-        self._inline = lambda iq: None
-        self._callback = lambda c, cq: None
+        self._callbacks = []
+        self._inlines = []
+        self._default = lambda chat, message: None
+        self._default_callback = lambda chat, cq: None
+        self._default_inline = lambda iq: None
 
     async def loop(self):
         """
@@ -185,6 +187,12 @@ class Bot:
         self._default = callback
         return callback
 
+    def add_inline(self, regexp, fn):
+        """
+        Manually register regexp based callback
+        """
+        self._inlines.append((regexp, fn))
+
     def inline(self, callback):
         """
         Set callback for inline queries
@@ -196,9 +204,29 @@ class Bot:
         >>>     return iq.answer([
         >>>         {"type": "text", "title": "test", "id", "0"}
         >>>     ])
+
+        >>> @bot.inline(r"myinline-(.+)")
+        >>> def echo(chat, iq, match):
+        >>>     return iq.answer([
+        >>>         {"type": "text", "title": "test", "id", "0"}
+        >>>     ])
         """
-        self._inline = callback
-        return callback
+        if callable(callback):
+            self._default_inline = callback
+            return callback
+        elif isinstance(callback, str):
+            def decorator(fn):
+                self.add_inline(callback, fn)
+                return fn
+            return decorator
+        else:
+            raise TypeError('str expected {} given'.format(type(callback)))
+
+    def add_callback(self, regexp, fn):
+        """
+        Manually register regexp based callback
+        """
+        self._callbacks.append((regexp, fn))
 
     def callback(self, callback):
         """
@@ -209,9 +237,21 @@ class Bot:
         >>> @bot.callback
         >>> def echo(chat, cq):
         >>>     return cq.answer()
+
+        >>> @bot.callback(r"buttonclick-(.+)")
+        >>> def echo(chat, cq, match):
+        >>>     return chat.reply(match.group(1))
         """
-        self._callback = callback
-        return callback
+        if callable(callback):
+            self._default_callback = callback
+            return callback
+        elif isinstance(callback, str):
+            def decorator(fn):
+                self.add_callback(callback, fn)
+                return fn
+            return decorator
+        else:
+            raise TypeError('str expected {} given'.format(type(callback)))
 
     def handle(self, msg_type):
         """
@@ -486,12 +526,23 @@ class Bot:
 
     def _process_inline_query(self, query):
         iq = InlineQuery(self, query)
-        return self._inline(iq)
+
+        for patterns, handler in self._inlines:
+            match = re.search(patterns, query['query'], re.I)
+            if match:
+                return handler(iq, match)
+        return self._default_inline(iq)
 
     def _process_callback_query(self, query):
         chat = Chat.from_message(self, query["message"])
         cq = CallbackQuery(self, query)
-        return self._callback(chat, cq)
+        for patterns, handler in self._callbacks:
+            match = re.search(patterns, cq.data, re.I)
+            if match:
+                return handler(chat, cq, match)
+
+        if not chat.is_group():
+            return self._default_callback(chat, cq)
 
     def _process_updates(self, updates):
         if not updates["ok"]:
