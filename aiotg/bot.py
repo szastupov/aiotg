@@ -152,7 +152,7 @@ class Bot:
 
     def add_command(self, regexp, fn):
         """
-        Manually register regexp based callback
+        Manually register regexp based command
         """
         self._commands.append((regexp, fn))
 
