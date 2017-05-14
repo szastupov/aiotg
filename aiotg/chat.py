@@ -356,7 +356,10 @@ class Chat:
     def __init__(self, bot, chat_id, chat_type="private", src_message=None):
         self.bot = bot
         self.message = src_message
-        sender = src_message['from'] if src_message and 'from' in src_message else {"first_name": "N/A"}
+        if src_message and 'from' in src_message:
+            sender = src_message['from']
+        else:
+            sender = {"first_name": "N/A"}
         self.sender = Sender(sender)
         self.id = chat_id
         self.type = chat_type
