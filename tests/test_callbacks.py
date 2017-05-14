@@ -6,6 +6,7 @@ from aiotg import MESSAGE_TYPES
 from aiotg.mock import MockBot
 from testfixtures import LogCapture
 
+
 API_TOKEN = "test_token"
 bot = Bot(API_TOKEN)
 
@@ -94,7 +95,7 @@ def test_channel_default():
     assert called_with == "foo bar"
 
 
-def test_inline():
+def test_default_inline():
     called_with = None
 
     @bot.inline
@@ -106,11 +107,23 @@ def test_inline():
     assert called_with == "foo bar"
 
 
+def test_inline():
+    called_with = None
+
+    @bot.inline(r'query-(\w+)')
+    def inline(query, match):
+        nonlocal called_with
+        called_with = match.group(1)
+
+    bot._process_inline_query(inline_query("query-foo"))
+    assert called_with == "foo"
+
+
 def test_callback_default():
     bot._process_callback_query(callback_query("foo"))
 
 
-def test_callback():
+def test_default_callback():
     called_with = None
 
     @bot.callback
@@ -119,6 +132,18 @@ def test_callback():
         called_with = cq.data
 
     bot._process_callback_query(callback_query("foo"))
+    assert called_with == "foo"
+
+
+def test_callback():
+    called_with = None
+
+    @bot.callback(r'click-(\w+)')
+    def click_callback(chat, cq, match):
+        nonlocal called_with
+        called_with = match.group(1)
+
+    bot._process_callback_query(callback_query("click-foo"))
     assert called_with == "foo"
 
 
