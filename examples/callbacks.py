@@ -1,8 +1,8 @@
-
 import json
-from aiotg.ext import ExtendedBot
+import os
+from aiotg import Bot
 
-bot = ExtendedBot(api_token='377308655:AAEUWJSr_0K67SUEQEE57ua5_DEf-TPHZKI')
+bot = Bot(api_token=os.environ["API_TOKEN"])
 
 
 @bot.command(r'/start')
