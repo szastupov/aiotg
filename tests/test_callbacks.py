@@ -57,6 +57,20 @@ def test_command():
     assert called_with == "foo"
 
 
+def test_channel_command():
+    called_with = None
+
+    @bot.channel_command(r"/echo (.+)")
+    def echo(chat, match):
+        nonlocal called_with
+        called_with = match.group(1)
+        # Let's check sender repr as well
+        assert repr(chat.sender) == "John"
+
+    bot._process_channel_post(text_msg("/echo foo"))
+    assert called_with == "foo"
+
+
 def test_default():
     called_with = None
 
@@ -66,6 +80,18 @@ def test_default():
         called_with = message["text"]
 
     bot._process_message(text_msg("foo bar"))
+    assert called_with == "foo bar"
+
+
+def test_channel_default():
+    called_with = None
+
+    @bot.channel_default
+    def default(chat, message):
+        nonlocal called_with
+        called_with = message["text"]
+
+    bot._process_channel_post(text_msg("foo bar"))
     assert called_with == "foo bar"
 
 

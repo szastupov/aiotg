@@ -20,7 +20,7 @@ class Chat:
         """
         return self.bot.send_message(self.id, text, **options)
 
-    def reply(self, text, markup={}, parse_mode=None):
+    def reply(self, text, markup=None, parse_mode=None):
         """
         Reply to the message this `Chat` object is based on.
 
@@ -29,6 +29,9 @@ class Chat:
         :param str parse_mode: Text parsing mode (``"Markdown"``, ``"HTML"`` or
             ``None``)
         """
+        if markup is None:
+            markup = {}
+
         return self.send_text(
             text,
             reply_to_message_id=self.message["message_id"],
@@ -37,7 +40,7 @@ class Chat:
             parse_mode=parse_mode
         )
 
-    def edit_text(self, message_id, text, markup={}, parse_mode=None):
+    def edit_text(self, message_id, text, markup=None, parse_mode=None):
         """
         Edit the message in this chat.
 
@@ -47,6 +50,9 @@ class Chat:
         :param str parse_mode: Text parsing mode (``"Markdown"``, ``"HTML"`` or
             ``None``)
         """
+        if markup is None:
+            markup = {}
+
         return self.bot.edit_message_text(
             self.id,
             message_id,
@@ -356,7 +362,10 @@ class Chat:
     def __init__(self, bot, chat_id, chat_type="private", src_message=None):
         self.bot = bot
         self.message = src_message
-        sender = src_message['from'] if src_message else {"first_name": "N/A"}
+        if src_message and 'from' in src_message:
+            sender = src_message['from']
+        else:
+            sender = {"first_name": "N/A"}
         self.sender = Sender(sender)
         self.id = chat_id
         self.type = chat_type

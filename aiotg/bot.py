@@ -57,6 +57,8 @@ class Bot:
 
         self._handlers = {mt: no_handle(mt) for mt in MESSAGE_TYPES}
         self._commands = []
+        self._channel_commands = []
+        self._channel_default = lambda chat, message: None
         self._callbacks = []
         self._inlines = []
         self._default = lambda chat, message: None
@@ -173,6 +175,29 @@ class Bot:
             return fn
         return decorator
 
+    def add_channel_command(self, regexp, fn):
+        """
+        Manually register regexp based channel command
+        """
+        self._channel_commands.append((regexp, fn))
+
+    def channel_command(self, regexp):
+        """
+        Register a new channel command
+
+        :param str regexp: Regular expression matching the command to register
+
+        :Example:
+
+        >>> @bot.channel_command(r"/echo (.+)")
+        >>> def echo(chat, match):
+        >>>     return chat.reply(match.group(1))
+        """
+        def decorator(fn):
+            self.add_channel_command(regexp, fn)
+            return fn
+        return decorator
+
     def default(self, callback):
         """
         Set callback for default command that is called on unrecognized
@@ -185,6 +210,20 @@ class Bot:
         >>>     return chat.reply(message["text"])
         """
         self._default = callback
+        return callback
+
+    def channel_default(self, callback):
+        """
+        Set callback for default channel command that is called on unrecognized
+        commands for 1-to-1 chats
+
+        :Example:
+
+        >>> @bot.channel_default
+        >>> def echo(chat, message):
+        >>>     return chat.reply(message["text"])
+        """
+        self._channel_default = callback
         return callback
 
     def add_inline(self, regexp, fn):
@@ -524,6 +563,28 @@ class Bot:
             self.track(message, "default")
             return self._default(chat, message)
 
+    def _process_channel_post(self, message):
+        chat = Chat.from_message(self, message)
+
+        for mt in MESSAGE_TYPES:
+            if mt in message:
+                self.track(message, mt)
+                return self._handlers[mt](chat, message[mt])
+
+        if "text" not in message:
+            return
+
+        for patterns, handler in self._channel_commands:
+            m = re.search(patterns, message["text"], re.I)
+            if m:
+                self.track(message, handler.__name__)
+                return handler(chat, m)
+
+        # No match, run default if it's a 1to1 chat
+        if not chat.is_group():
+            self.track(message, "channel_default")
+            return self._channel_default(chat, message)
+
     def _process_inline_query(self, query):
         iq = InlineQuery(self, query)
 
@@ -556,13 +617,14 @@ class Bot:
         logger.debug("update %s", update)
         self._offset = max(self._offset, update["update_id"])
         coro = None
-
         if "message" in update:
             coro = self._process_message(update["message"])
         elif "inline_query" in update:
             coro = self._process_inline_query(update["inline_query"])
         elif "callback_query" in update:
             coro = self._process_callback_query(update["callback_query"])
+        elif "channel_post" in update:
+            coro = self._process_channel_post(update["channel_post"])
 
         if coro:
             asyncio.ensure_future(coro)
