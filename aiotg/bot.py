@@ -194,7 +194,6 @@ class Bot:
         self._default = callback
         return callback
 
-
     def add_inline(self, regexp, fn):
         """
         Manually register regexp based callback
