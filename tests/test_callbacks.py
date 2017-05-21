@@ -2,7 +2,7 @@ import pytest
 import random
 
 from aiotg import Bot, Chat, InlineQuery
-from aiotg import MESSAGE_TYPES
+from aiotg import MESSAGE_TYPES, MESSAGE_UPDATES
 from aiotg.mock import MockBot
 from testfixtures import LogCapture
 
@@ -57,20 +57,6 @@ def test_command():
     assert called_with == "foo"
 
 
-def test_channel_command():
-    called_with = None
-
-    @bot.channel_command(r"/echo (.+)")
-    def echo(chat, match):
-        nonlocal called_with
-        called_with = match.group(1)
-        # Let's check sender repr as well
-        assert repr(chat.sender) == "John"
-
-    bot._process_channel_post(text_msg("/echo foo"))
-    assert called_with == "foo"
-
-
 def test_default():
     called_with = None
 
@@ -80,18 +66,6 @@ def test_default():
         called_with = message["text"]
 
     bot._process_message(text_msg("foo bar"))
-    assert called_with == "foo bar"
-
-
-def test_channel_default():
-    called_with = None
-
-    @bot.channel_default
-    def default(chat, message):
-        nonlocal called_with
-        called_with = message["text"]
-
-    bot._process_channel_post(text_msg("foo bar"))
     assert called_with == "foo bar"
 
 
@@ -147,10 +121,11 @@ def test_callback():
     assert called_with == "foo"
 
 
-def test_updates():
+@pytest.mark.parametrize("upd_type", MESSAGE_UPDATES)
+def test_message_updates(upd_type):
     update = {
         "update_id": 0,
-        "message": text_msg("foo bar")
+        upd_type: text_msg("foo bar")
     }
     updates = {"result": [update], "ok": True}
     called_with = None

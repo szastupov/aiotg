@@ -21,11 +21,17 @@ RETRY_TIMEOUT = 30
 RETRY_CODES = [429, 500, 502, 503, 504]
 BOTAN_URL = "https://api.botan.io/track"
 
+# Message types to be handled by bot.handle(...)
 MESSAGE_TYPES = [
     "location", "photo", "document", "audio", "voice", "sticker", "contact",
-    "venue", "video", "game", "contact", "delete_chat_photo", "new_chat_photo",
+    "venue", "video", "game", "delete_chat_photo", "new_chat_photo",
     "delete_chat_photo", "new_chat_member", "left_chat_member",
     "new_chat_title"
+]
+
+# Update types for
+MESSAGE_UPDATES = [
+    "message", "edited_message", "channel_post", "edited_channel_post"
 ]
 
 logger = logging.getLogger("aiotg")
@@ -55,10 +61,9 @@ class Bot:
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
 
+        # Init default handlers and callbacks
         self._handlers = {mt: no_handle(mt) for mt in MESSAGE_TYPES}
         self._commands = []
-        self._channel_commands = []
-        self._channel_default = lambda chat, message: None
         self._callbacks = []
         self._inlines = []
         self._default = lambda chat, message: None
@@ -175,29 +180,6 @@ class Bot:
             return fn
         return decorator
 
-    def add_channel_command(self, regexp, fn):
-        """
-        Manually register regexp based channel command
-        """
-        self._channel_commands.append((regexp, fn))
-
-    def channel_command(self, regexp):
-        """
-        Register a new channel command
-
-        :param str regexp: Regular expression matching the command to register
-
-        :Example:
-
-        >>> @bot.channel_command(r"/echo (.+)")
-        >>> def echo(chat, match):
-        >>>     return chat.reply(match.group(1))
-        """
-        def decorator(fn):
-            self.add_channel_command(regexp, fn)
-            return fn
-        return decorator
-
     def default(self, callback):
         """
         Set callback for default command that is called on unrecognized
@@ -212,19 +194,6 @@ class Bot:
         self._default = callback
         return callback
 
-    def channel_default(self, callback):
-        """
-        Set callback for default channel command that is called on unrecognized
-        commands for 1-to-1 chats
-
-        :Example:
-
-        >>> @bot.channel_default
-        >>> def echo(chat, message):
-        >>>     return chat.reply(message["text"])
-        """
-        self._channel_default = callback
-        return callback
 
     def add_inline(self, regexp, fn):
         """
@@ -563,28 +532,6 @@ class Bot:
             self.track(message, "default")
             return self._default(chat, message)
 
-    def _process_channel_post(self, message):
-        chat = Chat.from_message(self, message)
-
-        for mt in MESSAGE_TYPES:
-            if mt in message:
-                self.track(message, mt)
-                return self._handlers[mt](chat, message[mt])
-
-        if "text" not in message:
-            return
-
-        for patterns, handler in self._channel_commands:
-            m = re.search(patterns, message["text"], re.I)
-            if m:
-                self.track(message, handler.__name__)
-                return handler(chat, m)
-
-        # No match, run default if it's a 1to1 chat
-        if not chat.is_group():
-            self.track(message, "channel_default")
-            return self._channel_default(chat, message)
-
     def _process_inline_query(self, query):
         iq = InlineQuery(self, query)
 
@@ -615,16 +562,22 @@ class Bot:
 
     def _process_update(self, update):
         logger.debug("update %s", update)
+
+        # Update offset
         self._offset = max(self._offset, update["update_id"])
+
         coro = None
-        if "message" in update:
-            coro = self._process_message(update["message"])
-        elif "inline_query" in update:
-            coro = self._process_inline_query(update["inline_query"])
-        elif "callback_query" in update:
-            coro = self._process_callback_query(update["callback_query"])
-        elif "channel_post" in update:
-            coro = self._process_channel_post(update["channel_post"])
+
+        # Determine update type starting with message updates
+        for ut in MESSAGE_UPDATES:
+            if ut in update:
+                coro = self._process_message(update[ut])
+                break
+        else:
+            if "inline_query" in update:
+                coro = self._process_inline_query(update["inline_query"])
+            elif "callback_query" in update:
+                coro = self._process_callback_query(update["callback_query"])
 
         if coro:
             asyncio.ensure_future(coro)
