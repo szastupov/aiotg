@@ -12,7 +12,8 @@ aiotg.egg-info
 .LSOverride
 
 # Must end with CRCR (^M^M in vim)
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -21,3 +22,6 @@ Icon
 *~
 *.swp
 .venv
+
+# Ignore vscode
+.vscode
