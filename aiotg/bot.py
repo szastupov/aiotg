@@ -542,7 +542,7 @@ class Bot:
 
     def _process_callback_query(self, query):
         chat = Chat.from_message(self, query["message"])
-        cq = CallbackQuery(self, query)
+        cq = CallbackQuery(self, query, chat)
         for patterns, handler in self._callbacks:
             match = re.search(patterns, cq.data, re.I)
             if match:
@@ -616,8 +616,9 @@ class TgInlineQuery(InlineQuery):
 
 
 class CallbackQuery:
-    def __init__(self, bot, src):
+    def __init__(self, bot, src, chat):
         self.bot = bot
+        self.chat = chat
         self.query_id = src['id']
         self.data = src['data']
 
