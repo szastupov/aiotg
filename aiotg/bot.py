@@ -616,11 +616,12 @@ class TgInlineQuery(InlineQuery):
 
 
 class CallbackQuery:
-    def __init__(self, bot, src, chat):
+    def __init__(self, bot, query, chat):
         self.bot = bot
         self.chat = chat
-        self.query_id = src['id']
-        self.data = src['data']
+        self.query = query
+        self.query_id = query['id']
+        self.data = query['data']
 
     def answer(self, **options):
         return self.bot.api_call(
