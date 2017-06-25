@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>aiotg.chat &#8212; aiotg 0.8.0 documentation</title>
+    <title>aiotg.chat &#8212; aiotg 0.9.2 documentation</title>
     
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.9.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -64,7 +64,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.reply"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.reply">[docs]</a>    <span class="k">def</span> <span class="nf">reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="p">{},</span> <span class="n">parse_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.reply"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.reply">[docs]</a>    <span class="k">def</span> <span class="nf">reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parse_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reply to the message this `Chat` object is based on.</span>
 
@@ -73,6 +73,9 @@
 <span class="sd">        :param str parse_mode: Text parsing mode (``&quot;Markdown&quot;``, ``&quot;HTML&quot;`` or</span>
 <span class="sd">            ``None``)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">markup</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">markup</span> <span class="o">=</span> <span class="p">{}</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_text</span><span class="p">(</span>
             <span class="n">text</span><span class="p">,</span>
             <span class="n">reply_to_message_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">[</span><span class="s2">&quot;message_id&quot;</span><span class="p">],</span>
@@ -81,7 +84,7 @@
             <span class="n">parse_mode</span><span class="o">=</span><span class="n">parse_mode</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Chat.edit_text"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.edit_text">[docs]</a>    <span class="k">def</span> <span class="nf">edit_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message_id</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="p">{},</span> <span class="n">parse_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Chat.edit_text"><a class="viewcode-back" href="../../index.html#aiotg.chat.Chat.edit_text">[docs]</a>    <span class="k">def</span> <span class="nf">edit_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message_id</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parse_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Edit the message in this chat.</span>
 
@@ -91,6 +94,9 @@
 <span class="sd">        :param str parse_mode: Text parsing mode (``&quot;Markdown&quot;``, ``&quot;HTML&quot;`` or</span>
 <span class="sd">            ``None``)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">markup</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">markup</span> <span class="o">=</span> <span class="p">{}</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">edit_message_text</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
             <span class="n">message_id</span><span class="p">,</span>
@@ -400,7 +406,10 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bot</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="n">chat_type</span><span class="o">=</span><span class="s2">&quot;private&quot;</span><span class="p">,</span> <span class="n">src_message</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">src_message</span>
-        <span class="n">sender</span> <span class="o">=</span> <span class="n">src_message</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">src_message</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;first_name&quot;</span><span class="p">:</span> <span class="s2">&quot;N/A&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">src_message</span> <span class="ow">and</span> <span class="s1">&#39;from&#39;</span> <span class="ow">in</span> <span class="n">src_message</span><span class="p">:</span>
+            <span class="n">sender</span> <span class="o">=</span> <span class="n">src_message</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sender</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;first_name&quot;</span><span class="p">:</span> <span class="s2">&quot;N/A&quot;</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sender</span> <span class="o">=</span> <span class="n">Sender</span><span class="p">(</span><span class="n">sender</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">chat_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">chat_type</span>
@@ -486,8 +495,8 @@
       &copy;2016, Stepan Zastupov.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
     </div>
 
