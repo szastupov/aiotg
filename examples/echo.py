@@ -1,11 +1,11 @@
 import os
-from aiotg import Bot
+from aiotg import Bot, Chat
 
 bot = Bot(os.environ["API_TOKEN"])
 
 
 @bot.command(r"/echo (.+)")
-def echo(chat, match):
+def echo(chat: Chat, match):
     return chat.reply(match.group(1))
 
 

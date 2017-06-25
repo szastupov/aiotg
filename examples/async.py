@@ -1,11 +1,11 @@
 import os
-from aiotg import Bot
+from aiotg import Bot, Chat
 
 bot = Bot(os.environ["API_TOKEN"])
 
 
 @bot.command(r"bitcoin")
-async def bitcoin(chat, match):
+async def bitcoin(chat: Chat, match):
     url = "https://api.bitcoinaverage.com/ticker/global/USD/"
     async with bot.session.get(url) as s:
         info = await s.json()

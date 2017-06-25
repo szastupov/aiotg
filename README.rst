@@ -21,17 +21,19 @@ Then you can create a new bot in few lines:
 
 .. code:: python
 
-    from aiotg import Bot
+    from aiotg import Bot, Chat
 
     bot = Bot(api_token="...")
 
     @bot.command(r"/echo (.+)")
-    def echo(chat, match):
+    def echo(chat: Chat, match):
         return chat.reply(match.group(1))
 
     bot.run()
 
 Now run it with a proper API\_TOKEN and it should reply to /echo commands.
+
+.. note:: Type annotations are not required but will help you editor/IDE to provide code completion.
 
 The example above looks like a normal synchronous code but it actually returns a coroutine.
 If you want to make an external request (and that's what bots usually do) just use aiohttp and async/await syntax:
@@ -39,12 +41,12 @@ If you want to make an external request (and that's what bots usually do) just u
 .. code:: python
 
     import aiohttp
-    from aiotg import Bot
+    from aiotg import Bot, Chat
 
     bot = Bot(api_token="...")
 
     @bot.command("bitcoin")
-    async def bitcoin(chat, match):
+    async def bitcoin(chat: Chat, match):
         url = "https://api.bitcoinaverage.com/ticker/global/USD/"
         async with aiohttp.get(url) as s:
             info = await s.json()
