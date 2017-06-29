@@ -33,7 +33,7 @@ Then you can create a new bot in few lines:
 
 Now run it with a proper API\_TOKEN and it should reply to /echo commands.
 
-.. note:: Type annotations are not required but will help you editor/IDE to provide code completion.
+.. note:: Type annotations are not required but will help your editor/IDE to provide code completion.
 
 The example above looks like a normal synchronous code but it actually returns a coroutine.
 If you want to make an external request (and that's what bots usually do) just use aiohttp and async/await syntax:
