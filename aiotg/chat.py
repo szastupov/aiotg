@@ -229,7 +229,7 @@ class Chat:
         """
         return self.bot.api_call(
             "sendVoice",
-            chat_id=self.id,
+            chat_id=str(self.id),
             voice=voice,
             **options
         )
