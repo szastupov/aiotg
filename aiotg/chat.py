@@ -1,4 +1,3 @@
-import json
 import logging
 
 
@@ -36,7 +35,7 @@ class Chat:
             text,
             reply_to_message_id=self.message["message_id"],
             disable_web_page_preview='true',
-            reply_markup=json.dumps(markup),
+            reply_markup=self.bot.json_serialize(markup),
             parse_mode=parse_mode
         )
 
@@ -57,7 +56,7 @@ class Chat:
             self.id,
             message_id,
             text,
-            reply_markup=json.dumps(markup),
+            reply_markup=self.bot.json_serialize(markup),
             parse_mode=parse_mode
         )
 
@@ -71,7 +70,7 @@ class Chat:
         return self.bot.edit_message_reply_markup(
             self.id,
             message_id,
-            reply_markup=json.dumps(markup)
+            reply_markup=self.bot.json_serialize(markup)
         )
 
     def get_chat(self):

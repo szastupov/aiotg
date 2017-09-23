@@ -50,13 +50,14 @@ class Bot:
     _offset = 0
 
     def __init__(self, api_token, api_timeout=API_TIMEOUT,
-                 botan_token=None, name=None):
+                 botan_token=None, name=None, json_serialize=json.dumps):
         self.api_token = api_token
         self.api_timeout = api_timeout
         self.botan_token = botan_token
         self.name = name
         self.webhook_url = None
         self._session = None
+        self.json_serialize = json_serialize
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
@@ -312,14 +313,14 @@ class Bot:
         # Explicitly ensure that API call is executed
         return asyncio.ensure_future(coro)
 
-    async def _api_call(self, method, **params):
+    async def _api_call(self, method, loads=json.loads, **params):
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         logger.debug("api_call %s, %s", method, params)
 
         response = await self.session.post(url, data=params)
 
         if response.status == 200:
-            return await response.json()
+            return await response.json(loads=loads)
         elif response.status in RETRY_CODES:
             logger.info("Server returned %d, retrying in %d sec.",
                         response.status, RETRY_TIMEOUT)
@@ -328,7 +329,7 @@ class Bot:
             return await self.api_call(method, **params)
         else:
             if response.headers['content-type'] == 'application/json':
-                err_msg = (await response.json())["description"]
+                err_msg = (await response.json(loads=loads))["description"]
             else:
                 err_msg = await response.read()
             logger.error(err_msg)
@@ -442,7 +443,7 @@ class Bot:
     def stop(self):
         self._running = False
 
-    async def webhook_handle(self, request):
+    async def webhook_handle(self, request, loads=json.loads):
         """
         aiohttp.web handle for processing web hooks
 
@@ -452,7 +453,7 @@ class Bot:
         >>> app = web.Application()
         >>> app.router.add_route('/webhook')
         """
-        update = await request.json()
+        update = await request.json(loads=loads)
         self._process_update(update)
         return web.Response()
 
@@ -483,7 +484,7 @@ class Bot:
     @property
     def session(self):
         if not self._session:
-            self._session = aiohttp.ClientSession()
+            self._session = aiohttp.ClientSession(json_serialize=self.json_serialize)
         return self._session
 
     def __del__(self):
@@ -502,7 +503,7 @@ class Bot:
                 "uid": message["from"]["id"],
                 "name": name
             },
-            data=json.dumps(message),
+            data=self.json_serialize(message),
             headers={'content-type': 'application/json'}
         )
         if response.status != 200:
@@ -604,7 +605,7 @@ class InlineQuery:
         return self.bot.api_call(
             "answerInlineQuery",
             inline_query_id=self.query_id,
-            results=json.dumps(results),
+            results=self.bot.json_serialize(results),
             **options
         )
 
