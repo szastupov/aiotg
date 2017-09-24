@@ -44,20 +44,24 @@ class Bot:
     :param int api_timeout: Timeout for long polling
     :param str botan_token: Token for http://botan.io
     :param str name: Bot name
+    :param callable json_serialize: Json serializer function. (json.dumps() by default)
+    :param callable json_deserialize: Json deserializer function. (json.loads() by default)
     """
 
     _running = False
     _offset = 0
 
     def __init__(self, api_token, api_timeout=API_TIMEOUT,
-                 botan_token=None, name=None, json_serialize=json.dumps):
+                 botan_token=None, name=None,
+                 json_serialize=json.dumps, json_deserialize=json.loads):
         self.api_token = api_token
         self.api_timeout = api_timeout
         self.botan_token = botan_token
         self.name = name
+        self.json_serialize = json_serialize
+        self.json_deserialize = json_deserialize
         self.webhook_url = None
         self._session = None
-        self.json_serialize = json_serialize
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
@@ -313,14 +317,14 @@ class Bot:
         # Explicitly ensure that API call is executed
         return asyncio.ensure_future(coro)
 
-    async def _api_call(self, method, loads=json.loads, **params):
+    async def _api_call(self, method, **params):
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         logger.debug("api_call %s, %s", method, params)
 
         response = await self.session.post(url, data=params)
 
         if response.status == 200:
-            return await response.json(loads=loads)
+            return await response.json(loads=self.json_deserialize)
         elif response.status in RETRY_CODES:
             logger.info("Server returned %d, retrying in %d sec.",
                         response.status, RETRY_TIMEOUT)
@@ -329,7 +333,7 @@ class Bot:
             return await self.api_call(method, **params)
         else:
             if response.headers['content-type'] == 'application/json':
-                err_msg = (await response.json(loads=loads))["description"]
+                err_msg = (await response.json(loads=self.json_deserialize))["description"]
             else:
                 err_msg = await response.read()
             logger.error(err_msg)
@@ -443,7 +447,7 @@ class Bot:
     def stop(self):
         self._running = False
 
-    async def webhook_handle(self, request, loads=json.loads):
+    async def webhook_handle(self, request):
         """
         aiohttp.web handle for processing web hooks
 
@@ -453,7 +457,7 @@ class Bot:
         >>> app = web.Application()
         >>> app.router.add_route('/webhook')
         """
-        update = await request.json(loads=loads)
+        update = await request.json(loads=self.json_deserialize)
         self._process_update(update)
         return web.Response()
 
