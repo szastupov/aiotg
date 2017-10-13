@@ -214,13 +214,13 @@ class Bot:
         >>> @bot.inline
         >>> def echo(iq):
         >>>     return iq.answer([
-        >>>         {"type": "text", "title": "test", "id", "0"}
+        >>>         {"type": "text", "title": "test", "id": "0"}
         >>>     ])
 
         >>> @bot.inline(r"myinline-(.+)")
         >>> def echo(chat, iq, match):
         >>>     return iq.answer([
-        >>>         {"type": "text", "title": "test", "id", "0"}
+        >>>         {"type": "text", "title": "test", "id": "0"}
         >>>     ])
         """
         if callable(callback):
