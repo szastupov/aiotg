@@ -356,7 +356,7 @@ class Chat:
 
         :return: ``True`` if this chat is a group, ``False`` otherwise
         """
-        return self.type == "group"
+        return self.type == "group" or self.type == "supergroup"
 
     def __init__(self, bot, chat_id, chat_type="private", src_message=None):
         self.bot = bot
