@@ -46,6 +46,7 @@ class Bot:
     :param str name: Bot name
     :param callable json_serialize: Json serializer function. (json.dumps() by default)
     :param callable json_deserialize: Json deserializer function. (json.loads() by default)
+    :param bool default_in_groups: Enables default callback in groups
     """
 
     _running = False
@@ -53,13 +54,15 @@ class Bot:
 
     def __init__(self, api_token, api_timeout=API_TIMEOUT,
                  botan_token=None, name=None,
-                 json_serialize=json.dumps, json_deserialize=json.loads):
+                 json_serialize=json.dumps, json_deserialize=json.loads,
+                 default_in_groups=False):
         self.api_token = api_token
         self.api_timeout = api_timeout
         self.botan_token = botan_token
         self.name = name
         self.json_serialize = json_serialize
         self.json_deserialize = json_deserialize
+        self.default_in_groups = default_in_groups
         self.webhook_url = None
         self._session = None
 
@@ -189,6 +192,7 @@ class Bot:
         """
         Set callback for default command that is called on unrecognized
         commands for 1-to-1 chats
+        If default_in_groups option is True, callback is called in groups too
 
         :Example:
 
@@ -532,7 +536,8 @@ class Bot:
                 return handler(chat, m)
 
         # No match, run default if it's a 1to1 chat
-        if not chat.is_group():
+        # However, if default_in_groups option is active, run default in any chat (not only 1to1)
+        if not chat.is_group() or self.default_in_groups:
             self.track(message, "default")
             return self._default(chat, message)
 
@@ -553,7 +558,7 @@ class Bot:
             if match:
                 return handler(chat, cq, match)
 
-        if not chat.is_group():
+        if not chat.is_group() or self.default_in_groups:
             return self._default_callback(chat, cq)
 
     def _process_updates(self, updates):
