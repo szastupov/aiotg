@@ -499,9 +499,8 @@ class Bot:
         try:
             if self._session:
                 self._session.close()
-        except:
-            # 😶
-            pass
+        except Exception as e:
+            logger.debug(e)
 
     async def _track(self, message, name):
         response = await self.session.post(

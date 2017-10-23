@@ -145,9 +145,9 @@ def test_updates_failed():
         "description": "Opps"
     }
 
-    with LogCapture() as l:
+    with LogCapture() as log:
         bot._process_updates(updates)
-        l.check(('aiotg', 'ERROR', 'getUpdates error: Opps'))
+        log.check(('aiotg', 'ERROR', 'getUpdates error: Opps'))
 
 
 @pytest.mark.parametrize("mt", MESSAGE_TYPES)
