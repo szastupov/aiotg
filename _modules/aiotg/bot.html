@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>aiotg.bot &#8212; aiotg 0.9.2 documentation</title>
-    
+    <title>aiotg.bot &#8212; aiotg 0.9.4 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.9.2',
+        VERSION:     '0.9.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -33,7 +30,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">
+  <body>
   
 
     <div class="document">
@@ -88,17 +85,25 @@
 <span class="sd">    :param int api_timeout: Timeout for long polling</span>
 <span class="sd">    :param str botan_token: Token for http://botan.io</span>
 <span class="sd">    :param str name: Bot name</span>
+<span class="sd">    :param callable json_serialize: Json serializer function. (json.dumps() by default)</span>
+<span class="sd">    :param callable json_deserialize: Json deserializer function. (json.loads() by default)</span>
+<span class="sd">    :param bool default_in_groups: Enables default callback in groups</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_running</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">_offset</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_token</span><span class="p">,</span> <span class="n">api_timeout</span><span class="o">=</span><span class="n">API_TIMEOUT</span><span class="p">,</span>
-                 <span class="n">botan_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">botan_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">json_serialize</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">,</span> <span class="n">json_deserialize</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span>
+                 <span class="n">default_in_groups</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api_token</span> <span class="o">=</span> <span class="n">api_token</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api_timeout</span> <span class="o">=</span> <span class="n">api_timeout</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">botan_token</span> <span class="o">=</span> <span class="n">botan_token</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">json_serialize</span> <span class="o">=</span> <span class="n">json_serialize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">json_deserialize</span> <span class="o">=</span> <span class="n">json_deserialize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_in_groups</span> <span class="o">=</span> <span class="n">default_in_groups</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">webhook_url</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -228,6 +233,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set callback for default command that is called on unrecognized</span>
 <span class="sd">        commands for 1-to-1 chats</span>
+<span class="sd">        If default_in_groups option is True, callback is called in groups too</span>
 
 <span class="sd">        :Example:</span>
 
@@ -253,13 +259,13 @@
 <span class="sd">        &gt;&gt;&gt; @bot.inline</span>
 <span class="sd">        &gt;&gt;&gt; def echo(iq):</span>
 <span class="sd">        &gt;&gt;&gt;     return iq.answer([</span>
-<span class="sd">        &gt;&gt;&gt;         {&quot;type&quot;: &quot;text&quot;, &quot;title&quot;: &quot;test&quot;, &quot;id&quot;, &quot;0&quot;}</span>
+<span class="sd">        &gt;&gt;&gt;         {&quot;type&quot;: &quot;text&quot;, &quot;title&quot;: &quot;test&quot;, &quot;id&quot;: &quot;0&quot;}</span>
 <span class="sd">        &gt;&gt;&gt;     ])</span>
 
 <span class="sd">        &gt;&gt;&gt; @bot.inline(r&quot;myinline-(.+)&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; def echo(chat, iq, match):</span>
 <span class="sd">        &gt;&gt;&gt;     return iq.answer([</span>
-<span class="sd">        &gt;&gt;&gt;         {&quot;type&quot;: &quot;text&quot;, &quot;title&quot;: &quot;test&quot;, &quot;id&quot;, &quot;0&quot;}</span>
+<span class="sd">        &gt;&gt;&gt;         {&quot;type&quot;: &quot;text&quot;, &quot;title&quot;: &quot;test&quot;, &quot;id&quot;: &quot;0&quot;}</span>
 <span class="sd">        &gt;&gt;&gt;     ])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">callback</span><span class="p">):</span>
@@ -363,7 +369,7 @@
         <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
-            <span class="k">return</span> <span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="n">loads</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">json_deserialize</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="n">RETRY_CODES</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Server returned </span><span class="si">%d</span><span class="s2">, retrying in </span><span class="si">%d</span><span class="s2"> sec.&quot;</span><span class="p">,</span>
                         <span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">RETRY_TIMEOUT</span><span class="p">)</span>
@@ -372,7 +378,7 @@
             <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;application/json&#39;</span><span class="p">:</span>
-                <span class="n">err_msg</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
+                <span class="n">err_msg</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="n">loads</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">json_deserialize</span><span class="p">))[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">err_msg</span> <span class="o">=</span> <span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
@@ -496,7 +502,7 @@
 <span class="sd">        &gt;&gt;&gt; app = web.Application()</span>
 <span class="sd">        &gt;&gt;&gt; app.router.add_route(&#39;/webhook&#39;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">update</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="n">update</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="n">loads</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">json_deserialize</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_process_update</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">()</span></div>
 
@@ -527,16 +533,15 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">session</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">(</span><span class="n">json_serialize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">json_serialize</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span>
 
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="c1"># 😶</span>
-            <span class="k">pass</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_track</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
@@ -546,7 +551,7 @@
                 <span class="s2">&quot;uid&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">[</span><span class="s2">&quot;from&quot;</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
                 <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span>
             <span class="p">},</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">message</span><span class="p">),</span>
+            <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">json_serialize</span><span class="p">(</span><span class="n">message</span><span class="p">),</span>
             <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;content-type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
@@ -571,7 +576,8 @@
                 <span class="k">return</span> <span class="n">handler</span><span class="p">(</span><span class="n">chat</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
 
         <span class="c1"># No match, run default if it&#39;s a 1to1 chat</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">chat</span><span class="o">.</span><span class="n">is_group</span><span class="p">():</span>
+        <span class="c1"># However, if default_in_groups option is active, run default in any chat (not only 1to1)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chat</span><span class="o">.</span><span class="n">is_group</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_in_groups</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default</span><span class="p">(</span><span class="n">chat</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
 
@@ -592,7 +598,7 @@
             <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">handler</span><span class="p">(</span><span class="n">chat</span><span class="p">,</span> <span class="n">cq</span><span class="p">,</span> <span class="n">match</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">chat</span><span class="o">.</span><span class="n">is_group</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chat</span><span class="o">.</span><span class="n">is_group</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_in_groups</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_callback</span><span class="p">(</span><span class="n">chat</span><span class="p">,</span> <span class="n">cq</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_process_updates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">updates</span><span class="p">):</span>
@@ -648,7 +654,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span>
             <span class="s2">&quot;answerInlineQuery&quot;</span><span class="p">,</span>
             <span class="n">inline_query_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_id</span><span class="p">,</span>
-            <span class="n">results</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">results</span><span class="p">),</span>
+            <span class="n">results</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">json_serialize</span><span class="p">(</span><span class="n">results</span><span class="p">),</span>
             <span class="o">**</span><span class="n">options</span>
         <span class="p">)</span></div></div>
 
@@ -722,7 +728,7 @@
       &copy;2016, Stepan Zastupov.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
     </div>

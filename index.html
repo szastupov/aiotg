@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>aiotg &#8212; aiotg 0.9.2 documentation</title>
-    
+    <title>aiotg &#8212; aiotg 0.9.4 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.2',
+        VERSION:     '0.9.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -33,7 +30,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">
+  <body>
   
 
     <div class="document">
@@ -73,7 +70,7 @@
 <p class="last">Type annotations are not required but will help your editor/IDE to provide code completion.</p>
 </div>
 <p>The example above looks like a normal synchronous code but it actually returns a coroutine.
-If you want to make an external request (and that&#8217;s what bots usually do) just use aiohttp and async/await syntax:</p>
+If you want to make an external request (and that’s what bots usually do) just use aiohttp and async/await syntax:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">aiohttp</span>
 <span class="kn">from</span> <span class="nn">aiotg</span> <span class="k">import</span> <span class="n">Bot</span><span class="p">,</span> <span class="n">Chat</span>
 
@@ -89,7 +86,7 @@ If you want to make an external request (and that&#8217;s what bots usually do) 
 <span class="n">bot</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>But what if you just want to write a quick integration and don&#8217;t need to provide a conversational interface? We&#8217;ve got you covered!
+<p>But what if you just want to write a quick integration and don’t need to provide a conversational interface? We’ve got you covered!
 You can send messages (or any other media) by constructing a Chat object with user_id or channel name. We even saved you some extra keystrokes by providing handy Channel constructors:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">...</span>
 <span class="n">channel</span> <span class="o">=</span> <span class="n">bot</span><span class="o">.</span><span class="n">channel</span><span class="p">(</span><span class="s2">&quot;@yourchannel&quot;</span><span class="p">)</span>
@@ -112,7 +109,7 @@ You can send messages (or any other media) by constructing a Chat object with us
 </ul>
 <p>For a real world example, take a look at
 <a class="reference external" href="https://github.com/szastupov/whatisbot/blob/master/main.py">WhatisBot</a> or <a class="reference external" href="https://github.com/szastupov/musicbot">Music Catalog Bot</a>.</p>
-<p>For more information on how to use the project, see the project&#8217;s <a class="reference external" href="http://szastupov.github.io/aiotg/index.html">documentation</a>. Have a question? Ask it on project&#8217;s <a class="reference external" href="https://telegram.me/joinchat/ABwEXjy3Tfmj2NAqEsQ1nw">Telegram chat</a>.</p>
+<p>For more information on how to use the project, see the project’s <a class="reference external" href="http://szastupov.github.io/aiotg/index.html">documentation</a>. Have a question? Ask it on project’s <a class="reference external" href="https://telegram.me/joinchat/ABwEXjy3Tfmj2NAqEsQ1nw">Telegram chat</a>.</p>
 </div>
 <div class="section" id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
@@ -120,7 +117,7 @@ You can send messages (or any other media) by constructing a Chat object with us
 <span id="bot-interface"></span><h3>Bot Interface<a class="headerlink" href="#module-aiotg.bot" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="aiotg.bot.Bot">
-<em class="property">class </em><code class="descclassname">aiotg.bot.</code><code class="descname">Bot</code><span class="sig-paren">(</span><em>api_token</em>, <em>api_timeout=60</em>, <em>botan_token=None</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/bot.html#Bot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.bot.Bot" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">aiotg.bot.</code><code class="descname">Bot</code><span class="sig-paren">(</span><em>api_token</em>, <em>api_timeout=60</em>, <em>botan_token=None</em>, <em>name=None</em>, <em>json_serialize=&lt;function dumps&gt;</em>, <em>json_deserialize=&lt;function loads&gt;</em>, <em>default_in_groups=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/bot.html#Bot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.bot.Bot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Telegram bot framework designed for asyncio</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -128,10 +125,13 @@ You can send messages (or any other media) by constructing a Chat object with us
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>api_token</strong> (<em>str</em>) &#8211; Telegram bot token, ask &#64;BotFather for this</li>
-<li><strong>api_timeout</strong> (<em>int</em>) &#8211; Timeout for long polling</li>
-<li><strong>botan_token</strong> (<em>str</em>) &#8211; Token for <a class="reference external" href="http://botan.io">http://botan.io</a></li>
-<li><strong>name</strong> (<em>str</em>) &#8211; Bot name</li>
+<li><strong>api_token</strong> (<em>str</em>) – Telegram bot token, ask &#64;BotFather for this</li>
+<li><strong>api_timeout</strong> (<em>int</em>) – Timeout for long polling</li>
+<li><strong>botan_token</strong> (<em>str</em>) – Token for <a class="reference external" href="http://botan.io">http://botan.io</a></li>
+<li><strong>name</strong> (<em>str</em>) – Bot name</li>
+<li><strong>json_serialize</strong> (<em>callable</em>) – Json serializer function. (json.dumps() by default)</li>
+<li><strong>json_deserialize</strong> (<em>callable</em>) – Json deserializer function. (json.loads() by default)</li>
+<li><strong>default_in_groups</strong> (<em>bool</em>) – Enables default callback in groups</li>
 </ul>
 </td>
 </tr>
@@ -165,8 +165,8 @@ You can send messages (or any other media) by constructing a Chat object with us
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>method</strong> (<em>str</em>) &#8211; Telegram API method</li>
-<li><strong>params</strong> &#8211; Arguments for the method call</li>
+<li><strong>method</strong> (<em>str</em>) – Telegram API method</li>
+<li><strong>params</strong> – Arguments for the method call</li>
 </ul>
 </td>
 </tr>
@@ -206,7 +206,7 @@ You can send messages (or any other media) by constructing a Chat object with us
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>channel_name</strong> (<em>str</em>) &#8211; Channel name</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>channel_name</strong> (<em>str</em>) – Channel name</td>
 </tr>
 </tbody>
 </table>
@@ -220,7 +220,7 @@ You can send messages (or any other media) by constructing a Chat object with us
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>regexp</strong> (<em>str</em>) &#8211; Regular expression matching the command to register</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>regexp</strong> (<em>str</em>) – Regular expression matching the command to register</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"></td>
 </tr>
@@ -243,7 +243,8 @@ You can send messages (or any other media) by constructing a Chat object with us
 <dt id="aiotg.bot.Bot.default">
 <code class="descname">default</code><span class="sig-paren">(</span><em>callback</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/bot.html#Bot.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.bot.Bot.default" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set callback for default command that is called on unrecognized
-commands for 1-to-1 chats</p>
+commands for 1-to-1 chats
+If default_in_groups option is True, callback is called in groups too</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -280,10 +281,10 @@ commands for 1-to-1 chats</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>chat_id</strong> (<em>int</em>) &#8211; ID of the chat the message to edit is in</li>
-<li><strong>message_id</strong> (<em>int</em>) &#8211; ID of the message to edit</li>
-<li><strong>reply_markup</strong> (<em>str</em>) &#8211; New inline keyboard markup for the message</li>
-<li><strong>options</strong> &#8211; Additional API options</li>
+<li><strong>chat_id</strong> (<em>int</em>) – ID of the chat the message to edit is in</li>
+<li><strong>message_id</strong> (<em>int</em>) – ID of the message to edit</li>
+<li><strong>reply_markup</strong> (<em>str</em>) – New inline keyboard markup for the message</li>
+<li><strong>options</strong> – Additional API options</li>
 </ul>
 </td>
 </tr>
@@ -300,10 +301,10 @@ commands for 1-to-1 chats</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>chat_id</strong> (<em>int</em>) &#8211; ID of the chat the message to edit is in</li>
-<li><strong>message_id</strong> (<em>int</em>) &#8211; ID of the message to edit</li>
-<li><strong>text</strong> (<em>str</em>) &#8211; Text to edit the message to</li>
-<li><strong>options</strong> &#8211; Additional API options</li>
+<li><strong>chat_id</strong> (<em>int</em>) – ID of the chat the message to edit is in</li>
+<li><strong>message_id</strong> (<em>int</em>) – ID of the message to edit</li>
+<li><strong>text</strong> (<em>str</em>) – Text to edit the message to</li>
+<li><strong>options</strong> – Additional API options</li>
 </ul>
 </td>
 </tr>
@@ -319,7 +320,7 @@ commands for 1-to-1 chats</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_id</strong> (<em>int</em>) &#8211; File identifier to get information about</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_id</strong> (<em>int</em>) – File identifier to get information about</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">File object (see <a class="reference external" href="https://core.telegram.org/bots/api#file">https://core.telegram.org/bots/api#file</a>)</td>
 </tr>
@@ -343,8 +344,8 @@ commands for 1-to-1 chats</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>user_id</strong> (<em>int</em>) &#8211; Unique identifier of the target user</li>
-<li><strong>options</strong> &#8211; Additional getUserProfilePhotos options (see
+<li><strong>user_id</strong> (<em>int</em>) – Unique identifier of the target user</li>
+<li><strong>options</strong> – Additional getUserProfilePhotos options (see
 <a class="reference external" href="https://core.telegram.org/bots/api#getuserprofilephotos">https://core.telegram.org/bots/api#getuserprofilephotos</a>)</li>
 </ul>
 </td>
@@ -361,7 +362,7 @@ commands for 1-to-1 chats</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>group_id</strong> (<em>str</em>) &#8211; Group chat id</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>group_id</strong> (<em>str</em>) – Group chat id</td>
 </tr>
 </tbody>
 </table>
@@ -401,14 +402,14 @@ commands for 1-to-1 chats</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@bot</span><span class="o">.</span><span class="n">inline</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">echo</span><span class="p">(</span><span class="n">iq</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">iq</span><span class="o">.</span><span class="n">answer</span><span class="p">([</span>
-<span class="gp">&gt;&gt;&gt; </span>        <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">])</span>
 </pre></div>
 </div>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@bot</span><span class="o">.</span><span class="n">inline</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;myinline-(.+)&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">echo</span><span class="p">(</span><span class="n">chat</span><span class="p">,</span> <span class="n">iq</span><span class="p">,</span> <span class="n">match</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">iq</span><span class="o">.</span><span class="n">answer</span><span class="p">([</span>
-<span class="gp">&gt;&gt;&gt; </span>        <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">])</span>
 </pre></div>
 </div>
@@ -423,7 +424,7 @@ Returns True on success.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>chat_id</strong> (<em>int</em>) &#8211; Unique identifier for the target chat             or username of the target supergroup or channel             (in the format &#64;channelusername)</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>chat_id</strong> (<em>int</em>) – Unique identifier for the target chat             or username of the target supergroup or channel             (in the format &#64;channelusername)</td>
 </tr>
 </tbody>
 </table>
@@ -432,7 +433,7 @@ Returns True on success.</p>
 <dl class="method">
 <dt id="aiotg.bot.Bot.loop">
 <code class="descname">loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/bot.html#Bot.loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.bot.Bot.loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return bot&#8217;s main loop as coroutine. Use with asyncio.</p>
+<dd><p>Return bot’s main loop as coroutine. Use with asyncio.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -460,7 +461,7 @@ Returns True on success.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>user_id</strong> (<em>str</em>) &#8211; User id</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>user_id</strong> (<em>str</em>) – User id</td>
 </tr>
 </tbody>
 </table>
@@ -475,8 +476,8 @@ Returns True on success.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>debug</strong> (<em>bool</em>) &#8211; Enable debug logging and automatic reloading</li>
-<li><strong>reload</strong> (<em>bool</em>) &#8211; Automatically reload bot on code change</li>
+<li><strong>debug</strong> (<em>bool</em>) – Enable debug logging and automatic reloading</li>
+<li><strong>reload</strong> (<em>bool</em>) – Automatically reload bot on code change</li>
 </ul>
 </td>
 </tr>
@@ -518,9 +519,9 @@ Returns True on success.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>chat_id</strong> (<em>int</em>) &#8211; ID of the chat to send the message to</li>
-<li><strong>text</strong> (<em>str</em>) &#8211; Text to send</li>
-<li><strong>options</strong> &#8211; Additional sendMessage options
+<li><strong>chat_id</strong> (<em>int</em>) – ID of the chat to send the message to</li>
+<li><strong>text</strong> (<em>str</em>) – Text to send</li>
+<li><strong>options</strong> – Additional sendMessage options
 (see <a class="reference external" href="https://core.telegram.org/bots/api#sendmessage">https://core.telegram.org/bots/api#sendmessage</a>)</li>
 </ul>
 </td>
@@ -632,8 +633,8 @@ See <a class="reference external" href="https://core.telegram.org/bots/api#inlin
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>message_id</strong> (<em>int</em>) &#8211; ID of the message to edit</li>
-<li><strong>markup</strong> (<em>dict</em>) &#8211; Markup options</li>
+<li><strong>message_id</strong> (<em>int</em>) – ID of the message to edit</li>
+<li><strong>markup</strong> (<em>dict</em>) – Markup options</li>
 </ul>
 </td>
 </tr>
@@ -650,10 +651,10 @@ See <a class="reference external" href="https://core.telegram.org/bots/api#inlin
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>message_id</strong> (<em>int</em>) &#8211; ID of the message to edit</li>
-<li><strong>text</strong> (<em>str</em>) &#8211; Text to edit the message to</li>
-<li><strong>markup</strong> (<em>dict</em>) &#8211; Markup options</li>
-<li><strong>parse_mode</strong> (<em>str</em>) &#8211; Text parsing mode (<code class="docutils literal"><span class="pre">&quot;Markdown&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;HTML&quot;</span></code> or
+<li><strong>message_id</strong> (<em>int</em>) – ID of the message to edit</li>
+<li><strong>text</strong> (<em>str</em>) – Text to edit the message to</li>
+<li><strong>markup</strong> (<em>dict</em>) – Markup options</li>
+<li><strong>parse_mode</strong> (<em>str</em>) – Text parsing mode (<code class="docutils literal"><span class="pre">&quot;Markdown&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;HTML&quot;</span></code> or
 <code class="docutils literal"><span class="pre">None</span></code>)</li>
 </ul>
 </td>
@@ -671,8 +672,8 @@ See <a class="reference external" href="https://core.telegram.org/bots/api#inlin
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>from_chat_id</strong> (<em>int</em>) &#8211; ID of the chat to forward the message from</li>
-<li><strong>message_id</strong> (<em>int</em>) &#8211; ID of the message to forward</li>
+<li><strong>from_chat_id</strong> (<em>int</em>) – ID of the chat to forward the message from</li>
+<li><strong>message_id</strong> (<em>int</em>) – ID of the message to forward</li>
 </ul>
 </td>
 </tr>
@@ -689,8 +690,8 @@ See <a class="reference external" href="https://core.telegram.org/bots/api#inlin
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>bot</strong> (<a class="reference internal" href="#aiotg.bot.Bot" title="aiotg.bot.Bot"><em>Bot</em></a>) &#8211; <code class="docutils literal"><span class="pre">Bot</span></code> object the message and chat belong to</li>
-<li><strong>message</strong> (<em>dict</em>) &#8211; Message to base the object on</li>
+<li><strong>bot</strong> (<a class="reference internal" href="#aiotg.bot.Bot" title="aiotg.bot.Bot"><em>Bot</em></a>) – <code class="docutils literal"><span class="pre">Bot</span></code> object the message and chat belong to</li>
+<li><strong>message</strong> (<em>dict</em>) – Message to base the object on</li>
 </ul>
 </td>
 </tr>
@@ -721,7 +722,7 @@ See <a class="reference external" href="https://core.telegram.org/bots/api#inlin
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>user_id</strong> (<em>int</em>) &#8211; Unique identifier of the target user</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>user_id</strong> (<em>int</em>) – Unique identifier of the target user</td>
 </tr>
 </tbody>
 </table>
@@ -756,7 +757,7 @@ The bot must be an administrator in the group for this to work.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>user_id</strong> (<em>int</em>) &#8211; Unique identifier of the target user</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>user_id</strong> (<em>int</em>) – Unique identifier of the target user</td>
 </tr>
 </tbody>
 </table>
@@ -771,9 +772,9 @@ The bot must be an administrator in the group for this to work.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>text</strong> (<em>str</em>) &#8211; Text of the message to send</li>
-<li><strong>markup</strong> (<em>dict</em>) &#8211; Markup options</li>
-<li><strong>parse_mode</strong> (<em>str</em>) &#8211; Text parsing mode (<code class="docutils literal"><span class="pre">&quot;Markdown&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;HTML&quot;</span></code> or
+<li><strong>text</strong> (<em>str</em>) – Text of the message to send</li>
+<li><strong>markup</strong> (<em>dict</em>) – Markup options</li>
+<li><strong>parse_mode</strong> (<em>str</em>) – Text parsing mode (<code class="docutils literal"><span class="pre">&quot;Markdown&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;HTML&quot;</span></code> or
 <code class="docutils literal"><span class="pre">None</span></code>)</li>
 </ul>
 </td>
@@ -791,8 +792,8 @@ The bot must be an administrator in the group for this to work.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>audio</strong> &#8211; Object containing the audio data</li>
-<li><strong>options</strong> &#8211; Additional sendAudio options (see
+<li><strong>audio</strong> – Object containing the audio data</li>
+<li><strong>options</strong> – Additional sendAudio options (see
 <a class="reference external" href="https://core.telegram.org/bots/api#sendaudio">https://core.telegram.org/bots/api#sendaudio</a>)</li>
 </ul>
 </td>
@@ -811,7 +812,7 @@ The bot must be an administrator in the group for this to work.</p>
 <dt id="aiotg.chat.Chat.send_chat_action">
 <code class="descname">send_chat_action</code><span class="sig-paren">(</span><em>action</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiotg/chat.html#Chat.send_chat_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aiotg.chat.Chat.send_chat_action" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a chat action, to tell the user that something is happening on the
-bot&#8217;s side.</p>
+bot’s side.</p>
 <p>Available actions:</p>
 <ul class="simple">
 <li><cite>typing</cite> for text messages</li>
@@ -825,7 +826,7 @@ bot&#8217;s side.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>action</strong> (<em>str</em>) &#8211; Type of action to broadcast</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>action</strong> (<em>str</em>) – Type of action to broadcast</td>
 </tr>
 </tbody>
 </table>
@@ -840,9 +841,9 @@ bot&#8217;s side.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>phone_number</strong> (<em>str</em>) &#8211; Contact&#8217;s phone number</li>
-<li><strong>first_name</strong> (<em>str</em>) &#8211; Contact&#8217;s first name</li>
-<li><strong>options</strong> &#8211; Additional sendContact options (see
+<li><strong>phone_number</strong> (<em>str</em>) – Contact’s phone number</li>
+<li><strong>first_name</strong> (<em>str</em>) – Contact’s first name</li>
+<li><strong>options</strong> – Additional sendContact options (see
 <a class="reference external" href="https://core.telegram.org/bots/api#sendcontact">https://core.telegram.org/bots/api#sendcontact</a>)</li>
 </ul>
 </td>
@@ -860,9 +861,9 @@ bot&#8217;s side.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>document</strong> &#8211; Object containing the document data</li>
-<li><strong>caption</strong> (<em>str</em>) &#8211; Document caption (optional)</li>
-<li><strong>options</strong> &#8211; Additional sendDocument options (see
+<li><strong>document</strong> – Object containing the document data</li>
+<li><strong>caption</strong> (<em>str</em>) – Document caption (optional)</li>
+<li><strong>options</strong> – Additional sendDocument options (see
 <a class="reference external" href="https://core.telegram.org/bots/api#senddocument">https://core.telegram.org/bots/api#senddocument</a>)</li>
 </ul>
 </td>
@@ -886,9 +887,9 @@ bot&#8217;s side.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> (<em>float</em>) &#8211; Latitude of the location</li>
-<li><strong>longitude</strong> (<em>float</em>) &#8211; Longitude of the location</li>
-<li><strong>options</strong> &#8211; Additional sendLocation options (see
+<li><strong>latitude</strong> (<em>float</em>) – Latitude of the location</li>
+<li><strong>longitude</strong> (<em>float</em>) – Longitude of the location</li>
+<li><strong>options</strong> – Additional sendLocation options (see
 <a class="reference external" href="https://core.telegram.org/bots/api#sendlocation">https://core.telegram.org/bots/api#sendlocation</a>)</li>
 </ul>
 </td>
@@ -906,9 +907,9 @@ bot&#8217;s side.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>photo</strong> &#8211; Object containing the photo data</li>
-<li><strong>caption</strong> (<em>str</em>) &#8211; Photo caption (optional)</li>
-<li><strong>options</strong> &#8211; Additional sendPhoto options (see
+<li><strong>photo</strong> – Object containing the photo data</li>
+<li><strong>caption</strong> (<em>str</em>) – Photo caption (optional)</li>
+<li><strong>options</strong> – Additional sendPhoto options (see
 <a class="reference external" href="https://core.telegram.org/bots/api#sendphoto">https://core.telegram.org/bots/api#sendphoto</a>)</li>
 </ul>
 </td>
@@ -932,8 +933,8 @@ bot&#8217;s side.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>sticker</strong> &#8211; Sticker to send (file or string)</li>
-<li><strong>options</strong> &#8211; Additional sendSticker options (see
+<li><strong>sticker</strong> – Sticker to send (file or string)</li>
+<li><strong>options</strong> – Additional sendSticker options (see
 <a class="reference external" href="https://core.telegram.org/bots/api#sendsticker">https://core.telegram.org/bots/api#sendsticker</a>)</li>
 </ul>
 </td>
@@ -951,8 +952,8 @@ bot&#8217;s side.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>text</strong> (<em>str</em>) &#8211; Text of the message to send</li>
-<li><strong>options</strong> &#8211; Additional sendMessage options (see
+<li><strong>text</strong> (<em>str</em>) – Text of the message to send</li>
+<li><strong>options</strong> – Additional sendMessage options (see
 <a class="reference external" href="https://core.telegram.org/bots/api#sendmessage">https://core.telegram.org/bots/api#sendmessage</a></li>
 </ul>
 </td>
@@ -970,11 +971,11 @@ bot&#8217;s side.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> (<em>float</em>) &#8211; Latitude of the location</li>
-<li><strong>longitude</strong> (<em>float</em>) &#8211; Longitude of the location</li>
-<li><strong>title</strong> (<em>str</em>) &#8211; Name of the venue</li>
-<li><strong>address</strong> (<em>str</em>) &#8211; Address of the venue</li>
-<li><strong>options</strong> &#8211; Additional sendVenue options (see
+<li><strong>latitude</strong> (<em>float</em>) – Latitude of the location</li>
+<li><strong>longitude</strong> (<em>float</em>) – Longitude of the location</li>
+<li><strong>title</strong> (<em>str</em>) – Name of the venue</li>
+<li><strong>address</strong> (<em>str</em>) – Address of the venue</li>
+<li><strong>options</strong> – Additional sendVenue options (see
 <a class="reference external" href="https://core.telegram.org/bots/api#sendvenue">https://core.telegram.org/bots/api#sendvenue</a>)</li>
 </ul>
 </td>
@@ -992,9 +993,9 @@ bot&#8217;s side.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>video</strong> &#8211; Object containing the video data</li>
-<li><strong>caption</strong> (<em>str</em>) &#8211; Video caption (optional)</li>
-<li><strong>options</strong> &#8211; Additional sendVideo options (see
+<li><strong>video</strong> – Object containing the video data</li>
+<li><strong>caption</strong> (<em>str</em>) – Video caption (optional)</li>
+<li><strong>options</strong> – Additional sendVideo options (see
 <a class="reference external" href="https://core.telegram.org/bots/api#sendvideo">https://core.telegram.org/bots/api#sendvideo</a>)</li>
 </ul>
 </td>
@@ -1018,8 +1019,8 @@ bot&#8217;s side.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>voice</strong> &#8211; Object containing the audio data</li>
-<li><strong>options</strong> &#8211; Additional sendVoice options (see
+<li><strong>voice</strong> – Object containing the audio data</li>
+<li><strong>options</strong> – Additional sendVoice options (see
 <a class="reference external" href="https://core.telegram.org/bots/api#sendvoice">https://core.telegram.org/bots/api#sendvoice</a>)</li>
 </ul>
 </td>
@@ -1043,7 +1044,7 @@ The bot must be an administrator in the group for this to work.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>user_id</strong> (<em>int</em>) &#8211; Unique identifier of the target user</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>user_id</strong> (<em>int</em>) – Unique identifier of the target user</td>
 </tr>
 </tbody>
 </table>
@@ -1134,7 +1135,7 @@ The bot must be an administrator in the group for this to work.</p>
       &copy;2016, Stepan Zastupov.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
