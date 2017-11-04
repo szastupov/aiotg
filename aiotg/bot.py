@@ -37,7 +37,7 @@ MESSAGE_UPDATES = [
 logger = logging.getLogger("aiotg")
 
 
-class ApiError(RuntimeError):
+class TgBotApiError(RuntimeError):
     def __init__(self, *args, response):
         super().__init__(*args)
         self.response = response
@@ -347,7 +347,7 @@ class Bot:
             else:
                 err_msg = await response.read()
             logger.error(err_msg)
-            raise ApiError(err_msg, response=response)
+            raise TgBotApiError(err_msg, response=response)
 
     async def get_me(self):
         """
