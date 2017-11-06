@@ -341,7 +341,7 @@ class Bot:
             else:
                 err_msg = await response.read()
             logger.error(err_msg)
-            raise RuntimeError(err_msg)
+            raise BotApiError(err_msg, response=response)
 
     async def get_me(self):
         """
@@ -637,3 +637,9 @@ class CallbackQuery:
             callback_query_id=self.query_id,
             **options
         )
+
+
+class BotApiError(RuntimeError):
+    def __init__(self, *args, response):
+        super().__init__(*args)
+        self.response = response
