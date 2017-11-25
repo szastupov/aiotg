@@ -74,6 +74,7 @@ class Bot:
         self._commands = []
         self._callbacks = []
         self._inlines = []
+        self._conversations = {}
         self._default = lambda chat, message: None
         self._default_callback = lambda chat, cq: None
         self._default_inline = lambda iq: None
@@ -518,7 +519,13 @@ class Bot:
         await response.release()
 
     def _process_message(self, message):
-        chat = Chat.from_message(self, message)
+        chat_id = message["chat"]["id"]
+        chat = self._conversations.get(chat_id)
+
+        if chat:
+            chat.message = message # already exists is then updated
+        else:
+            chat = Chat.from_message(self, message) # otherwise, create new
 
         for mt in MESSAGE_TYPES:
             if mt in message:
