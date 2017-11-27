@@ -44,8 +44,8 @@ class Bot:
     :param int api_timeout: Timeout for long polling
     :param str botan_token: Token for http://botan.io
     :param str name: Bot name
-    :param callable json_serialize: Json serializer function. (json.dumps() by default)
-    :param callable json_deserialize: Json deserializer function. (json.loads() by default)
+    :param callable json_serialize: JSON serializer function. (json.dumps by default)
+    :param callable json_deserialize: JSON deserializer function. (json.loads by default)
     :param bool default_in_groups: Enables default callback in groups
     """
 
