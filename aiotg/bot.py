@@ -523,9 +523,9 @@ class Bot:
         chat = self._conversations.get(chat_id)
 
         if chat:
-            chat.message = message # already exists is then updated
+            chat.message = message  # already exists is then updated
         else:
-            chat = Chat.from_message(self, message) # otherwise, create new
+            chat = Chat.from_message(self, message)  # otherwise, create new
 
         for mt in MESSAGE_TYPES:
             if mt in message:

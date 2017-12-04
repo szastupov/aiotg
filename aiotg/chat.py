@@ -426,6 +426,14 @@ class TgChat(Chat):
 
 class Sender(dict):
     """A small wrapper for sender info, mostly used for logging"""
+    def __init__(self, obj, *args, **kwargs):
+        self.id = int(obj.get('id', 0))
+        self.is_bot = bool(obj.get('is_bot', False))
+        self.first_name = str(obj.get('first_name', ''))
+        self.last_name = str(obj.get('last_name', ''))
+        self.language_code = str(obj.get('language_code', ''))
+        self.username = str(obj.get('username', ''))
+        super().__init__(obj, *args, **kwargs)
 
     def __repr__(self):
         uname = " (%s)" % self["username"] if "username" in self else ""
