@@ -1,8 +1,5 @@
+import asyncio
 from . bot import Bot
-
-
-async def empty_func():
-    pass
 
 
 class MockBot(Bot):
@@ -12,5 +9,6 @@ class MockBot(Bot):
 
     def api_call(self, method, **params):
         self.calls[method] = params
-        return empty_func()
-
+        future = asyncio.Future()
+        future.set_result("1")
+        return future
