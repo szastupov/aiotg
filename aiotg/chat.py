@@ -1,5 +1,6 @@
+import re
 import logging
-
+import asyncio
 
 logger = logging.getLogger("aiotg")
 
@@ -8,6 +9,29 @@ class Chat:
     """
     Wrapper for telegram chats, passed to most callbacks
     """
+    async def response(self, regex=r'(.+)', unexpected=None):
+        """
+        Await a message if not match with regex send unexpected message.
+
+        :param str regex: Regex match with message sender
+        :param str unexpected: Message if not match
+        :return Response
+        """
+
+        if self.id not in self.bot._conversations:
+            self.bot._conversations[self.id] = self
+
+        self.event.clear()
+        await self.event.wait()
+
+        match = re.search(regex, self._message['text'], re.I)
+
+        if match:
+            return match
+        elif unexpected:
+            self.send_text(unexpected)
+
+        return None
 
     def send_text(self, text, **options):
         """
@@ -33,7 +57,7 @@ class Chat:
 
         return self.send_text(
             text,
-            reply_to_message_id=self.message["message_id"],
+            reply_to_message_id=self._message["message_id"],
             disable_web_page_preview='true',
             reply_markup=self.bot.json_serialize(markup),
             parse_mode=parse_mode
@@ -360,14 +384,26 @@ class Chat:
 
     def __init__(self, bot, chat_id, chat_type="private", src_message=None):
         self.bot = bot
+        self.event = asyncio.Event()
+        self._message = ''
+        self.sender = None
         self.message = src_message
-        if src_message and 'from' in src_message:
-            sender = src_message['from']
+        self.id = chat_id
+        self.type = chat_type
+
+    @property
+    def message(self):
+        return self._message
+
+    @message.setter
+    def message(self, message):
+        self._message = message
+        if message and 'from' in message:
+            sender = message['from']
         else:
             sender = {"first_name": "N/A"}
         self.sender = Sender(sender)
-        self.id = chat_id
-        self.type = chat_type
+        self.event.set()
 
     @staticmethod
     def from_message(bot, message):
@@ -390,6 +426,14 @@ class TgChat(Chat):
 
 class Sender(dict):
     """A small wrapper for sender info, mostly used for logging"""
+    def __init__(self, obj, *args, **kwargs):
+        self.id = int(obj.get('id', 0))
+        self.is_bot = bool(obj.get('is_bot', False))
+        self.first_name = str(obj.get('first_name', ''))
+        self.last_name = str(obj.get('last_name', ''))
+        self.language_code = str(obj.get('language_code', ''))
+        self.username = str(obj.get('username', ''))
+        super().__init__(obj, *args, **kwargs)
 
     def __repr__(self):
         uname = " (%s)" % self["username"] if "username" in self else ""

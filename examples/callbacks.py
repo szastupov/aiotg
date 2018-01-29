@@ -9,19 +9,29 @@ bot = Bot(api_token=os.environ["API_TOKEN"])
 def start(chat, match):
 
     markup = {
-            'type': 'InlineKeyboardMarkup',
-            'inline_keyboard': [
-                [{'type': 'InlineKeyboardButton',
-                  'text': 'Button A',
-                  'callback_data': 'buttonclick-A'},
-                 {'type': 'InlineKeyboardButton',
-                  'text': 'Button B',
-                  'callback_data': 'buttonclick-B'}],
-                [{'type': 'InlineKeyboardButton',
-                  'text': 'Nohandle Button',
-                  'callback_data': 'no_callback_data'}],
-                ]
-            }
+        'type': 'InlineKeyboardMarkup',
+        'inline_keyboard': [
+            [
+                {
+                    'type': 'InlineKeyboardButton',
+                    'text': 'Button A',
+                    'callback_data': 'buttonclick-A'
+                },
+                {
+                    'type': 'InlineKeyboardButton',
+                    'text': 'Button B',
+                    'callback_data': 'buttonclick-B'
+                }
+            ],
+            [
+                {
+                    'type': 'InlineKeyboardButton',
+                    'text': 'Nohandle Button',
+                    'callback_data': 'no_callback_data'
+                }
+            ],
+        ]
+    }
 
     chat.send_text('Hello', reply_markup=json.dumps(markup))
 
