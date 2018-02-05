@@ -6,7 +6,6 @@ from aiotg import MESSAGE_TYPES, MESSAGE_UPDATES
 from aiotg.mock import MockBot
 from testfixtures import LogCapture
 
-
 API_TOKEN = "test_token"
 bot = Bot(API_TOKEN)
 
@@ -14,8 +13,13 @@ bot = Bot(API_TOKEN)
 def custom_msg(msg):
     template = {
         "message_id": 0,
-        "from": {"first_name": "John"},
-        "chat": {"id": 0, "type": "private"}
+        "from": {
+            "first_name": "John"
+        },
+        "chat": {
+            "id": 0,
+            "type": "private"
+        }
     }
     template.update(msg)
     return template
@@ -27,7 +31,9 @@ def text_msg(text):
 
 def inline_query(query):
     return {
-        "from": {"first_name": "John"},
+        "from": {
+            "first_name": "John"
+        },
         "offset": "",
         "query": query,
         "id": "9999"
@@ -36,7 +42,9 @@ def inline_query(query):
 
 def callback_query(data):
     return {
-        "from": {"first_name": "John"},
+        "from": {
+            "first_name": "John"
+        },
         "data": data,
         "id": "9999",
         "message": custom_msg({})
@@ -123,10 +131,7 @@ def test_callback():
 
 @pytest.mark.parametrize("upd_type", MESSAGE_UPDATES)
 def test_message_updates(upd_type):
-    update = {
-        "update_id": 0,
-        upd_type: text_msg("foo bar")
-    }
+    update = {"update_id": 0, upd_type: text_msg("foo bar")}
     updates = {"result": [update], "ok": True}
     called_with = None
 
@@ -140,10 +145,7 @@ def test_message_updates(upd_type):
 
 
 def test_updates_failed():
-    updates = {
-        "ok": False,
-        "description": "Opps"
-    }
+    updates = {"ok": False, "description": "Opps"}
 
     with LogCapture() as log:
         bot._process_updates(updates)
@@ -164,11 +166,10 @@ def test_handle(mt):
     assert called_with == value
 
 
-@pytest.mark.parametrize("ctype,id", [
-    ("channel", "@foobar"),
-    ("private", "111111"),
-    ("group", "222222")
-])
+@pytest.mark.parametrize(
+    "ctype,id",
+    [("channel", "@foobar"), ("private", "111111"), ("group", "222222")]
+)
 def test_channel_constructors(ctype, id):
     chat = getattr(bot, ctype)(id)
     assert chat.id == id
@@ -220,6 +221,9 @@ def test_send_methods():
     chat.send_chat_action("typing")
     assert "sendChatAction" in bot.calls
 
+    chat.delete_message(1111)
+    assert "deleteMessage" in bot.calls
+
 
 def test_chat_reply():
     bot = MockBot()
@@ -236,10 +240,14 @@ def test_inline_answer():
     src = inline_query("Answer!")
     iq = InlineQuery(bot, src)
 
-    results = [{
-        "type": "article", "id": "000",
-        "title": "test", "message_text": "Foo bar"
-    }]
+    results = [
+        {
+            "type": "article",
+            "id": "000",
+            "title": "test",
+            "message_text": "Foo bar"
+        }
+    ]
     iq.answer(results)
     assert "answerInlineQuery" in bot.calls
     assert isinstance(bot.calls["answerInlineQuery"]["results"], str)

@@ -8,8 +8,8 @@ import aiohttp
 from aiohttp import web
 import json
 
-from . chat import Chat, Sender
-from . reloader import run_with_reloader
+from .chat import Chat, Sender
+from .reloader import run_with_reloader
 
 __author__ = "Stepan Zastupov"
 __copyright__ = "Copyright 2015-2017 Stepan Zastupov"
@@ -52,10 +52,16 @@ class Bot:
     _running = False
     _offset = 0
 
-    def __init__(self, api_token, api_timeout=API_TIMEOUT,
-                 botan_token=None, name=None,
-                 json_serialize=json.dumps, json_deserialize=json.loads,
-                 default_in_groups=False):
+    def __init__(
+        self,
+        api_token,
+        api_timeout=API_TIMEOUT,
+        botan_token=None,
+        name=None,
+        json_serialize=json.dumps,
+        json_deserialize=json.loads,
+        default_in_groups=False
+    ):
         self.api_token = api_token
         self.api_timeout = api_timeout
         self.botan_token = botan_token
@@ -123,7 +129,8 @@ class Bot:
         try:
             if reload:
                 loop.run_until_complete(
-                    run_with_reloader(loop, self.loop(), self.stop))
+                    run_with_reloader(loop, self.loop(), self.stop)
+                )
 
             else:
                 loop.run_until_complete(self.loop())
@@ -183,9 +190,11 @@ class Bot:
         >>> def echo(chat, match):
         >>>     return chat.reply(match.group(1))
         """
+
         def decorator(fn):
             self.add_command(regexp, fn)
             return fn
+
         return decorator
 
     def default(self, callback):
@@ -231,9 +240,11 @@ class Bot:
             self._default_inline = callback
             return callback
         elif isinstance(callback, str):
+
             def decorator(fn):
                 self.add_inline(callback, fn)
                 return fn
+
             return decorator
         else:
             raise TypeError('str expected {} given'.format(type(callback)))
@@ -262,9 +273,11 @@ class Bot:
             self._default_callback = callback
             return callback
         elif isinstance(callback, str):
+
             def decorator(fn):
                 self.add_callback(callback, fn)
                 return fn
+
             return decorator
         else:
             raise TypeError('str expected {} given'.format(type(callback)))
@@ -279,9 +292,11 @@ class Bot:
         >>> def handle(chat, audio):
         >>>     pass
         """
+
         def wrap(callback):
             self._handlers[msg_type] = callback
             return callback
+
         return wrap
 
     def channel(self, channel_name):
@@ -330,14 +345,17 @@ class Bot:
         if response.status == 200:
             return await response.json(loads=self.json_deserialize)
         elif response.status in RETRY_CODES:
-            logger.info("Server returned %d, retrying in %d sec.",
-                        response.status, RETRY_TIMEOUT)
+            logger.info(
+                "Server returned %d, retrying in %d sec.", response.status,
+                RETRY_TIMEOUT
+            )
             await response.release()
             await asyncio.sleep(RETRY_TIMEOUT)
             return await self.api_call(method, **params)
         else:
             if response.headers['content-type'] == 'application/json':
-                err_msg = (await response.json(loads=self.json_deserialize))["description"]
+                json_resp = await response.json(loads=self.json_deserialize)
+                err_msg = json_resp["description"]
             else:
                 err_msg = await response.read()
             logger.error(err_msg)
@@ -372,7 +390,9 @@ class Bot:
         :param options: Additional sendMessage options
             (see https://core.telegram.org/bots/api#sendmessage)
         """
-        return self.api_call("sendMessage", chat_id=chat_id, text=text, **options)
+        return self.api_call(
+            "sendMessage", chat_id=chat_id, text=text, **options
+        )
 
     def edit_message_text(self, chat_id, message_id, text, **options):
         """
@@ -391,7 +411,9 @@ class Bot:
             **options
         )
 
-    def edit_message_reply_markup(self, chat_id, message_id, reply_markup, **options):
+    def edit_message_reply_markup(
+        self, chat_id, message_id, reply_markup, **options
+    ):
         """
         Edit a reply markup of message in a chat
 
@@ -435,9 +457,7 @@ class Bot:
             https://core.telegram.org/bots/api#getuserprofilephotos)
         """
         return self.api_call(
-            "getUserProfilePhotos",
-            user_id=str(user_id),
-            **options
+            "getUserProfilePhotos", user_id=str(user_id), **options
         )
 
     def track(self, message, name="Message"):
@@ -477,11 +497,7 @@ class Bot:
         """
         Register you webhook url for Telegram service.
         """
-        return self.api_call(
-            'setWebhook',
-            url=webhook_url,
-            **options
-        )
+        return self.api_call('setWebhook', url=webhook_url, **options)
 
     def delete_webhook(self):
         '''
@@ -492,7 +508,9 @@ class Bot:
     @property
     def session(self):
         if not self._session:
-            self._session = aiohttp.ClientSession(json_serialize=self.json_serialize)
+            self._session = aiohttp.ClientSession(
+                json_serialize=self.json_serialize
+            )
         return self._session
 
     def __del__(self):
@@ -511,7 +529,9 @@ class Bot:
                 "name": name
             },
             data=self.json_serialize(message),
-            headers={'content-type': 'application/json'}
+            headers={
+                'content-type': 'application/json'
+            }
         )
         if response.status != 200:
             logger.info("error submiting stats %d", response.status)
@@ -633,9 +653,7 @@ class CallbackQuery:
 
     def answer(self, **options):
         return self.bot.api_call(
-            "answerCallbackQuery",
-            callback_query_id=self.query_id,
-            **options
+            "answerCallbackQuery", callback_query_id=self.query_id, **options
         )
 
 

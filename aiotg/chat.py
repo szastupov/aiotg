@@ -1,6 +1,5 @@
 import logging
 
-
 logger = logging.getLogger("aiotg")
 
 
@@ -68,37 +67,26 @@ class Chat:
         :param dict markup: Markup options
         """
         return self.bot.edit_message_reply_markup(
-            self.id,
-            message_id,
-            reply_markup=self.bot.json_serialize(markup)
+            self.id, message_id, reply_markup=self.bot.json_serialize(markup)
         )
 
     def get_chat(self):
         """
         Get information about the chat.
         """
-        return self.bot.api_call(
-            "getChat",
-            chat_id=str(self.id)
-        )
+        return self.bot.api_call("getChat", chat_id=str(self.id))
 
     def get_chat_administrators(self):
         """
         Get a list of administrators in a chat. Chat must not be private.
         """
-        return self.bot.api_call(
-            "getChatAdministrators",
-            chat_id=str(self.id)
-        )
+        return self.bot.api_call("getChatAdministrators", chat_id=str(self.id))
 
     def get_chat_members_count(self):
         """
         Get the number of members in a chat.
         """
-        return self.bot.api_call(
-            "getChatMembersCount",
-            chat_id=str(self.id)
-        )
+        return self.bot.api_call("getChatMembersCount", chat_id=str(self.id))
 
     def get_chat_member(self, user_id):
         """
@@ -107,9 +95,7 @@ class Chat:
         :param int user_id: Unique identifier of the target user
         """
         return self.bot.api_call(
-            "getChatMember",
-            chat_id=str(self.id),
-            user_id=str(user_id)
+            "getChatMember", chat_id=str(self.id), user_id=str(user_id)
         )
 
     def send_sticker(self, sticker, **options):
@@ -121,10 +107,7 @@ class Chat:
             https://core.telegram.org/bots/api#sendsticker)
         """
         return self.bot.api_call(
-            "sendSticker",
-            chat_id=str(self.id),
-            sticker=sticker,
-            **options
+            "sendSticker", chat_id=str(self.id), sticker=sticker, **options
         )
 
     def send_audio(self, audio, **options):
@@ -141,10 +124,7 @@ class Chat:
         >>>     await chat.send_audio(f, performer="Foo", title="Eversong")
         """
         return self.bot.api_call(
-            "sendAudio",
-            chat_id=str(self.id),
-            audio=audio,
-            **options
+            "sendAudio", chat_id=str(self.id), audio=audio, **options
         )
 
     def send_photo(self, photo, caption="", **options):
@@ -227,10 +207,7 @@ class Chat:
         >>>     await chat.send_voice(f)
         """
         return self.bot.api_call(
-            "sendVoice",
-            chat_id=str(self.id),
-            voice=voice,
-            **options
+            "sendVoice", chat_id=str(self.id), voice=voice, **options
         )
 
     def send_location(self, latitude, longitude, **options):
@@ -305,9 +282,7 @@ class Chat:
         :param str action: Type of action to broadcast
         """
         return self.bot.api_call(
-            "sendChatAction",
-            chat_id=self.id,
-            action=action
+            "sendChatAction", chat_id=self.id, action=action
         )
 
     def forward_message(self, from_chat_id, message_id):
@@ -332,9 +307,7 @@ class Chat:
         :param int user_id: Unique identifier of the target user
         """
         return self.bot.api_call(
-            "kickChatMember",
-            chat_id=self.id,
-            user_id=user_id
+            "kickChatMember", chat_id=self.id, user_id=user_id
         )
 
     def unban_chat_member(self, user_id):
@@ -345,9 +318,17 @@ class Chat:
         :param int user_id: Unique identifier of the target user
         """
         return self.bot.api_call(
-            "unbanChatMember",
-            chat_id=self.id,
-            user_id=user_id
+            "unbanChatMember", chat_id=self.id, user_id=user_id
+        )
+
+    def delete_message(self, message_id):
+        """
+        Delete message from this chat
+
+        :param int message_id: ID of the message
+        """
+        return self.bot.api_call(
+            "deleteMessage", chat_id=self.id, message_id=message_id
         )
 
     def is_group(self):
