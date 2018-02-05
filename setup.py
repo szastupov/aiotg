@@ -1,3 +1,4 @@
+# yapf: disable
 from setuptools import setup, find_packages
 
 version_file = open('VERSION')
