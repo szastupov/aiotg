@@ -17,3 +17,4 @@ deploy:
     tags: true
     distributions: sdist bdist_wheel
     repo: szastupov/aiotg
+    python: '3.6'
