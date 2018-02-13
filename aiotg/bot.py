@@ -26,7 +26,7 @@ MESSAGE_TYPES = [
     "location", "photo", "document", "audio", "voice", "sticker", "contact",
     "venue", "video", "game", "delete_chat_photo", "new_chat_photo",
     "delete_chat_photo", "new_chat_member", "left_chat_member",
-    "new_chat_title"
+    "new_chat_title", "group_chat_created",
 ]
 
 # Update types for
@@ -540,10 +540,10 @@ class Bot:
     def _process_message(self, message):
         chat = Chat.from_message(self, message)
 
-        for mt in MESSAGE_TYPES:
+        for mt, func in self._handlers.items():
             if mt in message:
                 self.track(message, mt)
-                return self._handlers[mt](chat, message[mt])
+                return func(chat, message[mt])
 
         if "text" not in message:
             return
