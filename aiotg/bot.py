@@ -34,6 +34,8 @@ MESSAGE_UPDATES = [
     "message", "edited_message", "channel_post", "edited_channel_post"
 ]
 
+AIOHTTP_23 = aiohttp.__version__ > '2.3'
+
 logger = logging.getLogger("aiotg")
 
 
@@ -126,22 +128,28 @@ class Bot:
         if reload is None:
             reload = debug
 
+        bot_loop = asyncio.ensure_future(self.loop())
+
         try:
             if reload:
                 loop.run_until_complete(
-                    run_with_reloader(loop, self.loop(), self.stop)
+                    run_with_reloader(loop, bot_loop, self.stop)
                 )
 
             else:
-                loop.run_until_complete(self.loop())
+                loop.run_until_complete(bot_loop)
 
         # User cancels
         except KeyboardInterrupt:
             logger.debug("User cancelled")
+            bot_loop.cancel()
             self.stop()
 
         # Stop loop
         finally:
+            if AIOHTTP_23:
+                loop.run_until_complete(self.session.close())
+
             logger.debug("Closing loop")
             loop.stop()
             loop.close()
@@ -164,7 +172,13 @@ class Bot:
             app = self.create_webhook_app(url.path, loop)
             host = os.environ.get('HOST', '0.0.0.0')
             port = int(os.environ.get('PORT', 0)) or url.port
+
+            if AIOHTTP_23:
+                app.on_cleanup.append(lambda _: self.session.close())
+
             web.run_app(app, host=host, port=port)
+        else:
+            loop.run_until_complete(self.session.close())
 
     def stop_webhook(self):
         """
@@ -507,7 +521,7 @@ class Bot:
 
     @property
     def session(self):
-        if not self._session:
+        if not self._session or self._session.closed:
             self._session = aiohttp.ClientSession(
                 json_serialize=self.json_serialize
             )
@@ -515,7 +529,7 @@ class Bot:
 
     def __del__(self):
         try:
-            if self._session:
+            if not AIOHTTP_23 and self._session:
                 self._session.close()
         except Exception as e:
             logger.debug(e)
