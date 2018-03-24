@@ -285,8 +285,8 @@ class Chat:
             "sendChatAction", chat_id=self.id, action=action
         )
 
-    def send_media_group(self, media: str, disable_notification:bool=False,
-                         reply_to_message_id:int=None, options=None):
+    def send_media_group(self, media: str, disable_notification: bool=False,
+                         reply_to_message_id: int=None, options=None):
         """
         Send a group of photos or videos as an album
 
