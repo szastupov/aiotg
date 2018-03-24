@@ -285,6 +285,49 @@ class Chat:
             "sendChatAction", chat_id=self.id, action=action
         )
 
+    def send_media_group(self, media: str, disable_notification:bool=False,
+                         reply_to_message_id:int=None, options=None):
+        """
+        Send a group of photos or videos as an album
+
+        :param media: A JSON-serialized array describing photos and videos
+        to be sent, must include 2–10 items
+        :param disable_notification: Sends the messages silently. Users will
+        receive a notification with no sound.
+        :param reply_to_message_id: If the messages are a reply, ID of the original message
+        :param options: Additional sendMediaGroup options (see
+        https://core.telegram.org/bots/api#sendmediagroup)
+
+        :Example:
+        >>> from json import dumps
+        >>> photos_urls = [
+        >>>     "https://telegram.org/img/t_logo.png",
+        >>>     "https://telegram.org/img/SiteAndroid.jpg?1",
+        >>>     "https://telegram.org/img/SiteiOs.jpg?1",
+        >>>     "https://telegram.org/img/SiteWP.jpg?2"
+        >>> ]
+        >>> tg_album = []
+        >>> count = len(photos_urls)
+        >>> for i, p in enumerate(photos_urls):
+        >>> {
+        >>>     'type': 'photo',
+        >>>     'media': p,
+        >>>     'caption': f'{i} of {count}'
+        >>> }
+        >>> await chat.send_media_group(dumps(tg_album))
+        """
+        if options is None:
+            options = {}
+
+        return self.bot.api_call(
+            "sendMediaGroup",
+            chat_id=str(self.id),
+            media=media,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            **options
+        )
+
     def forward_message(self, from_chat_id, message_id):
         """
         Forward a message from another chat to this chat.

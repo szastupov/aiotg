@@ -221,6 +221,9 @@ def test_send_methods():
     chat.send_chat_action("typing")
     assert "sendChatAction" in bot.calls
 
+    chat.send_media_group("foo")
+    assert "sendMediaGroup" in bot.calls
+
     chat.delete_message(1111)
     assert "deleteMessage" in bot.calls
 
