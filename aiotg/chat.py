@@ -286,7 +286,7 @@ class Chat:
         )
 
     def send_media_group(self, media: str, disable_notification: bool=False,
-                         reply_to_message_id: int=None, options=None):
+                         reply_to_message_id: int=None, **options):
         """
         Send a group of photos or videos as an album
 
@@ -316,8 +316,6 @@ class Chat:
         >>> }
         >>> await chat.send_media_group(dumps(tg_album))
         """
-        if options is None:
-            options = {}
 
         return self.bot.api_call(
             "sendMediaGroup",
