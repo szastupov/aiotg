@@ -7,6 +7,11 @@ from urllib.parse import urlparse
 import aiohttp
 from aiohttp import web
 import json
+try:
+    import certifi
+    import ssl
+except ImportError:
+    certifi = None
 
 from .chat import Chat, Sender
 from .reloader import run_with_reloader
@@ -522,7 +527,14 @@ class Bot:
     @property
     def session(self):
         if not self._session or self._session.closed:
+            if certifi:
+                context = ssl.create_default_context(cafile=certifi.where())
+                connector = aiohttp.TCPConnector(ssl_context=context)
+            else:
+                connector = None
+
             self._session = aiohttp.ClientSession(
+                connector=connector,
                 json_serialize=self.json_serialize
             )
         return self._session
