@@ -28,10 +28,23 @@ BOTAN_URL = "https://api.botan.io/track"
 
 # Message types to be handled by bot.handle(...)
 MESSAGE_TYPES = [
-    "location", "photo", "document", "audio", "voice", "sticker", "contact",
-    "venue", "video", "game", "delete_chat_photo", "new_chat_photo",
-    "delete_chat_photo", "new_chat_member", "left_chat_member",
-    "new_chat_title", "group_chat_created",
+    "location",
+    "photo",
+    "document",
+    "audio",
+    "voice",
+    "sticker",
+    "contact",
+    "venue",
+    "video",
+    "game",
+    "delete_chat_photo",
+    "new_chat_photo",
+    "delete_chat_photo",
+    "new_chat_member",
+    "left_chat_member",
+    "new_chat_title",
+    "group_chat_created",
 ]
 
 # Update types for
@@ -54,6 +67,7 @@ class Bot:
     :param callable json_serialize: JSON serializer function. (json.dumps by default)
     :param callable json_deserialize: JSON deserializer function. (json.loads by default)
     :param bool default_in_groups: Enables default callback in groups
+    :param str proxy: Proxy URL to use for HTTP requests
     """
 
     _running = False
@@ -67,7 +81,8 @@ class Bot:
         name=None,
         json_serialize=json.dumps,
         json_deserialize=json.loads,
-        default_in_groups=False
+        default_in_groups=False,
+        proxy=None
     ):
         self.api_token = api_token
         self.api_timeout = api_timeout
@@ -78,6 +93,7 @@ class Bot:
         self.default_in_groups = default_in_groups
         self.webhook_url = None
         self._session = None
+        self.proxy = proxy
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
@@ -359,7 +375,7 @@ class Bot:
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         logger.debug("api_call %s, %s", method, params)
 
-        response = await self.session.post(url, data=params)
+        response = await self.session.post(url, data=params, proxy=self.proxy)
 
         if response.status == 200:
             return await response.json(loads=self.json_deserialize)
@@ -465,7 +481,7 @@ class Bot:
         """
         headers = {"range": range} if range else None
         url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
-        return self.session.get(url, headers=headers)
+        return self.session.get(url, headers=headers, proxy=self.proxy)
 
     def get_user_profile_photos(self, user_id, **options):
         """
@@ -534,8 +550,7 @@ class Bot:
                 connector = None
 
             self._session = aiohttp.ClientSession(
-                connector=connector,
-                json_serialize=self.json_serialize
+                connector=connector, json_serialize=self.json_serialize
             )
         return self._session
 
@@ -555,9 +570,8 @@ class Bot:
                 "name": name
             },
             data=self.json_serialize(message),
-            headers={
-                'content-type': 'application/json'
-            }
+            headers={'content-type': 'application/json'},
+            proxy=self.proxy
         )
         if response.status != 200:
             logger.info("error submiting stats %d", response.status)
