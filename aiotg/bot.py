@@ -49,7 +49,7 @@ MESSAGE_TYPES = [
 
 # Update types for
 MESSAGE_UPDATES = [
-    "message", "edited_message", "channel_post", "edited_channel_post"
+    "message", "edited_message", "channel_post", "edited_channel_post", "successful_payment"
 ]
 
 AIOHTTP_23 = aiohttp.__version__ > '2.3'
@@ -103,6 +103,7 @@ class Bot:
         self._commands = []
         self._callbacks = []
         self._inlines = []
+        self._checkouts = []
         self._default = lambda chat, message: None
         self._default_callback = lambda chat, cq: None
         self._default_inline = lambda iq: None
@@ -311,6 +312,25 @@ class Bot:
 
             def decorator(fn):
                 self.add_callback(callback, fn)
+                return fn
+
+            return decorator
+        else:
+            raise TypeError('str expected {} given'.format(type(callback)))
+
+    def add_checkout(self, regexp, fn):
+        """
+        Manually register regexp based checkout handler
+        """
+        self._checkouts.append((regexp, fn))
+
+    def checkout(self, callback):
+        if callable(callback):
+            self._default_checkout = callback
+        elif isinstance(callback, str):
+
+            def decorator(fn):
+                self.add_checkout(callback, fn)
                 return fn
 
             return decorator
@@ -620,6 +640,15 @@ class Bot:
         if not chat.is_group() or self.default_in_groups:
             return self._default_callback(chat, cq)
 
+    def _process_pre_checkout_query(self, query):
+        pcq = PreCheckoutQuery(self, query)
+
+        for patterns, handler in self._checkouts:
+            match = re.search(patterns, pcq.invoice_payload, re.I)
+            if match:
+                return handler(pcq, match)
+        return self._default_checkout(pcq)
+
     def _process_updates(self, updates):
         if not updates["ok"]:
             logger.error("getUpdates error: %s", updates.get("description"))
@@ -646,6 +675,10 @@ class Bot:
                 coro = self._process_inline_query(update["inline_query"])
             elif "callback_query" in update:
                 coro = self._process_callback_query(update["callback_query"])
+            elif "pre_checkout_query" in update:
+                coro = self._process_pre_checkout_query(update["pre_checkout_query"])
+            else:
+                logger.error("don't know how to handle update: %s", update)
 
         if coro:
             asyncio.ensure_future(coro)
@@ -694,6 +727,25 @@ class CallbackQuery:
     def answer(self, **options):
         return self.bot.api_call(
             "answerCallbackQuery", callback_query_id=self.query_id, **options
+        )
+
+
+class PreCheckoutQuery:
+    def __init__(self, bot, src):
+        self.bot = bot
+        self.sender = Sender(src['from'])
+        self.query_id = src['id']
+        self.currency = src['currency']
+        self.total_amount = src['total_amount']
+        self.invoice_payload = src['invoice_payload']
+
+    def answer(self, error_message=None, **options):
+        return self.bot.api_call(
+            "answerPreCheckoutQuery",
+            pre_checkout_query_id=self.query_id,
+            ok=error_message is None,
+            error_message=error_message,
+            **options
         )
 
 
