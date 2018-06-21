@@ -2,10 +2,11 @@ import os
 import re
 import logging
 import asyncio
-from urllib.parse import urlparse
+from urllib.parse import splitpasswd, splituser, urlparse
 
 import aiohttp
 from aiohttp import web
+from aiosocksy import Socks4Auth, Socks5Auth, connector as socks_connector
 import json
 try:
     import certifi
@@ -94,6 +95,22 @@ class Bot:
         self.webhook_url = None
         self._session = None
         self.proxy = proxy
+
+        self._proxy_is_socks = self.proxy and self.proxy.startswith('socks')
+        if self._proxy_is_socks and '@' in self.proxy:
+            proxy_scheme, proxy_loc = self.proxy.split('://', 1)
+            proxy_auth, proxy_loc = splituser(proxy_loc)
+            proxy_user, proxy_pass = splitpasswd(proxy_auth)
+            if proxy_scheme == 'socks5':
+                proxy_auth_factory = Socks5Auth
+            elif proxy_scheme == 'socks4':
+                proxy_auth_factory = Socks4Auth
+            else:
+                raise ValueError('Unknown SOCKS-proxy scheme: {}'.format(proxy_scheme))
+            self.proxy_auth = proxy_auth_factory(proxy_user, password=proxy_pass)
+            self.proxy = '{}://{}'.format(proxy_scheme, proxy_loc)
+        else:
+            self.proxy_auth = None
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
@@ -375,7 +392,12 @@ class Bot:
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         logger.debug("api_call %s, %s", method, params)
 
-        response = await self.session.post(url, data=params, proxy=self.proxy)
+        response = await self.session.post(
+            url,
+            data=params,
+            proxy=self.proxy,
+            proxy_auth=self.proxy_auth
+        )
 
         if response.status == 200:
             return await response.json(loads=self.json_deserialize)
@@ -481,7 +503,7 @@ class Bot:
         """
         headers = {"range": range} if range else None
         url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
-        return self.session.get(url, headers=headers, proxy=self.proxy)
+        return self.session.get(url, headers=headers, proxy=self.proxy, proxy_auth=self.proxy_auth)
 
     def get_user_profile_photos(self, user_id, **options):
         """
@@ -543,15 +565,15 @@ class Bot:
     @property
     def session(self):
         if not self._session or self._session.closed:
-            if certifi:
+            kwargs = {'json_serialize': self.json_serialize}
+            if self._proxy_is_socks:
+                kwargs['connector'] = socks_connector.ProxyConnector()
+                kwargs['request_class'] = socks_connector.ProxyClientRequest
+            elif certifi:
                 context = ssl.create_default_context(cafile=certifi.where())
-                connector = aiohttp.TCPConnector(ssl_context=context)
-            else:
-                connector = None
+                kwargs['connector'] = aiohttp.TCPConnector(ssl_context=context)
 
-            self._session = aiohttp.ClientSession(
-                connector=connector, json_serialize=self.json_serialize
-            )
+            self._session = aiohttp.ClientSession(**kwargs)
         return self._session
 
     def __del__(self):
@@ -571,7 +593,8 @@ class Bot:
             },
             data=self.json_serialize(message),
             headers={'content-type': 'application/json'},
-            proxy=self.proxy
+            proxy=self.proxy,
+            proxy_auth=self.proxy
         )
         if response.status != 200:
             logger.info("error submiting stats %d", response.status)
