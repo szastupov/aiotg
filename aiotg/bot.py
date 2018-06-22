@@ -45,6 +45,7 @@ MESSAGE_TYPES = [
     "left_chat_member",
     "new_chat_title",
     "group_chat_created",
+    "successful_payment"
 ]
 
 # Update types for
