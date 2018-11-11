@@ -8,7 +8,7 @@ Asynchronous Python API for building Telegram bots, featuring:
 
 - Easy and declarative API
 - Hassle-free setup - no need for SSL certificates or static IP
-- Built-in support for analytics via botan.io
+- Built-in support for analytics via chatbase.com
 - Automatic handling of Telegram API throttling or timeouts
 
 Install it with pip:

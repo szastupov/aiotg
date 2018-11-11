@@ -535,8 +535,8 @@ class Bot:
 
     def track(self, message, name="Message"):
         """
-        Track message using http://botan.io
-        Set botan_token to make it work
+        Track message using http://chatbase.com
+        Set chatbase_token to make it work
         """
         if self.chatbase_token:
             asyncio.ensure_future(self._track(message, name))
