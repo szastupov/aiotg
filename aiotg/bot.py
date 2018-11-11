@@ -651,14 +651,14 @@ class Bot:
         return self._default_inline(iq)
 
     def _process_callback_query(self, query):
-        chat = Chat.from_message(self, query["message"])
+        chat = Chat.from_message(self, query["message"]) if "message" in query else None
         cq = CallbackQuery(self, query)
         for patterns, handler in self._callbacks:
             match = re.search(patterns, cq.data, re.I)
             if match:
                 return handler(chat, cq, match)
 
-        if not chat.is_group() or self.default_in_groups:
+        if chat and not chat.is_group() or self.default_in_groups:
             return self._default_callback(chat, cq)
 
     def _process_pre_checkout_query(self, query):
