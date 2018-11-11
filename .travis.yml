@@ -1,12 +1,14 @@
 language: python
 python:
-  - '3.5'
-  - '3.6'
+  - "3.5"
+  - "3.6"
 install:
   - pip install .
+  - pip install black
 script:
   - python setup.py -q test
   - python setup.py -q flake8
+  - black --check --diff .
 deploy:
   provider: pypi
   user: szastupov
@@ -17,4 +19,4 @@ deploy:
     tags: true
     distributions: sdist bdist_wheel
     repo: szastupov/aiotg
-    python: '3.6'
+    python: "3.6"

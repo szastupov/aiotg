@@ -11,5 +11,6 @@ async def greeter():
     await channel.send_text("Hello from channel!")
     await private.send_text("Why not say hello directly?")
 
+
 loop = asyncio.get_event_loop()
 loop.run_until_complete(greeter())

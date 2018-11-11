@@ -8,6 +8,7 @@ import aiohttp
 from aiohttp import web
 from aiosocksy import Socks4Auth, Socks5Auth, connector as socks_connector
 import json
+
 try:
     import certifi
     import ssl
@@ -46,15 +47,19 @@ MESSAGE_TYPES = [
     "left_chat_member",
     "new_chat_title",
     "group_chat_created",
-    "successful_payment"
+    "successful_payment",
 ]
 
 # Update types for
 MESSAGE_UPDATES = [
-    "message", "edited_message", "channel_post", "edited_channel_post", "successful_payment"
+    "message",
+    "edited_message",
+    "channel_post",
+    "edited_channel_post",
+    "successful_payment",
 ]
 
-AIOHTTP_23 = aiohttp.__version__ > '2.3'
+AIOHTTP_23 = aiohttp.__version__ > "2.3"
 
 logger = logging.getLogger("aiotg")
 
@@ -76,15 +81,15 @@ class Bot:
     _offset = 0
 
     def __init__(
-            self,
-            api_token,
-            api_timeout=API_TIMEOUT,
-            chatbase_token=None,
-            name=None,
-            json_serialize=json.dumps,
-            json_deserialize=json.loads,
-            default_in_groups=False,
-            proxy=None
+        self,
+        api_token,
+        api_timeout=API_TIMEOUT,
+        chatbase_token=None,
+        name=None,
+        json_serialize=json.dumps,
+        json_deserialize=json.loads,
+        default_in_groups=False,
+        proxy=None,
     ):
         self.api_token = api_token
         self.api_timeout = api_timeout
@@ -97,19 +102,19 @@ class Bot:
         self._session = None
         self.proxy = proxy
 
-        self._proxy_is_socks = self.proxy and self.proxy.startswith('socks')
-        if self._proxy_is_socks and '@' in self.proxy:
-            proxy_scheme, proxy_loc = self.proxy.split('://', 1)
+        self._proxy_is_socks = self.proxy and self.proxy.startswith("socks")
+        if self._proxy_is_socks and "@" in self.proxy:
+            proxy_scheme, proxy_loc = self.proxy.split("://", 1)
             proxy_auth, proxy_loc = splituser(proxy_loc)
             proxy_user, proxy_pass = splitpasswd(proxy_auth)
-            if proxy_scheme == 'socks5':
+            if proxy_scheme == "socks5":
                 proxy_auth_factory = Socks5Auth
-            elif proxy_scheme == 'socks4':
+            elif proxy_scheme == "socks4":
                 proxy_auth_factory = Socks4Auth
             else:
-                raise ValueError('Unknown SOCKS-proxy scheme: {}'.format(proxy_scheme))
+                raise ValueError("Unknown SOCKS-proxy scheme: {}".format(proxy_scheme))
             self.proxy_auth = proxy_auth_factory(proxy_user, password=proxy_pass)
-            self.proxy = '{}://{}'.format(proxy_scheme, proxy_loc)
+            self.proxy = "{}://{}".format(proxy_scheme, proxy_loc)
         else:
             self.proxy_auth = None
 
@@ -143,9 +148,7 @@ class Bot:
         self._running = True
         while self._running:
             updates = await self.api_call(
-                'getUpdates',
-                offset=self._offset + 1,
-                timeout=self.api_timeout
+                "getUpdates", offset=self._offset + 1, timeout=self.api_timeout
             )
             self._process_updates(updates)
 
@@ -172,9 +175,7 @@ class Bot:
 
         try:
             if reload:
-                loop.run_until_complete(
-                    run_with_reloader(loop, bot_loop, self.stop)
-                )
+                loop.run_until_complete(run_with_reloader(loop, bot_loop, self.stop))
 
             else:
                 loop.run_until_complete(bot_loop)
@@ -210,8 +211,8 @@ class Bot:
         if webhook_url:
             url = urlparse(webhook_url)
             app = self.create_webhook_app(url.path, loop)
-            host = os.environ.get('HOST', '0.0.0.0')
-            port = int(os.environ.get('PORT', 0)) or url.port
+            host = os.environ.get("HOST", "0.0.0.0")
+            port = int(os.environ.get("PORT", 0)) or url.port
 
             if AIOHTTP_23:
                 app.on_cleanup.append(lambda _: self.session.close())
@@ -301,7 +302,7 @@ class Bot:
 
             return decorator
         else:
-            raise TypeError('str expected {} given'.format(type(callback)))
+            raise TypeError("str expected {} given".format(type(callback)))
 
     def add_callback(self, regexp, fn):
         """
@@ -334,7 +335,7 @@ class Bot:
 
             return decorator
         else:
-            raise TypeError('str expected {} given'.format(type(callback)))
+            raise TypeError("str expected {} given".format(type(callback)))
 
     def add_checkout(self, regexp, fn):
         """
@@ -353,7 +354,7 @@ class Bot:
 
             return decorator
         else:
-            raise TypeError('str expected {} given'.format(type(callback)))
+            raise TypeError("str expected {} given".format(type(callback)))
 
     def handle(self, msg_type):
         """
@@ -414,24 +415,22 @@ class Bot:
         logger.debug("api_call %s, %s", method, params)
 
         response = await self.session.post(
-            url,
-            data=params,
-            proxy=self.proxy,
-            proxy_auth=self.proxy_auth
+            url, data=params, proxy=self.proxy, proxy_auth=self.proxy_auth
         )
 
         if response.status == 200:
             return await response.json(loads=self.json_deserialize)
         elif response.status in RETRY_CODES:
             logger.info(
-                "Server returned %d, retrying in %d sec.", response.status,
-                RETRY_TIMEOUT
+                "Server returned %d, retrying in %d sec.",
+                response.status,
+                RETRY_TIMEOUT,
             )
             await response.release()
             await asyncio.sleep(RETRY_TIMEOUT)
             return await self.api_call(method, **params)
         else:
-            if response.headers['content-type'] == 'application/json':
+            if response.headers["content-type"] == "application/json":
                 json_resp = await response.json(loads=self.json_deserialize)
                 err_msg = json_resp["description"]
             else:
@@ -468,9 +467,7 @@ class Bot:
         :param options: Additional sendMessage options
             (see https://core.telegram.org/bots/api#sendmessage)
         """
-        return self.api_call(
-            "sendMessage", chat_id=chat_id, text=text, **options
-        )
+        return self.api_call("sendMessage", chat_id=chat_id, text=text, **options)
 
     def edit_message_text(self, chat_id, message_id, text, **options):
         """
@@ -489,9 +486,7 @@ class Bot:
             **options
         )
 
-    def edit_message_reply_markup(
-        self, chat_id, message_id, reply_markup, **options
-    ):
+    def edit_message_reply_markup(self, chat_id, message_id, reply_markup, **options):
         """
         Edit a reply markup of message in a chat
 
@@ -524,7 +519,9 @@ class Bot:
         """
         headers = {"range": range} if range else None
         url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
-        return self.session.get(url, headers=headers, proxy=self.proxy, proxy_auth=self.proxy_auth)
+        return self.session.get(
+            url, headers=headers, proxy=self.proxy, proxy_auth=self.proxy_auth
+        )
 
     def get_user_profile_photos(self, user_id, **options):
         """
@@ -534,9 +531,7 @@ class Bot:
         :param options: Additional getUserProfilePhotos options (see
             https://core.telegram.org/bots/api#getuserprofilephotos)
         """
-        return self.api_call(
-            "getUserProfilePhotos", user_id=str(user_id), **options
-        )
+        return self.api_call("getUserProfilePhotos", user_id=str(user_id), **options)
 
     def track(self, message, name="Message"):
         """
@@ -568,31 +563,31 @@ class Bot:
         Shorthand for creating aiohttp.web.Application with registered webhook hanlde
         """
         app = web.Application(loop=loop)
-        app.router.add_route('POST', path, self.webhook_handle)
+        app.router.add_route("POST", path, self.webhook_handle)
         return app
 
     def set_webhook(self, webhook_url, **options):
         """
         Register you webhook url for Telegram service.
         """
-        return self.api_call('setWebhook', url=webhook_url, **options)
+        return self.api_call("setWebhook", url=webhook_url, **options)
 
     def delete_webhook(self):
-        '''
+        """
         Tell Telegram to switch back to getUpdates mode
-        '''
-        return self.api_call('deleteWebhook')
+        """
+        return self.api_call("deleteWebhook")
 
     @property
     def session(self):
         if not self._session or self._session.closed:
-            kwargs = {'json_serialize': self.json_serialize}
+            kwargs = {"json_serialize": self.json_serialize}
             if self._proxy_is_socks:
-                kwargs['connector'] = socks_connector.ProxyConnector()
-                kwargs['request_class'] = socks_connector.ProxyClientRequest
+                kwargs["connector"] = socks_connector.ProxyConnector()
+                kwargs["request_class"] = socks_connector.ProxyClientRequest
             elif certifi:
                 context = ssl.create_default_context(cafile=certifi.where())
-                kwargs['connector'] = aiohttp.TCPConnector(ssl_context=context)
+                kwargs["connector"] = aiohttp.TCPConnector(ssl_context=context)
 
             self._session = aiohttp.ClientSession(**kwargs)
         return self._session
@@ -615,9 +610,9 @@ class Bot:
                     "platform": "telegram",
                     "user_id": message["from"]["id"],
                     "version": "1.0",
-                    "not_handled": "true"
+                    "not_handled": "true",
                 }
-            )
+            ),
         )
         if response.status != 200:
             logger.info("error submiting stats %d", response.status)
@@ -650,7 +645,7 @@ class Bot:
         iq = InlineQuery(self, query)
 
         for patterns, handler in self._inlines:
-            match = re.search(patterns, query['query'], re.I)
+            match = re.search(patterns, query["query"], re.I)
             if match:
                 return handler(iq, match)
         return self._default_inline(iq)
@@ -724,9 +719,9 @@ class InlineQuery:
 
     def __init__(self, bot, src):
         self.bot = bot
-        self.sender = Sender(src['from'])
-        self.query_id = src['id']
-        self.query = src['query']
+        self.sender = Sender(src["from"])
+        self.query_id = src["id"]
+        self.query = src["query"]
 
     def answer(self, results, **options):
         return self.bot.api_call(
@@ -746,8 +741,8 @@ class TgInlineQuery(InlineQuery):
 class CallbackQuery:
     def __init__(self, bot, src):
         self.bot = bot
-        self.query_id = src['id']
-        self.data = src['data']
+        self.query_id = src["id"]
+        self.data = src["data"]
         self.src = src
 
     def answer(self, **options):
@@ -759,11 +754,11 @@ class CallbackQuery:
 class PreCheckoutQuery:
     def __init__(self, bot, src):
         self.bot = bot
-        self.sender = Sender(src['from'])
-        self.query_id = src['id']
-        self.currency = src['currency']
-        self.total_amount = src['total_amount']
-        self.invoice_payload = src['invoice_payload']
+        self.sender = Sender(src["from"])
+        self.query_id = src["id"]
+        self.currency = src["currency"]
+        self.total_amount = src["total_amount"]
+        self.invoice_payload = src["invoice_payload"]
 
     def answer(self, error_message=None, **options):
         return self.bot.api_call(

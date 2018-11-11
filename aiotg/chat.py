@@ -33,9 +33,9 @@ class Chat:
         return self.send_text(
             text,
             reply_to_message_id=self.message["message_id"],
-            disable_web_page_preview='true',
+            disable_web_page_preview="true",
             reply_markup=self.bot.json_serialize(markup),
-            parse_mode=parse_mode
+            parse_mode=parse_mode,
         )
 
     def edit_text(self, message_id, text, markup=None, parse_mode=None):
@@ -56,7 +56,7 @@ class Chat:
             message_id,
             text,
             reply_markup=self.bot.json_serialize(markup),
-            parse_mode=parse_mode
+            parse_mode=parse_mode,
         )
 
     def edit_reply_markup(self, message_id, markup):
@@ -142,11 +142,7 @@ class Chat:
         >>>     await chat.send_photo(f, caption="Would you look at this!")
         """
         return self.bot.api_call(
-            "sendPhoto",
-            chat_id=str(self.id),
-            photo=photo,
-            caption=caption,
-            **options
+            "sendPhoto", chat_id=str(self.id), photo=photo, caption=caption, **options
         )
 
     def send_video(self, video, caption="", **options):
@@ -164,11 +160,7 @@ class Chat:
         >>>     await chat.send_video(f)
         """
         return self.bot.api_call(
-            "sendVideo",
-            chat_id=str(self.id),
-            video=video,
-            caption=caption,
-            **options
+            "sendVideo", chat_id=str(self.id), video=video, caption=caption, **options
         )
 
     def send_document(self, document, caption="", **options):
@@ -281,12 +273,15 @@ class Chat:
 
         :param str action: Type of action to broadcast
         """
-        return self.bot.api_call(
-            "sendChatAction", chat_id=self.id, action=action
-        )
+        return self.bot.api_call("sendChatAction", chat_id=self.id, action=action)
 
-    def send_media_group(self, media: str, disable_notification: bool=False,
-                         reply_to_message_id: int=None, **options):
+    def send_media_group(
+        self,
+        media: str,
+        disable_notification: bool = False,
+        reply_to_message_id: int = None,
+        **options
+    ):
         """
         Send a group of photos or videos as an album
 
@@ -337,7 +332,7 @@ class Chat:
             "forwardMessage",
             chat_id=self.id,
             from_chat_id=from_chat_id,
-            message_id=message_id
+            message_id=message_id,
         )
 
     def kick_chat_member(self, user_id):
@@ -347,9 +342,7 @@ class Chat:
 
         :param int user_id: Unique identifier of the target user
         """
-        return self.bot.api_call(
-            "kickChatMember", chat_id=self.id, user_id=user_id
-        )
+        return self.bot.api_call("kickChatMember", chat_id=self.id, user_id=user_id)
 
     def unban_chat_member(self, user_id):
         """
@@ -358,9 +351,7 @@ class Chat:
 
         :param int user_id: Unique identifier of the target user
         """
-        return self.bot.api_call(
-            "unbanChatMember", chat_id=self.id, user_id=user_id
-        )
+        return self.bot.api_call("unbanChatMember", chat_id=self.id, user_id=user_id)
 
     def delete_message(self, message_id):
         """
@@ -383,8 +374,8 @@ class Chat:
     def __init__(self, bot, chat_id, chat_type="private", src_message=None):
         self.bot = bot
         self.message = src_message
-        if src_message and 'from' in src_message:
-            sender = src_message['from']
+        if src_message and "from" in src_message:
+            sender = src_message["from"]
         else:
             sender = {"first_name": "N/A"}
         self.sender = Sender(sender)
@@ -415,7 +406,7 @@ class Sender(dict):
 
     def __repr__(self):
         uname = " (%s)" % self["username"] if "username" in self else ""
-        return self['first_name'] + uname
+        return self["first_name"] + uname
 
 
 class TgSender(Sender):

@@ -7,7 +7,7 @@ from threading import Thread, Event
 
 # ⚠️  beware, this test is a total hack ⚠️
 
-webhook_url = 'http://localhost:6666/webhook'
+webhook_url = "http://localhost:6666/webhook"
 server_started = Event()
 
 
@@ -44,11 +44,12 @@ def test_webhooks_integration():
             "message_id": 0,
             "from": {"first_name": "John"},
             "chat": {"id": 0, "type": "private"},
-            "text": "/echo foo"
-        }
+            "text": "/echo foo",
+        },
     }
 
     import requests
+
     requests.post(webhook_url, json=update)
     assert called_with == "foo"
 

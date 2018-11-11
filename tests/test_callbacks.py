@@ -13,13 +13,8 @@ bot = Bot(API_TOKEN)
 def custom_msg(msg):
     template = {
         "message_id": 0,
-        "from": {
-            "first_name": "John"
-        },
-        "chat": {
-            "id": 0,
-            "type": "private"
-        }
+        "from": {"first_name": "John"},
+        "chat": {"id": 0, "type": "private"},
     }
     template.update(msg)
     return template
@@ -30,24 +25,15 @@ def text_msg(text):
 
 
 def inline_query(query):
-    return {
-        "from": {
-            "first_name": "John"
-        },
-        "offset": "",
-        "query": query,
-        "id": "9999"
-    }
+    return {"from": {"first_name": "John"}, "offset": "", "query": query, "id": "9999"}
 
 
 def callback_query(data):
     return {
-        "from": {
-            "first_name": "John"
-        },
+        "from": {"first_name": "John"},
         "data": data,
         "id": "9999",
-        "message": custom_msg({})
+        "message": custom_msg({}),
     }
 
 
@@ -92,7 +78,7 @@ def test_default_inline():
 def test_inline():
     called_with = None
 
-    @bot.inline(r'query-(\w+)')
+    @bot.inline(r"query-(\w+)")
     def inline(query, match):
         nonlocal called_with
         called_with = match.group(1)
@@ -120,7 +106,7 @@ def test_default_callback():
 def test_callback():
     called_with = None
 
-    @bot.callback(r'click-(\w+)')
+    @bot.callback(r"click-(\w+)")
     def click_callback(chat, cq, match):
         nonlocal called_with
         called_with = match.group(1)
@@ -149,7 +135,7 @@ def test_updates_failed():
 
     with LogCapture() as log:
         bot._process_updates(updates)
-        log.check(('aiotg', 'ERROR', 'getUpdates error: Opps'))
+        log.check(("aiotg", "ERROR", "getUpdates error: Opps"))
 
 
 @pytest.mark.parametrize("mt", MESSAGE_TYPES)
@@ -167,8 +153,7 @@ def test_handle(mt):
 
 
 @pytest.mark.parametrize(
-    "ctype,id",
-    [("channel", "@foobar"), ("private", "111111"), ("group", "222222")]
+    "ctype,id", [("channel", "@foobar"), ("private", "111111"), ("group", "222222")]
 )
 def test_channel_constructors(ctype, id):
     chat = getattr(bot, ctype)(id)
@@ -244,12 +229,7 @@ def test_inline_answer():
     iq = InlineQuery(bot, src)
 
     results = [
-        {
-            "type": "article",
-            "id": "000",
-            "title": "test",
-            "message_text": "Foo bar"
-        }
+        {"type": "article", "id": "000", "title": "test", "message_text": "Foo bar"}
     ]
     iq.answer(results)
     assert "answerInlineQuery" in bot.calls
@@ -274,7 +254,7 @@ def test_edit_reply_markup():
     message_id = 1337
     chat = Chat(bot, chat_id)
 
-    chat.edit_reply_markup(message_id, {'inline_keyboard': [['ok', 'cancel']]})
+    chat.edit_reply_markup(message_id, {"inline_keyboard": [["ok", "cancel"]]})
     assert "editMessageReplyMarkup" in bot.calls
     call = bot.calls["editMessageReplyMarkup"]
     assert call["reply_markup"] == '{"inline_keyboard": [["ok", "cancel"]]}'

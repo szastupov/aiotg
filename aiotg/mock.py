@@ -1,5 +1,5 @@
 import asyncio
-from . bot import Bot
+from .bot import Bot
 
 
 class MockBot(Bot):

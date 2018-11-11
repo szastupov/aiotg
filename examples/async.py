@@ -11,5 +11,6 @@ async def bitcoin(chat: Chat, match):
         info = await s.json()
         await chat.send_text(info["24h_avg"])
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     bot.run(debug=True)
