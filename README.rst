@@ -82,4 +82,4 @@ Examples
 For a real world example, take a look at
 `WhatisBot <https://github.com/szastupov/whatisbot/blob/master/main.py>`__ or `Music Catalog Bot <https://github.com/szastupov/musicbot>`__.
 
-For more information on how to use the project, see the project's `documentation <http://szastupov.github.io/aiotg/index.html>`__. Have a question? Ask it on project's `Telegram chat <https://telegram.me/joinchat/ABwEXjy3Tfmj2NAqEsQ1nw>`__.
+For more information on how to use the project, see the project's `documentation <http://szastupov.github.io/aiotg/index.html>`__.
