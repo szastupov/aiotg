@@ -48,11 +48,10 @@ If you want to make an external request (and that's what bots usually do) just u
     @bot.command("bitcoin")
     async def bitcoin(chat: Chat, match):
         url = "https://apiv2.bitcoinaverage.com/indices/global/ticker/BTCUSD"
-        session = aiohttp.ClientSession()
-        response = await session.get(url)
-        info = await response.json()
-        await chat.send_text(str(info["averages"]["day"]))
-        await session.close()
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(url)
+            info = await response.json()
+            await chat.send_text(str(info["averages"]["day"]))
 
     bot.run()
 
