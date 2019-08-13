@@ -1,7 +1,7 @@
 import os
 from aiotg import Bot, Chat
 
-bot = Bot(os.environ["API_TOKEN"])
+bot = Bot(api_token="API_TOKEN")
 
 
 @bot.command(r"/echo (.+)")
