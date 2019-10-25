@@ -163,6 +163,24 @@ class Chat:
             "sendVideo", chat_id=str(self.id), video=video, caption=caption, **options
         )
 
+    def send_animation(self, animation, caption="", **options):
+        """
+        Send an animation(gif) to the chat.
+
+        :param animation: Object containing the animation data
+        :param str caption: Animation caption (optional)
+        :param options: Additional sendVideo options (see
+            https://core.telegram.org/bots/api#sendanimation)
+
+        :Example:
+
+        >>> with open("foo.gif", "rb") as f:
+        >>>     await chat.send_animation(f)
+        """
+        return self.bot.api_call(
+            "sendAnimation", chat_id=str(self.id), animation=animation, caption=caption, **options
+        )
+
     def send_document(self, document, caption="", **options):
         """
         Send a general file.
