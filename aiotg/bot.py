@@ -126,10 +126,12 @@ class Bot:
         self._commands = []
         self._callbacks = []
         self._inlines = []
+        self._chosen_inline_result_callbacks = []
         self._checkouts = []
         self._default = lambda chat, message: None
         self._default_callback = lambda chat, cq: None
         self._default_inline = lambda iq: None
+        self._default_chosen_inline_result_callback = lambda res: None
 
     async def loop(self):
         """
@@ -300,6 +302,37 @@ class Bot:
                 self.add_inline(callback, fn)
                 return fn
 
+            return decorator
+        else:
+            raise TypeError("str expected {} given".format(type(callback)))
+
+    def add_chosen_inline_result_callback(self, regexp, fn):
+        """
+        Manually register regexp based callback for the ``chosen_inline_result`` updates
+        """
+        self._chosen_inline_result_callbacks.append((regexp, fn))
+
+    def chosen_inline_result_callback(self, callback):
+        """
+        Set callback for ``chosen_inline_result`` updates
+
+        :Example:
+
+        >>> @bot.chosen_inline_result_callback
+        >>> def inc_metric(iq):
+        >>>     metrics[iq.result_id].inc()
+
+        >>> @bot.chosen_inline_result_callback(r"myinline-(.+)")
+        >>> def inc_metric(chat, iq, match):
+        >>>     metrics[iq.result_id].inc()
+        """
+        if callable(callback):
+            self._default_chosen_inline_result_callback = callback
+            return callback
+        elif isinstance(callback, str):
+            def decorator(fn):
+                self.add_chosen_inline_result_callback(callback, fn)
+                return fn
             return decorator
         else:
             raise TypeError("str expected {} given".format(type(callback)))
@@ -650,6 +683,14 @@ class Bot:
                 return handler(iq, match)
         return self._default_inline(iq)
 
+    def _process_chosen_inline_result(self, result):
+        cir = ChosenInlineResult(self, result)
+        for patterns, handler in self._chosen_inline_result_callbacks:
+            match = re.search(patterns, result["query"], re.I)
+            if match:
+                return handler(cir, match)
+        return self._default_chosen_inline_result_callback(cir)
+
     def _process_callback_query(self, query):
         chat = Chat.from_message(self, query["message"]) if "message" in query else None
         cq = CallbackQuery(self, query)
@@ -698,6 +739,8 @@ class Bot:
                 coro = self._process_callback_query(update["callback_query"])
             elif "pre_checkout_query" in update:
                 coro = self._process_pre_checkout_query(update["pre_checkout_query"])
+            elif "chosen_inline_result" in update:
+                coro = self._process_chosen_inline_result(update["chosen_inline_result"])
             else:
                 logger.error("don't know how to handle update: %s", update)
 
@@ -736,6 +779,16 @@ class TgInlineQuery(InlineQuery):
     def __init__(self, *args, **kwargs):
         logger.warning("TgInlineQuery is depricated, use InlineQuery instead")
         super().__init__(*args, **kwargs)
+
+
+class ChosenInlineResult:
+    def __init__(self, bot, src):
+        self.bot = bot
+        self.sender = Sender(src["from"])
+        self.result_id = src["result_id"]
+        self.location = src.get("location")
+        self.inline_message_id = src.get("inline_messages_id")
+        self.query = src["query"]
 
 
 class CallbackQuery:
