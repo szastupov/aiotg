@@ -58,6 +58,7 @@ def test_set_webhook():
     bot = MockBot()
     bot.set_webhook(webhook_url)
     assert "setWebhook" in bot.calls
+    assert "secret_token" in bot.calls["setWebhook"]
 
 
 def test_delete_webhook():
