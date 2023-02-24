@@ -101,6 +101,7 @@ class Bot:
         self.webhook_url = None
         self._session = None
         self.proxy = proxy
+        self.cleanups = []
 
         self._proxy_is_socks = self.proxy and self.proxy.startswith("socks")
         if self._proxy_is_socks and "@" in self.proxy:
@@ -188,6 +189,8 @@ class Bot:
 
         # Stop loop
         finally:
+            for cleanup_action in self.cleanups:
+                cleanup_action()
             if AIOHTTP_23:
                 loop.run_until_complete(self.session.close())
 
@@ -216,6 +219,8 @@ class Bot:
 
             if AIOHTTP_23:
                 app.on_cleanup.append(lambda _: self.session.close())
+                for cleanup_action in self.cleanups:
+                    app.on_cleanup.append(cleanup_action)
 
             web.run_app(app, host=host, port=port)
         else:
@@ -577,6 +582,18 @@ class Bot:
         Tell Telegram to switch back to getUpdates mode
         """
         return self.api_call("deleteWebhook")
+
+    def on_cleanup(self, action):
+        """
+        You can set an action that will be executed before closing the loop
+
+        :param action: must be a simple callable without any arguments
+
+        :Example:
+
+        >>> bot.on_cleanup(lambda: [t.cancel() for t in tasks])
+        """
+        self.cleanups.append(action)
 
     @property
     def session(self):
