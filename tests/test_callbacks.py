@@ -28,6 +28,10 @@ def inline_query(query):
     return {"from": {"first_name": "John"}, "offset": "", "query": query, "id": "9999"}
 
 
+def chosen_inline_result(query):
+    return {"from": {"first_name": "John"}, "query": query, "result_id": "9999"}
+
+
 def callback_query(data):
     return {
         "from": {"first_name": "John"},
@@ -84,6 +88,30 @@ def test_inline():
         called_with = match.group(1)
 
     bot._process_inline_query(inline_query("query-foo"))
+    assert called_with == "foo"
+
+
+def test_default_chosen_inline_result():
+    called_with = None
+
+    @bot.chosen_inline_result_callback
+    def chosen_inline_result_callback(query):
+        nonlocal called_with
+        called_with = query.query
+
+    bot._process_chosen_inline_result(chosen_inline_result("foo bar"))
+    assert called_with == "foo bar"
+
+
+def test_chosen_inline_result():
+    called_with = None
+
+    @bot.chosen_inline_result_callback(r"query-(\w+)")
+    def chosen_inline_result_callback(query, match):
+        nonlocal called_with
+        called_with = match.group(1)
+
+    bot._process_chosen_inline_result(chosen_inline_result("query-foo"))
     assert called_with == "foo"
 
 
