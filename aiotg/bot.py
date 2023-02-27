@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+import uuid
 import asyncio
 from urllib.parse import splitpasswd, splituser, urlparse
 
@@ -101,6 +102,8 @@ class Bot:
         self.webhook_url = None
         self._session = None
         self.proxy = proxy
+        self.cleanups = []
+        self._webhook_uuid = None
 
         self._proxy_is_socks = self.proxy and self.proxy.startswith("socks")
         if self._proxy_is_socks and "@" in self.proxy:
@@ -188,6 +191,8 @@ class Bot:
 
         # Stop loop
         finally:
+            for cleanup_action in self.cleanups:
+                cleanup_action()
             if AIOHTTP_23:
                 loop.run_until_complete(self.session.close())
 
@@ -216,6 +221,8 @@ class Bot:
 
             if AIOHTTP_23:
                 app.on_cleanup.append(lambda _: self.session.close())
+                for cleanup_action in self.cleanups:
+                    app.on_cleanup.append(cleanup_action)
 
             web.run_app(app, host=host, port=port)
         else:
@@ -554,6 +561,11 @@ class Bot:
         >>> app = web.Application()
         >>> app.router.add_route('/webhook')
         """
+
+        if request.headers.get("X-Telegram-Bot-Api-Secret-Token") != self._webhook_uuid:
+            logger.warning("Probably, a malicious request! " + request)
+            return web.Response(status=403)
+
         update = await request.json(loads=self.json_deserialize)
         self._process_update(update)
         return web.Response()
@@ -569,7 +581,13 @@ class Bot:
     def set_webhook(self, webhook_url, **options):
         """
         Register you webhook url for Telegram service.
+
+        A newly generated UUID will be used as a secret_token parameter
+        if it's not specified explicitly
         """
+        if "secret_token" not in options:
+            options["secret_token"] = str(uuid.uuid4())
+        self._webhook_uuid = options["secret_token"]
         return self.api_call("setWebhook", url=webhook_url, **options)
 
     def delete_webhook(self):
@@ -577,6 +595,18 @@ class Bot:
         Tell Telegram to switch back to getUpdates mode
         """
         return self.api_call("deleteWebhook")
+
+    def on_cleanup(self, action):
+        """
+        You can set an action that will be executed before closing the loop
+
+        :param action: must be a simple callable without any arguments
+
+        :Example:
+
+        >>> bot.on_cleanup(lambda: [t.cancel() for t in tasks])
+        """
+        self.cleanups.append(action)
 
     @property
     def session(self):
