@@ -1,4 +1,3 @@
-import os
 from aiotg import Bot
 
 bot = Bot(api_token="API_TOKEN")
