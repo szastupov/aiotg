@@ -29,7 +29,7 @@ setup(
 
     packages=find_packages(exclude=['examples', 'docs', 'tests*']),
 
-    install_requires=['aiohttp>=3.0.0', 'aiosocksy>=0.1.1', 'watchdog>=0.9.0'],
+    install_requires=['aiohttp>=3.0.0', 'watchdog>=0.9.0'],
     setup_requires=['pytest-runner', 'flake8'],
     tests_require=['pytest', 'testfixtures']
 )

@@ -3,18 +3,11 @@ import re
 import logging
 import uuid
 import asyncio
-from urllib.parse import splitpasswd, splituser, urlparse
+from urllib.parse import urlparse
 
 import aiohttp
 from aiohttp import web
-from aiosocksy import Socks4Auth, Socks5Auth, connector as socks_connector
 import json
-
-try:
-    import certifi
-    import ssl
-except ImportError:
-    certifi = None
 
 from .chat import Chat, Sender
 from .reloader import run_with_reloader
@@ -60,8 +53,6 @@ MESSAGE_UPDATES = [
     "successful_payment",
 ]
 
-AIOHTTP_23 = aiohttp.__version__ > "2.3"
-
 logger = logging.getLogger("aiotg")
 
 
@@ -76,6 +67,7 @@ class Bot:
     :param callable json_deserialize: JSON deserializer function. (json.loads by default)
     :param bool default_in_groups: Enables default callback in groups
     :param str proxy: Proxy URL to use for HTTP requests
+    :param connector: Custom aiohttp connector
     """
 
     _running = False
@@ -90,7 +82,7 @@ class Bot:
         json_serialize=json.dumps,
         json_deserialize=json.loads,
         default_in_groups=False,
-        proxy=None,
+        connector=None,
     ):
         self.api_token = api_token
         self.api_timeout = api_timeout
@@ -99,27 +91,10 @@ class Bot:
         self.json_serialize = json_serialize
         self.json_deserialize = json_deserialize
         self.default_in_groups = default_in_groups
-        self.webhook_url = None
         self._session = None
-        self.proxy = proxy
-        self.cleanups = []
+        self._cleanups = []
         self._webhook_uuid = None
-
-        self._proxy_is_socks = self.proxy and self.proxy.startswith("socks")
-        if self._proxy_is_socks and "@" in self.proxy:
-            proxy_scheme, proxy_loc = self.proxy.split("://", 1)
-            proxy_auth, proxy_loc = splituser(proxy_loc)
-            proxy_user, proxy_pass = splitpasswd(proxy_auth)
-            if proxy_scheme == "socks5":
-                proxy_auth_factory = Socks5Auth
-            elif proxy_scheme == "socks4":
-                proxy_auth_factory = Socks4Auth
-            else:
-                raise ValueError("Unknown SOCKS-proxy scheme: {}".format(proxy_scheme))
-            self.proxy_auth = proxy_auth_factory(proxy_user, password=proxy_pass)
-            self.proxy = "{}://{}".format(proxy_scheme, proxy_loc)
-        else:
-            self.proxy_auth = None
+        self._connector = connector
 
         def no_handle(mt):
             return lambda chat, msg: logger.debug("no handle for %s", mt)
@@ -193,10 +168,9 @@ class Bot:
 
         # Stop loop
         finally:
-            for cleanup_action in self.cleanups:
+            for cleanup_action in self._cleanups:
                 cleanup_action()
-            if AIOHTTP_23:
-                loop.run_until_complete(self.session.close())
+            loop.run_until_complete(self.session.close())
 
             logger.debug("Closing loop")
             loop.stop()
@@ -221,10 +195,9 @@ class Bot:
             host = os.environ.get("HOST", "0.0.0.0")
             port = int(os.environ.get("PORT", 0)) or url.port
 
-            if AIOHTTP_23:
-                app.on_cleanup.append(lambda _: self.session.close())
-                for cleanup_action in self.cleanups:
-                    app.on_cleanup.append(cleanup_action)
+            app.on_cleanup.append(lambda _: self.session.close())
+            for cleanup_action in self._cleanups:
+                app.on_cleanup.append(cleanup_action)
 
             web.run_app(app, host=host, port=port)
         else:
@@ -456,9 +429,7 @@ class Bot:
         url = "{0}/bot{1}/{2}".format(API_URL, self.api_token, method)
         logger.debug("api_call %s, %s", method, params)
 
-        response = await self.session.post(
-            url, data=params, proxy=self.proxy, proxy_auth=self.proxy_auth
-        )
+        response = await self.session.post(url, data=params)
 
         if response.status == 200:
             return await response.json(loads=self.json_deserialize)
@@ -561,9 +532,7 @@ class Bot:
         """
         headers = {"range": range} if range else None
         url = "{0}/file/bot{1}/{2}".format(API_URL, self.api_token, file_path)
-        return self.session.get(
-            url, headers=headers, proxy=self.proxy, proxy_auth=self.proxy_auth
-        )
+        return self.session.get(url, headers=headers)
 
     def get_user_profile_photos(self, user_id, **options):
         """
@@ -641,28 +610,15 @@ class Bot:
 
         >>> bot.on_cleanup(lambda: [t.cancel() for t in tasks])
         """
-        self.cleanups.append(action)
+        self._cleanups.append(action)
 
     @property
     def session(self):
         if not self._session or self._session.closed:
-            kwargs = {"json_serialize": self.json_serialize}
-            if self._proxy_is_socks:
-                kwargs["connector"] = socks_connector.ProxyConnector()
-                kwargs["request_class"] = socks_connector.ProxyClientRequest
-            elif certifi:
-                context = ssl.create_default_context(cafile=certifi.where())
-                kwargs["connector"] = aiohttp.TCPConnector(ssl_context=context)
-
-            self._session = aiohttp.ClientSession(**kwargs)
+            self._session = aiohttp.ClientSession(
+                json_serialize=self.json_serialize, connector=self._connector
+            )
         return self._session
-
-    def __del__(self):
-        try:
-            if not AIOHTTP_23 and self._session:
-                self._session.close()
-        except Exception as e:
-            logger.debug(e)
 
     async def _track(self, message, name):
         response = await self.session.post(
