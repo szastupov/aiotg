@@ -7,7 +7,6 @@ bot = Bot(api_token=os.environ["API_TOKEN"])
 
 @bot.command(r"/start")
 def start(chat, match):
-
     markup = {
         "type": "InlineKeyboardMarkup",
         "inline_keyboard": [

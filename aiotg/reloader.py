@@ -27,7 +27,6 @@ class Handler(EventHandler):
         return super(Handler, self).__init__(*args, **kwargs)
 
     def on_any_event(self, event):
-
         # Resolve future
         if isinstance(event, Event) and not self._future_resolved:
             self.loop.call_soon_threadsafe(self.changed.set_result, event)
@@ -44,7 +43,7 @@ def clear_screen():
 
 
 def reload():
-    """ Reload process """
+    """Reload process"""
     try:
         # Reload and replace current process
         os.execv(sys.executable, [sys.executable] + sys.argv)
@@ -57,7 +56,7 @@ def reload():
 
 
 async def run_with_reloader(loop, coroutine, cleanup=None, *args, **kwargs):
-    """ Run coroutine with reloader """
+    """Run coroutine with reloader"""
 
     clear_screen()
     print("🤖  Running in debug mode with live reloading")

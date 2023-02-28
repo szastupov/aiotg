@@ -337,9 +337,11 @@ class Bot:
             self._default_chosen_inline_result_callback = callback
             return callback
         elif isinstance(callback, str):
+
             def decorator(fn):
                 self.add_chosen_inline_result_callback(callback, fn)
                 return fn
+
             return decorator
         else:
             raise TypeError("str expected {} given".format(type(callback)))
@@ -770,7 +772,9 @@ class Bot:
             elif "pre_checkout_query" in update:
                 coro = self._process_pre_checkout_query(update["pre_checkout_query"])
             elif "chosen_inline_result" in update:
-                coro = self._process_chosen_inline_result(update["chosen_inline_result"])
+                coro = self._process_chosen_inline_result(
+                    update["chosen_inline_result"]
+                )
             else:
                 logger.error("don't know how to handle update: %s", update)
 
