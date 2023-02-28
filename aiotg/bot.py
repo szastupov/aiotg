@@ -20,7 +20,6 @@ API_URL = "https://api.telegram.org"
 API_TIMEOUT = 60
 RETRY_TIMEOUT = 30
 RETRY_CODES = [429, 500, 502, 503, 504]
-CHATBASE_URL = "https://chatbase.com/api/message"
 
 # Message types to be handled by bot.handle(...)
 MESSAGE_TYPES = [
@@ -61,7 +60,6 @@ class Bot:
 
     :param str api_token: Telegram bot token, ask @BotFather for this
     :param int api_timeout: Timeout for long polling
-    :param str chatbase_token: Token for http://chatbase.com
     :param str name: Bot name
     :param callable json_serialize: JSON serializer function. (json.dumps by default)
     :param callable json_deserialize: JSON deserializer function. (json.loads by default)
@@ -77,7 +75,6 @@ class Bot:
         self,
         api_token,
         api_timeout=API_TIMEOUT,
-        chatbase_token=None,
         name=None,
         json_serialize=json.dumps,
         json_deserialize=json.loads,
@@ -86,7 +83,6 @@ class Bot:
     ):
         self.api_token = api_token
         self.api_timeout = api_timeout
-        self.chatbase_token = chatbase_token
         self.name = name
         self.json_serialize = json_serialize
         self.json_deserialize = json_deserialize
@@ -545,12 +541,8 @@ class Bot:
         return self.api_call("getUserProfilePhotos", user_id=str(user_id), **options)
 
     def track(self, message, name="Message"):
-        """
-        Track message using http://chatbase.com
-        Set chatbase_token to make it work
-        """
-        if self.chatbase_token:
-            asyncio.ensure_future(self._track(message, name))
+        # TODO allow configuring custom tracking
+        pass
 
     def stop(self):
         self._running = False
@@ -619,25 +611,6 @@ class Bot:
                 json_serialize=self.json_serialize, connector=self._connector
             )
         return self._session
-
-    async def _track(self, message, name):
-        response = await self.session.post(
-            CHATBASE_URL,
-            data=self.json_serialize(
-                {
-                    "api_key": self.chatbase_token,
-                    "type": "user",
-                    "message": message["text"],
-                    "platform": "telegram",
-                    "user_id": message["from"]["id"],
-                    "version": "1.0",
-                    "not_handled": "true",
-                }
-            ),
-        )
-        if response.status != 200:
-            logger.info("error submiting stats %d", response.status)
-        await response.release()
 
     def _process_message(self, message):
         chat = Chat.from_message(self, message)
