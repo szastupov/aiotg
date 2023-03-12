@@ -1,3 +1,73 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aiotg"
+dynamic = ["version"]
+description = "Asynchronous Python API for building Telegram bots"
+readme = "README.rst"
+license = "MIT"
+authors = [
+    { name = "Stepan Zastupov", email = "stepan.zastupov@gmail.com" },
+]
+keywords = [
+    "asyncio",
+    "telegram",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.6",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "aiohttp>=3.0.0",
+    "watchdog>=0.9.0",
+]
+
+[project.urls]
+Homepage = "http://szastupov.github.io/aiotg"
+
+[tool.hatch.version]
+path = "aiotg/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/aiotg",
+]
+
+[tool.hatch.envs.test]
+dependencies = [
+    "pytest",
+    "testfixtures",
+]
+
+[tool.hatch.envs.test.scripts]
+run = "pytest"
+
+[tool.hatch.envs.lint]
+detached = true
+dependencies = [
+  "black>=22.10.0",
+  "flake8"
+]
+
+[tool.hatch.envs.lint.scripts]
+style = [
+    "flake8 {args:.}",
+    "black --check --diff {args:.}"
+]
+fmt = [
+  "black {args:.}",
+  "style",
+]
+all = [
+    "style"
+]
+
 [tool.black]
 exclude = '''
 /(
