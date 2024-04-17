@@ -195,7 +195,11 @@ class Bot:
             for cleanup_action in self._cleanups:
                 app.on_cleanup.append(cleanup_action)
 
-            web.run_app(app, host=host, port=port)
+            if aiohttp.__version__ >= "3.8":
+                web.run_app(app, host=host, port=port, loop=loop)
+            else:
+                web.run_app(app, host=host, port=port)
+
         else:
             loop.run_until_complete(self.session.close())
 
