@@ -559,7 +559,7 @@ class Bot:
         """
 
         if request.headers.get("X-Telegram-Bot-Api-Secret-Token") != self._webhook_uuid:
-            logger.warning("Probably, a malicious request! " + request)
+            logger.warning(f"Probably, a malicious request! Request: {request}")
             return web.Response(status=403)
 
         update = await request.json(loads=self.json_deserialize)
