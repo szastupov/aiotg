@@ -256,9 +256,7 @@ def test_inline_answer():
     src = inline_query("Answer!")
     iq = InlineQuery(bot, src)
 
-    results = [
-        {"type": "article", "id": "000", "title": "test", "message_text": "Foo bar"}
-    ]
+    results = [{"type": "article", "id": "000", "title": "test", "message_text": "Foo bar"}]
     iq.answer(results)
     assert "answerInlineQuery" in bot.calls
     assert isinstance(bot.calls["answerInlineQuery"]["results"], str)
