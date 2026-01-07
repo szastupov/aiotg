@@ -94,9 +94,7 @@ class Chat:
 
         :param int user_id: Unique identifier of the target user
         """
-        return self.bot.api_call(
-            "getChatMember", chat_id=str(self.id), user_id=str(user_id)
-        )
+        return self.bot.api_call("getChatMember", chat_id=str(self.id), user_id=str(user_id))
 
     def send_sticker(self, sticker, **options):
         """
@@ -106,9 +104,7 @@ class Chat:
         :param options: Additional sendSticker options (see
             https://core.telegram.org/bots/api#sendsticker)
         """
-        return self.bot.api_call(
-            "sendSticker", chat_id=str(self.id), sticker=sticker, **options
-        )
+        return self.bot.api_call("sendSticker", chat_id=str(self.id), sticker=sticker, **options)
 
     def send_audio(self, audio, **options):
         """
@@ -123,9 +119,7 @@ class Chat:
         >>> with open("foo.mp3", "rb") as f:
         >>>     await chat.send_audio(f, performer="Foo", title="Eversong")
         """
-        return self.bot.api_call(
-            "sendAudio", chat_id=str(self.id), audio=audio, **options
-        )
+        return self.bot.api_call("sendAudio", chat_id=str(self.id), audio=audio, **options)
 
     def send_photo(self, photo, caption="", **options):
         """
@@ -178,11 +172,7 @@ class Chat:
         >>>     await chat.send_document(f)
         """
         return self.bot.api_call(
-            "sendDocument",
-            chat_id=str(self.id),
-            document=document,
-            caption=caption,
-            **options
+            "sendDocument", chat_id=str(self.id), document=document, caption=caption, **options
         )
 
     def send_voice(self, voice, **options):
@@ -198,9 +188,7 @@ class Chat:
         >>> with open("voice.ogg", "rb") as f:
         >>>     await chat.send_voice(f)
         """
-        return self.bot.api_call(
-            "sendVoice", chat_id=str(self.id), voice=voice, **options
-        )
+        return self.bot.api_call("sendVoice", chat_id=str(self.id), voice=voice, **options)
 
     def send_location(self, latitude, longitude, **options):
         """
@@ -212,11 +200,7 @@ class Chat:
             https://core.telegram.org/bots/api#sendlocation)
         """
         return self.bot.api_call(
-            "sendLocation",
-            chat_id=self.id,
-            latitude=latitude,
-            longitude=longitude,
-            **options
+            "sendLocation", chat_id=self.id, latitude=latitude, longitude=longitude, **options
         )
 
     def send_venue(self, latitude, longitude, title, address, **options):
@@ -237,7 +221,7 @@ class Chat:
             longitude=longitude,
             title=title,
             address=address,
-            **options
+            **options,
         )
 
     def send_contact(self, phone_number, first_name, **options):
@@ -254,7 +238,7 @@ class Chat:
             chat_id=self.id,
             phone_number=phone_number,
             first_name=first_name,
-            **options
+            **options,
         )
 
     def send_chat_action(self, action):
@@ -280,7 +264,7 @@ class Chat:
         media: str,
         disable_notification: bool = False,
         reply_to_message_id: int = None,
-        **options
+        **options,
     ):
         """
         Send a group of photos or videos as an album
@@ -318,7 +302,7 @@ class Chat:
             media=media,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
-            **options
+            **options,
         )
 
     def forward_message(self, from_chat_id, message_id):
@@ -359,9 +343,7 @@ class Chat:
 
         :param int message_id: ID of the message
         """
-        return self.bot.api_call(
-            "deleteMessage", chat_id=self.id, message_id=message_id
-        )
+        return self.bot.api_call("deleteMessage", chat_id=self.id, message_id=message_id)
 
     def is_group(self):
         """

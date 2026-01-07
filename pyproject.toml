@@ -51,34 +51,35 @@ run = "pytest"
 [tool.hatch.envs.lint]
 detached = true
 dependencies = [
-  "black>=22.10.0",
-  "flake8"
+  "ruff>=0.8.0",
 ]
 
 [tool.hatch.envs.lint.scripts]
 style = [
-    "flake8 {args:.}",
-    "black --check --diff {args:.}"
+    "ruff check {args:.}",
+    "ruff format --check {args:.}"
 ]
 fmt = [
-  "black {args:.}",
+  "ruff check --fix {args:.}",
+  "ruff format {args:.}",
   "style",
 ]
 all = [
     "style"
 ]
 
-[tool.black]
-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | \.eggs
-  | _build
-  | build
-  | dist
-)/
-'''
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"docs/*" = ["E402"]
+"examples/*" = ["E402"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

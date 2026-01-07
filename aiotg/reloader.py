@@ -35,9 +35,9 @@ class Handler(EventHandler):
 
 def clear_screen():
     if os.name == "nt":
-        seq = "\x1Bc"
+        seq = "\x1bc"
     else:
-        seq = "\x1B[2J\x1B[H"
+        seq = "\x1b[2J\x1b[H"
 
     sys.stdout.write(seq)
 

@@ -488,11 +488,7 @@ class Bot:
         :param options: Additional API options
         """
         return self.api_call(
-            "editMessageText",
-            chat_id=chat_id,
-            message_id=message_id,
-            text=text,
-            **options
+            "editMessageText", chat_id=chat_id, message_id=message_id, text=text, **options
         )
 
     def edit_message_reply_markup(self, chat_id, message_id, reply_markup, **options):
@@ -509,7 +505,7 @@ class Bot:
             chat_id=chat_id,
             message_id=message_id,
             reply_markup=reply_markup,
-            **options
+            **options,
         )
 
     async def get_file(self, file_id):
@@ -701,9 +697,7 @@ class Bot:
             elif "pre_checkout_query" in update:
                 coro = self._process_pre_checkout_query(update["pre_checkout_query"])
             elif "chosen_inline_result" in update:
-                coro = self._process_chosen_inline_result(
-                    update["chosen_inline_result"]
-                )
+                coro = self._process_chosen_inline_result(update["chosen_inline_result"])
             else:
                 logger.error("don't know how to handle update: %s", update)
 
@@ -734,7 +728,7 @@ class InlineQuery:
             "answerInlineQuery",
             inline_query_id=self.query_id,
             results=self.bot.json_serialize(results),
-            **options
+            **options,
         )
 
 
@@ -762,9 +756,7 @@ class CallbackQuery:
         self.src = src
 
     def answer(self, **options):
-        return self.bot.api_call(
-            "answerCallbackQuery", callback_query_id=self.query_id, **options
-        )
+        return self.bot.api_call("answerCallbackQuery", callback_query_id=self.query_id, **options)
 
 
 class PreCheckoutQuery:
@@ -782,7 +774,7 @@ class PreCheckoutQuery:
             pre_checkout_query_id=self.query_id,
             ok=error_message is None,
             error_message=error_message,
-            **options
+            **options,
         )
 
 
